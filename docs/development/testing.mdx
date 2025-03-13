@@ -1,0 +1,858 @@
+---
+title: Testing Guide
+description: 'Comprehensive testing strategy and guidelines'
+---
+
+## Testing Philosophy
+
+GitLab CI/CD Visual Editor employs a multi-layered testing approach:
+
+1. **Property-Based Testing**: Validates universal correctness properties
+2. **Unit Testing**: Tests individual components and functions
+3. **Integration Testing**: Tests external integrations (GitLab API, localStorage)
+4. **End-to-End Testing**: Tests complete user workflows
+
+## Test Coverage Goals
+
+<CardGroup cols={2}>
+  <Card title="Unit Tests" icon="flask">
+    80% code coverage for components and utilities
+  </Card>
+  <Card title="Property Tests" icon="check-double">
+    100% coverage of all 14 correctness properties
+  </Card>
+  <Card title="Integration Tests" icon="plug">
+    All external integrations tested
+  </Card>
+  <Card title="E2E Tests" icon="robot">
+    All critical user workflows covered
+  </Card>
+</CardGroup>
+
+## Running Tests
+
+### All Tests
+
+```bash
+# Run all test suites
+npm run test
+
+# Run with coverage report
+npm run coverage
+
+# Run in watch mode
+npm run test:watch
+```
+
+### Specific Test Suites
+
+```bash
+# Unit tests only
+npm run test:unit
+
+# Property-based tests only
+npm run test:property
+
+# Integration tests only
+npm run test:integration
+
+# E2E tests only
+npm run test:e2e
+```
+
+### Test Filtering
+
+```bash
+# Run tests matching pattern
+npm run test -- --grep "YAML Engine"
+
+# Run specific test file
+npm run test -- src/engine/yaml-engine.test.ts
+
+# Run tests in specific directory
+npm run test -- src/components/
+```
+
+## Property-Based Testing
+
+### Overview
+
+Property-based testing validates that certain properties hold true for all possible inputs, not just specific examples.
+
+**Library**: [fast-check](https://github.com/dubzzz/fast-check)
+
+### Configuration
+
+```typescript
+// jest.config.js
+module.exports = {
+  testMatch: ['**/*.property.test.ts'],
+  testTimeout: 30000, // Property tests can take longer
+};
+```
+
+### Writing Property Tests
+
+Each property test references its design document property:
+
+```typescript
+/**
+ * Feature: gitlab-cicd-visual-editor
+ * Property 6: YAML Round-Trip Semantic Preservation
+ * 
+ * For any valid Pipeline_State, converting to YAML and parsing back
+ * SHALL produce a semantically equivalent Pipeline_State.
+ */
+test('YAML round-trip preserves semantics', () => {
+  fc.assert(
+    fc.property(
+      pipelineStateArbitrary(),
+      (state) => {
+        const yaml = yamlEngine.toYAML(state);
+        const parsed = yamlEngine.fromYAML(yaml);
+        expect(semanticallyEquivalent(state, parsed)).toBe(true);
+      }
+    ),
+    { numRuns: 100 }
+  );
+});
+```
+
+### Generators (Arbitraries)
+
+Generators create random test data:
+
+```typescript
+// Generate random Pipeline_State
+function pipelineStateArbitrary(): fc.Arbitrary<Pipeline_State> {
+  return fc.record({
+    version: fc.constant('1.0'),
+    metadata: fc.record({
+      created: fc.date().map(d => d.toISOString()),
+      modified: fc.date().map(d => d.toISOString()),
+      name: fc.option(fc.string(), { nil: undefined }),
+    }),
+    global: fc.record({
+      image: fc.option(dockerImageArbitrary(), { nil: undefined }),
+      variables: fc.option(
+        fc.dictionary(fc.string(), fc.string()),
+        { nil: undefined }
+      ),
+    }),
+    stages: fc.array(fc.string(), { minLength: 1, maxLength: 5 }),
+    jobs: fc.dictionary(
+      fc.string(),
+      jobNodeConfigArbitrary(),
+      { minKeys: 1, maxKeys: 10 }
+    ),
+    ui: fc.record({
+      nodes: fc.dictionary(fc.string(), nodePositionArbitrary()),
+      viewport: fc.record({
+        x: fc.integer(),
+        y: fc.integer(),
+        zoom: fc.float({ min: 0.1, max: 2.0 }),
+      }),
+    }),
+  });
+}
+
+// Generate valid Docker image names
+function dockerImageArbitrary(): fc.Arbitrary<string> {
+  return fc.tuple(
+    fc.stringOf(
+      fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz0123456789-'.split('')),
+      { minLength: 1, maxLength: 20 }
+    ),
+    fc.stringOf(
+      fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz0123456789.-'.split('')),
+      { minLength: 1, maxLength: 10 }
+    )
+  ).map(([name, tag]) => `${name}:${tag}`);
+}
+```
+
+### All 14 Properties
+
+<AccordionGroup>
+  <Accordion title="Property 1: DAG Acyclicity Invariant">
+    **File**: `dependency-graph.property.test.ts`
+    
+    For any sequence of edge additions, if adding an edge would create a cycle, the system SHALL reject the addition.
+    
+    ```typescript
+    fc.assert(
+      fc.property(
+        dependencyGraphArbitrary(),
+        edgeArbitrary(),
+        (graph, newEdge) => {
+          const wouldCreateCycle = detectCycle(graph, newEdge);
+          if (wouldCreateCycle) {
+            expect(() => graph.addEdge(newEdge)).toThrow();
+          }
+        }
+      )
+    );
+    ```
+  </Accordion>
+  
+  <Accordion title="Property 2: Job Configuration Validation">
+    **File**: `job-validation.property.test.ts`
+    
+    For any job configuration missing required fields, the system SHALL prevent job creation.
+    
+    ```typescript
+    fc.assert(
+      fc.property(
+        invalidJobConfigArbitrary(),
+        (invalidJob) => {
+          expect(() => validateJobConfig(invalidJob)).toThrow();
+        }
+      )
+    );
+    ```
+  </Accordion>
+  
+  <Accordion title="Property 3: YAML Generation Validity">
+    **File**: `yaml-engine.property.test.ts`
+    
+    For any valid Pipeline_State, the YAML_Engine SHALL generate syntactically valid GitLab CI/CD YAML.
+    
+    ```typescript
+    fc.assert(
+      fc.property(
+        pipelineStateArbitrary(),
+        (state) => {
+          const yaml = yamlEngine.toYAML(state);
+          const validation = yamlEngine.validateSyntax(yaml);
+          expect(validation.valid).toBe(true);
+        }
+      )
+    );
+    ```
+  </Accordion>
+  
+  <Accordion title="Property 4: YAML Anchor/Alias Optimization">
+    **File**: `yaml-optimization.property.test.ts`
+    
+    For any Pipeline_State with identical config blocks in 2+ jobs, the YAML_Engine SHALL generate anchors and aliases.
+    
+    ```typescript
+    fc.assert(
+      fc.property(
+        pipelineStateWithDuplicatesArbitrary(),
+        (state) => {
+          const yaml = yamlEngine.toYAML(state);
+          const anchors = detectAnchorsInYAML(yaml);
+          expect(anchors.length).toBeGreaterThan(0);
+        }
+      )
+    );
+    ```
+  </Accordion>
+  
+  <Accordion title="Property 5: Job Ordering by Stage">
+    **File**: `yaml-ordering.property.test.ts`
+    
+    For any Pipeline_State, the generated YAML SHALL order jobs by stage.
+    
+    ```typescript
+    fc.assert(
+      fc.property(
+        pipelineStateArbitrary(),
+        (state) => {
+          const yaml = yamlEngine.toYAML(state);
+          const jobOrder = extractJobOrder(yaml);
+          expect(isOrderedByStage(jobOrder, state.stages)).toBe(true);
+        }
+      )
+    );
+    ```
+  </Accordion>
+  
+  <Accordion title="Property 6: YAML Round-Trip Semantic Preservation">
+    **File**: `yaml-engine.property.test.ts`
+    
+    For any valid Pipeline_State, converting to YAML and parsing back SHALL produce semantically equivalent state.
+    
+    ```typescript
+    fc.assert(
+      fc.property(
+        pipelineStateArbitrary(),
+        (state) => {
+          const yaml = yamlEngine.toYAML(state);
+          const parsed = yamlEngine.fromYAML(yaml);
+          expect(semanticallyEquivalent(state, parsed)).toBe(true);
+        }
+      )
+    );
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  See the full list of all 14 properties in the [Design Document](/architecture/overview#correctness-properties)
+</Note>
+
+### Debugging Failed Properties
+
+When a property test fails, fast-check provides a minimal failing example:
+
+```
+Property failed after 42 runs with seed 1234567890:
+Counterexample: {
+  "jobs": {
+    "job-1": { "needs": ["job-2"] },
+    "job-2": { "needs": ["job-1"] }
+  }
+}
+```
+
+To reproduce:
+
+```typescript
+test('reproduce failure', () => {
+  fc.assert(
+    fc.property(/* ... */),
+    { seed: 1234567890, path: "42" }
+  );
+});
+```
+
+## Unit Testing
+
+### Overview
+
+Unit tests validate individual components and functions with specific examples.
+
+**Library**: [Jest](https://jestjs.io/) + [React Testing Library](https://testing-library.com/react)
+
+### Component Testing
+
+```typescript
+import { render, screen, fireEvent } from '@testing-library/react';
+import { JobNode } from './JobNode';
+
+describe('JobNode Component', () => {
+  it('renders job name and stage', () => {
+    const job = {
+      id: '1',
+      name: 'build',
+      stage: 'build',
+      script: ['npm build']
+    };
+    
+    render(<JobNode data={job} selected={false} hasErrors={false} />);
+    
+    expect(screen.getByText('build')).toBeInTheDocument();
+    expect(screen.getByText('Stage: build')).toBeInTheDocument();
+  });
+  
+  it('displays error indicator when hasErrors is true', () => {
+    const job = {
+      id: '1',
+      name: 'build',
+      stage: 'build',
+      script: ['npm build']
+    };
+    
+    render(
+      <JobNode
+        data={job}
+        selected={false}
+        hasErrors={true}
+        errorMessages={['Invalid script']}
+      />
+    );
+    
+    expect(screen.getByText(/validation errors/i)).toBeInTheDocument();
+  });
+  
+  it('applies selected styling when selected', () => {
+    const job = {
+      id: '1',
+      name: 'build',
+      stage: 'build',
+      script: ['npm build']
+    };
+    
+    const { container } = render(
+      <JobNode data={job} selected={true} hasErrors={false} />
+    );
+    
+    expect(container.firstChild).toHaveClass('border-gitlab-accent-blue');
+  });
+});
+```
+
+### Redux Testing
+
+```typescript
+import { configureStore } from '@reduxjs/toolkit';
+import pipelineReducer, { addJob, updateJob, deleteJob } from './pipelineSlice';
+
+describe('Pipeline Reducer', () => {
+  let store;
+  
+  beforeEach(() => {
+    store = configureStore({
+      reducer: { pipeline: pipelineReducer }
+    });
+  });
+  
+  it('adds job to state', () => {
+    const job = {
+      id: '1',
+      name: 'test',
+      stage: 'build',
+      script: ['npm test']
+    };
+    
+    store.dispatch(addJob({ job, position: { x: 0, y: 0 } }));
+    
+    const state = store.getState().pipeline.present;
+    expect(state.jobs['1']).toEqual(job);
+  });
+  
+  it('updates job properties', () => {
+    const job = {
+      id: '1',
+      name: 'test',
+      stage: 'build',
+      script: ['npm test']
+    };
+    
+    store.dispatch(addJob({ job, position: { x: 0, y: 0 } }));
+    store.dispatch(updateJob({
+      jobId: '1',
+      updates: { script: ['npm run test:unit'] }
+    }));
+    
+    const state = store.getState().pipeline.present;
+    expect(state.jobs['1'].script).toEqual(['npm run test:unit']);
+  });
+  
+  it('deletes job and removes dependencies', () => {
+    const job1 = {
+      id: '1',
+      name: 'build',
+      stage: 'build',
+      script: ['npm build']
+    };
+    const job2 = {
+      id: '2',
+      name: 'test',
+      stage: 'test',
+      script: ['npm test'],
+      needs: ['1']
+    };
+    
+    store.dispatch(addJob({ job: job1, position: { x: 0, y: 0 } }));
+    store.dispatch(addJob({ job: job2, position: { x: 0, y: 200 } }));
+    store.dispatch(deleteJob('1'));
+    
+    const state = store.getState().pipeline.present;
+    expect(state.jobs['1']).toBeUndefined();
+    expect(state.jobs['2'].needs).toEqual([]);
+  });
+});
+```
+
+### Utility Function Testing
+
+```typescript
+import { detectCycle, validateDependencies } from './dependency-graph';
+
+describe('Dependency Graph Utilities', () => {
+  describe('detectCycle', () => {
+    it('detects simple cycle', () => {
+      const graph = {
+        'A': ['B'],
+        'B': ['C'],
+        'C': ['A']
+      };
+      
+      expect(detectCycle(graph, { source: 'C', target: 'A' })).toBe(true);
+    });
+    
+    it('returns false for acyclic graph', () => {
+      const graph = {
+        'A': ['B'],
+        'B': ['C']
+      };
+      
+      expect(detectCycle(graph, { source: 'C', target: 'D' })).toBe(false);
+    });
+  });
+  
+  describe('validateDependencies', () => {
+    it('validates all dependencies exist', () => {
+      const jobs = {
+        'build': { id: 'build', needs: [] },
+        'test': { id: 'test', needs: ['build'] }
+      };
+      
+      expect(validateDependencies(jobs)).toBe(true);
+    });
+    
+    it('returns false for missing dependency', () => {
+      const jobs = {
+        'test': { id: 'test', needs: ['build'] }
+      };
+      
+      expect(validateDependencies(jobs)).toBe(false);
+    });
+  });
+});
+```
+
+## Integration Testing
+
+### Overview
+
+Integration tests validate external integrations with mocked services.
+
+**Library**: [MSW (Mock Service Worker)](https://mswjs.io/)
+
+### GitLab API Testing
+
+```typescript
+import { rest } from 'msw';
+import { setupServer } from 'msw/node';
+import { GitLabAPIClient } from './gitlab-api-client';
+
+const server = setupServer(
+  rest.post('https://gitlab.com/api/v4/ci/lint', (req, res, ctx) => {
+    return res(ctx.json({ valid: true, errors: [] }));
+  })
+);
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
+describe('GitLab API Integration', () => {
+  it('validates YAML successfully', async () => {
+    const client = new GitLabAPIClient();
+    const yaml = 'test:\n  script:\n    - echo "test"';
+    
+    const result = await client.validateYAML(yaml);
+    
+    expect(result.valid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
+  
+  it('handles validation errors', async () => {
+    server.use(
+      rest.post('https://gitlab.com/api/v4/ci/lint', (req, res, ctx) => {
+        return res(ctx.json({
+          valid: false,
+          errors: ['jobs:test script can\'t be blank']
+        }));
+      })
+    );
+    
+    const client = new GitLabAPIClient();
+    const yaml = 'test:\n  stage: test';
+    
+    const result = await client.validateYAML(yaml);
+    
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('jobs:test script can\'t be blank');
+  });
+  
+  it('handles network errors gracefully', async () => {
+    server.use(
+      rest.post('https://gitlab.com/api/v4/ci/lint', (req, res, ctx) => {
+        return res(ctx.status(500));
+      })
+    );
+    
+    const client = new GitLabAPIClient();
+    
+    await expect(client.validateYAML('test')).rejects.toThrow();
+  });
+});
+```
+
+### Local Storage Testing
+
+```typescript
+describe('State Persistence', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+  
+  it('saves pipeline state to localStorage', () => {
+    const state = {
+      version: '1.0',
+      jobs: { 'build': { id: 'build', name: 'build', stage: 'build', script: ['npm build'] } },
+      // ...
+    };
+    
+    savePipelineState(state);
+    
+    const saved = localStorage.getItem('pipeline_state');
+    expect(JSON.parse(saved)).toEqual(state);
+  });
+  
+  it('restores pipeline state from localStorage', () => {
+    const state = {
+      version: '1.0',
+      jobs: { 'build': { id: 'build', name: 'build', stage: 'build', script: ['npm build'] } },
+      // ...
+    };
+    
+    localStorage.setItem('pipeline_state', JSON.stringify(state));
+    
+    const restored = restorePipelineState();
+    expect(restored).toEqual(state);
+  });
+  
+  it('handles corrupted data gracefully', () => {
+    localStorage.setItem('pipeline_state', 'invalid json');
+    
+    const restored = restorePipelineState();
+    expect(restored).toBeNull();
+  });
+});
+```
+
+## End-to-End Testing
+
+### Overview
+
+E2E tests validate complete user workflows in a real browser.
+
+**Library**: [Playwright](https://playwright.dev/)
+
+### Setup
+
+```typescript
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './e2e',
+  use: {
+    baseURL: 'http://localhost:5173',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+  webServer: {
+    command: 'npm run dev',
+    port: 5173,
+    reuseExistingServer: !process.env.CI,
+  },
+});
+```
+
+### Writing E2E Tests
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('create simple pipeline and export YAML', async ({ page }) => {
+  await page.goto('/');
+  
+  // Dismiss welcome overlay
+  await page.click('[data-testid="start-from-scratch"]');
+  
+  // Add first job
+  await page.click('[data-testid="add-job-button"]');
+  await page.fill('[data-testid="job-name-input"]', 'build');
+  await page.selectOption('[data-testid="job-stage-select"]', 'build');
+  await page.fill('[data-testid="job-script-input"]', 'npm build');
+  await page.click('[data-testid="save-job-button"]');
+  
+  // Verify job appears on canvas
+  await expect(page.locator('[data-job-id="build"]')).toBeVisible();
+  
+  // Add second job
+  await page.click('[data-testid="add-job-button"]');
+  await page.fill('[data-testid="job-name-input"]', 'test');
+  await page.selectOption('[data-testid="job-stage-select"]', 'test');
+  await page.fill('[data-testid="job-script-input"]', 'npm test');
+  await page.click('[data-testid="save-job-button"]');
+  
+  // Create dependency
+  await page.dragAndDrop(
+    '[data-job-id="build"] [data-handle="output"]',
+    '[data-job-id="test"] [data-handle="input"]'
+  );
+  
+  // Verify YAML preview
+  const yamlPreview = page.locator('[data-testid="yaml-preview"]');
+  await expect(yamlPreview).toContainText('build:');
+  await expect(yamlPreview).toContainText('test:');
+  await expect(yamlPreview).toContainText('needs:');
+  
+  // Export YAML
+  const downloadPromise = page.waitForEvent('download');
+  await page.click('[data-testid="export-button"]');
+  const download = await downloadPromise;
+  
+  // Verify downloaded file
+  expect(download.suggestedFilename()).toBe('.gitlab-ci.yml');
+});
+```
+
+## Test Data Builders
+
+Use builder pattern for complex test data:
+
+```typescript
+class PipelineStateBuilder {
+  private state: Pipeline_State;
+  
+  constructor() {
+    this.state = {
+      version: '1.0',
+      metadata: {
+        created: new Date().toISOString(),
+        modified: new Date().toISOString()
+      },
+      global: {},
+      stages: [],
+      jobs: {},
+      ui: {
+        nodes: {},
+        viewport: { x: 0, y: 0, zoom: 1 }
+      }
+    };
+  }
+  
+  withJob(job: Job_Node_Config): this {
+    this.state.jobs[job.id] = job;
+    if (!this.state.stages.includes(job.stage)) {
+      this.state.stages.push(job.stage);
+    }
+    return this;
+  }
+  
+  withGlobalImage(image: string): this {
+    this.state.global.image = image;
+    return this;
+  }
+  
+  build(): Pipeline_State {
+    return this.state;
+  }
+}
+
+// Usage
+const state = new PipelineStateBuilder()
+  .withGlobalImage('node:18')
+  .withJob({
+    id: 'build',
+    name: 'build',
+    stage: 'build',
+    script: ['npm build']
+  })
+  .withJob({
+    id: 'test',
+    name: 'test',
+    stage: 'test',
+    script: ['npm test'],
+    needs: ['build']
+  })
+  .build();
+```
+
+## Continuous Integration
+
+### GitHub Actions Workflow
+
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      
+      - run: npm ci
+      
+      - name: Run unit tests
+        run: npm run test:unit
+      
+      - name: Run property tests
+        run: npm run test:property
+      
+      - name: Run integration tests
+        run: npm run test:integration
+      
+      - name: Run E2E tests
+        run: npm run test:e2e
+      
+      - name: Generate coverage
+        run: npm run coverage
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Test Behavior, Not Implementation" icon="lightbulb">
+    Focus on what the component does, not how it does it:
+    
+    ✅ Good: `expect(screen.getByText('build')).toBeInTheDocument()`  
+    ❌ Bad: `expect(component.state.jobName).toBe('build')`
+  </Accordion>
+  
+  <Accordion title="Use Data-Testid Sparingly" icon="tag">
+    Prefer accessible queries:
+    
+    ✅ Good: `screen.getByRole('button', { name: 'Add Job' })`  
+    ❌ Bad: `screen.getByTestId('add-job-button')`
+  </Accordion>
+  
+  <Accordion title="Keep Tests Independent" icon="arrows-split-up-and-left">
+    Each test should be runnable in isolation:
+    
+    ```typescript
+    beforeEach(() => {
+      // Reset state before each test
+      store = configureStore({ reducer: pipelineReducer });
+    });
+    ```
+  </Accordion>
+  
+  <Accordion title="Use Descriptive Test Names" icon="file-signature">
+    Test names should describe the behavior:
+    
+    ✅ Good: `'displays error when job name is empty'`  
+    ❌ Bad: `'test 1'`
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Property-Based Testing"
+    icon="check-double"
+    href="/development/property-based-testing"
+  >
+    Deep dive into property-based testing
+  </Card>
+  <Card
+    title="Debugging"
+    icon="bug"
+    href="/development/debugging"
+  >
+    Debugging tips and tools
+  </Card>
+</CardGroup>

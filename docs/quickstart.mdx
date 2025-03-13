@@ -1,0 +1,217 @@
+---
+title: Quick Start
+description: 'Create your first GitLab CI/CD pipeline in under 5 minutes'
+---
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **Node.js** 18+ and npm/yarn
+- **Git** for cloning the repository
+- A modern web browser (Chrome, Firefox, or Safari)
+
+## Installation
+
+<Steps>
+  <Step title="Clone the Repository">
+    ```bash
+    git clone https://github.com/yourusername/gitlab-cicd-visual-editor.git
+    cd gitlab-cicd-visual-editor
+    ```
+  </Step>
+  
+  <Step title="Install Dependencies">
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+  </Step>
+  
+  <Step title="Start Development Server">
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    ```
+    
+    The application will open at `http://localhost:5173`
+  </Step>
+</Steps>
+
+## Create Your First Pipeline
+
+### 1. Start with a Template
+
+When you first open the application, you'll see a welcome overlay with quick-start options.
+
+<Tip>
+  Click **"Hello World"** to create a simple working pipeline instantly, or choose **"Start from Scratch"** to build your own.
+</Tip>
+
+### 2. Add Your First Job
+
+<Steps>
+  <Step title="Click Add Job">
+    Click the **"Add Job"** button in the toolbar or press `Ctrl+N`
+  </Step>
+  
+  <Step title="Configure Job Properties">
+    The Property Panel opens on the right. Fill in:
+    - **Job Name**: `build`
+    - **Stage**: `build` (select from dropdown)
+    - **Script**: `npm install && npm run build`
+    - **Image**: `node:18` (optional)
+  </Step>
+  
+  <Step title="Save the Job">
+    Click **"Save"** or press `Ctrl+S`. Your job appears on the canvas!
+  </Step>
+</Steps>
+
+### 3. Add a Second Job
+
+Let's add a test job that depends on the build job:
+
+<Steps>
+  <Step title="Add Another Job">
+    Click **"Add Job"** again
+  </Step>
+  
+  <Step title="Configure Test Job">
+    - **Job Name**: `test`
+    - **Stage**: `test`
+    - **Script**: `npm test`
+    - **Image**: `node:18`
+  </Step>
+  
+  <Step title="Create Dependency">
+    Drag from the **build** job's output handle to the **test** job's input handle to create a dependency edge
+  </Step>
+</Steps>
+
+### 4. View Generated YAML
+
+Look at the right panel to see your YAML being generated in real-time:
+
+```yaml
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  image: node:18
+  script:
+    - npm install && npm run build
+
+test:
+  stage: test
+  image: node:18
+  script:
+    - npm test
+  needs:
+    - build
+```
+
+### 5. Export Your Pipeline
+
+<Steps>
+  <Step title="Click Export">
+    Click the **"Export YAML"** button in the toolbar or press `Ctrl+E`
+  </Step>
+  
+  <Step title="Save File">
+    Your browser downloads `.gitlab-ci.yml` - ready to commit to your repository!
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Explore the Canvas"
+    icon="diagram-project"
+    href="/user-guide/canvas-interface"
+  >
+    Learn about zoom, pan, and organizing large pipelines
+  </Card>
+  <Card
+    title="Job Configuration"
+    icon="sliders"
+    href="/user-guide/job-configuration"
+  >
+    Discover all job configuration options: artifacts, cache, rules, and more
+  </Card>
+  <Card
+    title="Use Templates"
+    icon="layer-group"
+    href="/user-guide/templates"
+  >
+    Browse official GitLab templates and create your own
+  </Card>
+  <Card
+    title="Keyboard Shortcuts"
+    icon="keyboard"
+    href="/user-guide/keyboard-shortcuts"
+  >
+    Master keyboard shortcuts for efficient editing
+  </Card>
+</CardGroup>
+
+## Common First-Time Questions
+
+<AccordionGroup>
+  <Accordion title="How do I validate my pipeline?">
+    The application automatically validates your pipeline using GitLab's CI Lint API. You'll see a validation status indicator in the toolbar:
+    - ✅ Green: Valid pipeline
+    - ❌ Red: Validation errors (hover over jobs to see details)
+    - 🔄 Gray: Validating...
+    - ⚠️ Yellow: Offline mode (validation unavailable)
+  </Accordion>
+  
+  <Accordion title="Can I import existing .gitlab-ci.yml files?">
+    Yes! Click **"Import YAML"** in the toolbar and select your `.gitlab-ci.yml` file. The visual editor will parse it and render all jobs on the canvas.
+  </Accordion>
+  
+  <Accordion title="How do I create circular dependencies?">
+    You can't! The editor prevents circular dependencies automatically. If you try to create an edge that would form a cycle, you'll see an error message showing the cycle path.
+  </Accordion>
+  
+  <Accordion title="Where is my work saved?">
+    Your pipeline is automatically saved to browser local storage every 30 seconds. When you return, your work is restored automatically. You can also manually export to YAML or JSON for backup.
+  </Accordion>
+  
+  <Accordion title="Do I need a GitLab account?">
+    No! The core editing functionality works completely offline. GitLab API integration (for validation and templates) is optional and requires a personal access token.
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<Warning>
+  If you encounter issues, check the browser console for error messages. Common issues:
+  - **Port already in use**: Change the port in `vite.config.ts`
+  - **Dependencies not installed**: Run `npm install` again
+  - **Browser compatibility**: Use Chrome, Firefox, or Safari (latest versions)
+</Warning>
+
+## Get Help
+
+<CardGroup cols={2}>
+  <Card
+    title="Documentation"
+    icon="book"
+    href="/user-guide/creating-pipelines"
+  >
+    Read the full user guide
+  </Card>
+  <Card
+    title="GitHub Issues"
+    icon="github"
+    href="https://github.com/yourusername/gitlab-cicd-visual-editor/issues"
+  >
+    Report bugs or request features
+  </Card>
+</CardGroup>

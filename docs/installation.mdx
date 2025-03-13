@@ -1,0 +1,370 @@
+---
+title: Installation
+description: 'Complete installation guide for GitLab CI/CD Visual Editor'
+---
+
+## System Requirements
+
+Before installing, ensure your system meets these requirements:
+
+<CardGroup cols={2}>
+  <Card title="Node.js" icon="node-js">
+    Version 18.0.0 or higher
+  </Card>
+  <Card title="Package Manager" icon="box">
+    npm 9+ or yarn 1.22+
+  </Card>
+  <Card title="Browser" icon="browser">
+    Chrome 90+, Firefox 88+, or Safari 14+
+  </Card>
+  <Card title="Git" icon="git">
+    For cloning the repository
+  </Card>
+</CardGroup>
+
+## Installation Methods
+
+<Tabs>
+  <Tab title="From Source (Recommended)">
+    ### Clone and Install
+    
+    ```bash
+    # Clone the repository
+    git clone https://github.com/yourusername/gitlab-cicd-visual-editor.git
+    
+    # Navigate to project directory
+    cd gitlab-cicd-visual-editor
+    
+    # Install dependencies
+    npm install
+    
+    # Start development server
+    npm run dev
+    ```
+    
+    The application will be available at `http://localhost:5173`
+  </Tab>
+  
+  <Tab title="Using Docker">
+    ### Docker Installation
+    
+    ```bash
+    # Pull the Docker image
+    docker pull yourusername/gitlab-cicd-visual-editor:latest
+    
+    # Run the container
+    docker run -p 3000:3000 yourusername/gitlab-cicd-visual-editor:latest
+    ```
+    
+    Access the application at `http://localhost:3000`
+  </Tab>
+  
+  <Tab title="Production Build">
+    ### Build for Production
+    
+    ```bash
+    # Clone and install
+    git clone https://github.com/yourusername/gitlab-cicd-visual-editor.git
+    cd gitlab-cicd-visual-editor
+    npm install
+    
+    # Build production bundle
+    npm run build
+    
+    # Preview production build
+    npm run preview
+    ```
+    
+    The `dist/` folder contains the production-ready static files.
+  </Tab>
+</Tabs>
+
+## Verify Installation
+
+After installation, verify everything is working:
+
+<Steps>
+  <Step title="Check Development Server">
+    Open `http://localhost:5173` in your browser. You should see the welcome overlay.
+  </Step>
+  
+  <Step title="Test Canvas Interaction">
+    Click "Add Job" and verify the Property Panel opens.
+  </Step>
+  
+  <Step title="Check YAML Preview">
+    The Monaco Editor on the right should display generated YAML in real-time.
+  </Step>
+  
+  <Step title="Run Tests">
+    ```bash
+    npm run test
+    ```
+    All tests should pass.
+  </Step>
+</Steps>
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+# GitLab API Configuration (Optional)
+VITE_GITLAB_API_URL=https://gitlab.com/api/v4
+VITE_GITLAB_TOKEN=your_personal_access_token
+
+# Application Configuration
+VITE_APP_NAME=GitLab CI/CD Visual Editor
+VITE_AUTO_SAVE_INTERVAL=30000
+VITE_VALIDATION_DEBOUNCE=500
+```
+
+<Tip>
+  GitLab API integration is optional. The application works fully offline without a token.
+</Tip>
+
+### GitLab Personal Access Token
+
+To enable validation and template fetching:
+
+<Steps>
+  <Step title="Create Token">
+    Go to GitLab → Settings → Access Tokens
+  </Step>
+  
+  <Step title="Set Scopes">
+    Select the `api` scope
+  </Step>
+  
+  <Step title="Generate Token">
+    Click "Create personal access token" and copy the token
+  </Step>
+  
+  <Step title="Add to Application">
+    In the application, go to Settings → GitLab Integration and paste your token
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Port 5173 is already in use">
+    Change the port in `vite.config.ts`:
+    
+    ```typescript
+    export default defineConfig({
+      server: {
+        port: 3000 // Change to any available port
+      }
+    })
+    ```
+  </Accordion>
+  
+  <Accordion title="Dependencies fail to install">
+    Try clearing npm cache and reinstalling:
+    
+    ```bash
+    npm cache clean --force
+    rm -rf node_modules package-lock.json
+    npm install
+    ```
+  </Accordion>
+  
+  <Accordion title="Monaco Editor not loading">
+    Ensure you have a stable internet connection for CDN resources, or configure Monaco to use local assets:
+    
+    ```typescript
+    // vite.config.ts
+    import monacoEditorPlugin from 'vite-plugin-monaco-editor'
+    
+    export default defineConfig({
+      plugins: [
+        monacoEditorPlugin({
+          languageWorkers: ['yaml']
+        })
+      ]
+    })
+    ```
+  </Accordion>
+  
+  <Accordion title="React Flow canvas not rendering">
+    Check browser console for errors. Ensure your browser supports:
+    - CSS Grid
+    - CSS Custom Properties
+    - ES2020 features
+    
+    Update to the latest browser version if needed.
+  </Accordion>
+  
+  <Accordion title="Local storage quota exceeded">
+    Clear browser local storage:
+    
+    ```javascript
+    // In browser console
+    localStorage.clear()
+    ```
+    
+    Or export your pipeline to JSON before clearing.
+  </Accordion>
+</AccordionGroup>
+
+## Development Setup
+
+For contributors and developers:
+
+### Install Development Tools
+
+```bash
+# Install development dependencies
+npm install --save-dev
+
+# Install Git hooks for pre-commit checks
+npm run prepare
+```
+
+### IDE Configuration
+
+<Tabs>
+  <Tab title="VS Code">
+    Install recommended extensions:
+    - ESLint
+    - Prettier
+    - TypeScript and JavaScript Language Features
+    - Tailwind CSS IntelliSense
+    
+    Settings are pre-configured in `.vscode/settings.json`
+  </Tab>
+  
+  <Tab title="WebStorm">
+    Enable:
+    - ESLint integration (Settings → Languages & Frameworks → JavaScript → Code Quality Tools → ESLint)
+    - Prettier integration (Settings → Languages & Frameworks → JavaScript → Prettier)
+    - TypeScript support (enabled by default)
+  </Tab>
+</Tabs>
+
+### Run Development Commands
+
+```bash
+# Start development server with hot reload
+npm run dev
+
+# Run unit tests
+npm run test:unit
+
+# Run property-based tests
+npm run test:property
+
+# Run integration tests
+npm run test:integration
+
+# Run E2E tests
+npm run test:e2e
+
+# Run all tests
+npm run test
+
+# Generate coverage report
+npm run coverage
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+
+# Type check
+npm run type-check
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Docker Setup
+
+### Build Docker Image
+
+```dockerfile
+# Dockerfile
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+```bash
+# Build image
+docker build -t gitlab-cicd-visual-editor .
+
+# Run container
+docker run -p 8080:80 gitlab-cicd-visual-editor
+```
+
+### Docker Compose
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_GITLAB_API_URL=https://gitlab.com/api/v4
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+```
+
+```bash
+# Start with Docker Compose
+docker-compose up -d
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Quick Start"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Create your first pipeline
+  </Card>
+  <Card
+    title="User Guide"
+    icon="book"
+    href="/user-guide/creating-pipelines"
+  >
+    Learn all features
+  </Card>
+  <Card
+    title="Development Setup"
+    icon="code"
+    href="/development/setup"
+  >
+    Set up development environment
+  </Card>
+  <Card
+    title="Contributing"
+    icon="users"
+    href="/contributing/guidelines"
+  >
+    Contribute to the project
+  </Card>
+</CardGroup>

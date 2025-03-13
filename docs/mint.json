@@ -1,0 +1,141 @@
+{
+  "name": "GitLab CI/CD Visual Editor",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#60A5FA",
+    "dark": "#1E40AF",
+    "anchors": {
+      "from": "#3B82F6",
+      "to": "#8B5CF6"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "mailto:support@example.com"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://github.com/yourusername/gitlab-cicd-visual-editor"
+  },
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    },
+    {
+      "name": "Architecture",
+      "url": "architecture"
+    },
+    {
+      "name": "Contributing",
+      "url": "contributing"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "Documentation",
+      "icon": "book-open-cover",
+      "url": "https://docs.example.com"
+    },
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/example"
+    },
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/yourusername/gitlab-cicd-visual-editor"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "installation",
+        "features"
+      ]
+    },
+    {
+      "group": "User Guide",
+      "pages": [
+        "user-guide/creating-pipelines",
+        "user-guide/canvas-interface",
+        "user-guide/job-configuration",
+        "user-guide/templates",
+        "user-guide/import-export",
+        "user-guide/keyboard-shortcuts",
+        "user-guide/validation"
+      ]
+    },
+    {
+      "group": "Core Concepts",
+      "pages": [
+        "concepts/pipeline-state",
+        "concepts/yaml-engine",
+        "concepts/dependency-graph",
+        "concepts/stages-vs-needs"
+      ]
+    },
+    {
+      "group": "Architecture",
+      "pages": [
+        "architecture/overview",
+        "architecture/tech-stack",
+        "architecture/data-flow",
+        "architecture/state-management",
+        "architecture/components"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/yaml-engine",
+        "api-reference/gitlab-api-client",
+        "api-reference/redux-actions",
+        "api-reference/utilities"
+      ]
+    },
+    {
+      "group": "Development",
+      "pages": [
+        "development/setup",
+        "development/project-structure",
+        "development/testing",
+        "development/property-based-testing",
+        "development/debugging"
+      ]
+    },
+    {
+      "group": "Contributing",
+      "pages": [
+        "contributing/guidelines",
+        "contributing/code-style",
+        "contributing/pull-requests",
+        "contributing/testing-requirements"
+      ]
+    },
+    {
+      "group": "Deployment",
+      "pages": [
+        "deployment/building",
+        "deployment/environment-variables",
+        "deployment/hosting"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/yourusername/gitlab-cicd-visual-editor",
+    "twitter": "https://twitter.com/yourhandle",
+    "discord": "https://discord.gg/example"
+  }
+}

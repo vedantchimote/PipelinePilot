@@ -1,0 +1,417 @@
+---
+title: Features
+description: 'Comprehensive overview of all features in GitLab CI/CD Visual Editor'
+---
+
+## Core Features
+
+### Visual Pipeline Canvas
+
+<img src="/images/canvas-overview.png" alt="Canvas Overview" />
+
+The heart of the application is the visual canvas powered by React Flow:
+
+<CardGroup cols={2}>
+  <Card title="Drag & Drop" icon="hand">
+    Drag jobs around the canvas to organize your pipeline visually
+  </Card>
+  <Card title="Zoom & Pan" icon="magnifying-glass">
+    Navigate large pipelines with smooth zoom and pan controls
+  </Card>
+  <Card title="Stage Swim Lanes" icon="layer-group">
+    Visual grouping of jobs by stage for better organization
+  </Card>
+  <Card title="Dependency Edges" icon="arrow-right-arrow-left">
+    Visual arrows showing job dependencies and execution order
+  </Card>
+</CardGroup>
+
+**Key Capabilities:**
+- Add jobs with a single click
+- Create dependencies by dragging between jobs
+- Automatic cycle detection prevents invalid pipelines
+- Real-time position updates
+- Stage-based auto-layout
+- Visual indicators for job status (valid, error, trigger)
+
+### Job Configuration Panel
+
+<img src="/images/property-panel.png" alt="Property Panel" />
+
+Comprehensive form-based configuration for every job property:
+
+<Tabs>
+  <Tab title="Basic">
+    - **Job Name**: Unique identifier for the job
+    - **Stage**: Pipeline stage (build, test, deploy, etc.)
+    - **Image**: Docker image to use
+    - **Tags**: Runner tags for job execution
+    - **When**: Execution condition (on_success, on_failure, always, manual)
+  </Tab>
+  
+  <Tab title="Scripts">
+    - **Script**: Main commands to execute
+    - **Before Script**: Commands to run before main script
+    - **After Script**: Commands to run after main script (always executed)
+  </Tab>
+  
+  <Tab title="Artifacts">
+    - **Paths**: Files/directories to preserve
+    - **Exclude**: Patterns to exclude
+    - **Expire In**: Artifact retention period
+    - **Expose As**: Name for UI download
+    - **Reports**: Test reports, coverage, etc.
+  </Tab>
+  
+  <Tab title="Cache">
+    - **Key**: Cache identifier (supports variables)
+    - **Paths**: Directories to cache
+    - **Policy**: pull, push, or pull-push
+    - **Untracked**: Include untracked files
+  </Tab>
+  
+  <Tab title="Variables">
+    - **Key-Value Pairs**: Job-specific variables
+    - **Protected**: Only available on protected branches
+    - **Masked**: Hidden in job logs
+    - **Inherited**: View global variables
+  </Tab>
+  
+  <Tab title="Rules">
+    - **If Conditions**: When to run the job
+    - **When**: Override execution condition
+    - **Allow Failure**: Continue pipeline on failure
+    - **Variables**: Rule-specific variables
+  </Tab>
+  
+  <Tab title="Advanced">
+    - **Needs**: Explicit dependencies (DAG execution)
+    - **Dependencies**: Artifact dependencies
+    - **Timeout**: Maximum execution time
+    - **Retry**: Retry configuration
+    - **Allow Failure**: Continue on failure
+    - **Trigger**: Multi-project pipeline triggers
+  </Tab>
+</Tabs>
+
+### Real-Time YAML Preview
+
+<img src="/images/yaml-preview.png" alt="YAML Preview" />
+
+Monaco Editor integration provides VS Code-quality YAML preview:
+
+✅ **Syntax Highlighting**: Full YAML syntax highlighting  
+✅ **Line Numbers**: Easy reference to specific lines  
+✅ **Code Folding**: Collapse sections for better readability  
+✅ **Read-Only**: Prevents accidental edits  
+✅ **Dark Theme**: Matches application theme  
+✅ **Real-Time Updates**: Updates within 200ms of changes
+
+**YAML Optimizations:**
+- Automatic anchor generation for repeated config
+- Alias substitution to reduce duplication
+- Proper job ordering by stage
+- Clean formatting with consistent indentation
+
+### GitLab API Integration
+
+<img src="/images/validation.png" alt="Validation" />
+
+Seamless integration with GitLab's CI Lint API:
+
+<AccordionGroup>
+  <Accordion title="Real-Time Validation" icon="check">
+    - Validates YAML against GitLab's schema
+    - Debounced requests (500ms) to avoid API spam
+    - Displays validation status in toolbar
+    - Highlights invalid jobs on canvas
+    - Shows detailed error messages
+  </Accordion>
+  
+  <Accordion title="Template Fetching" icon="download">
+    - Fetches official GitLab CI templates
+    - Caches templates for offline use
+    - Searchable template library
+    - Preview template content before use
+  </Accordion>
+  
+  <Accordion title="Offline Mode" icon="wifi-slash">
+    - Graceful degradation when API unavailable
+    - Core editing works without internet
+    - Cached templates remain available
+    - Clear offline indicator in UI
+  </Accordion>
+</AccordionGroup>
+
+### Template Library
+
+<img src="/images/templates.png" alt="Template Library" />
+
+Pre-built job templates for common CI/CD patterns:
+
+**Official Templates:**
+- Docker Build & Push
+- Node.js (install, lint, test, build)
+- Python (setup, test, coverage)
+- Security Scanning (SAST, DAST, dependency scanning)
+- Deploy to Kubernetes
+- Deploy to AWS
+- And many more...
+
+**Custom Templates:**
+- Save any job as a reusable template
+- Organize templates by category
+- Search by name or description
+- Drag onto canvas to apply
+
+**Template Features:**
+- Searchable by name and description
+- Filterable by category and source
+- Preview before applying
+- Automatic name conflict resolution
+- Opens Property Panel for customization
+
+### Import & Export
+
+<img src="/images/import-export.png" alt="Import Export" />
+
+Bidirectional YAML synchronization:
+
+<Tabs>
+  <Tab title="Import YAML">
+    **Import existing `.gitlab-ci.yml` files:**
+    - Parses YAML to Pipeline_State
+    - Renders jobs on canvas with auto-layout
+    - Preserves all job configuration
+    - Handles includes and extends
+    - Displays parsing errors with line numbers
+    - Suggests fixes for common syntax errors
+  </Tab>
+  
+  <Tab title="Export YAML">
+    **Export to `.gitlab-ci.yml`:**
+    - Generates optimized YAML
+    - Uses anchors/aliases for DRY code
+    - Orders jobs by stage
+    - Preserves comments where possible
+    - Ready to commit to repository
+  </Tab>
+  
+  <Tab title="Export JSON">
+    **Export Pipeline_State as JSON:**
+    - Full pipeline state backup
+    - Includes UI metadata (positions, viewport)
+    - Can be re-imported later
+    - Useful for version control
+  </Tab>
+</Tabs>
+
+### State Management & Persistence
+
+<img src="/images/persistence.png" alt="Persistence" />
+
+Never lose your work:
+
+<CardGroup cols={2}>
+  <Card title="Auto-Save" icon="floppy-disk">
+    Saves to browser local storage every 30 seconds
+  </Card>
+  <Card title="Auto-Restore" icon="clock-rotate-left">
+    Restores your work when you return
+  </Card>
+  <Card title="Undo/Redo" icon="rotate-left">
+    50-state history with Ctrl+Z / Ctrl+Y
+  </Card>
+  <Card title="Manual Save" icon="download">
+    Export to YAML or JSON anytime
+  </Card>
+</CardGroup>
+
+**State Features:**
+- Immutable state updates with Redux
+- Time-travel debugging with Redux DevTools
+- Undo/redo for all canvas operations
+- Automatic recovery from crashes
+- Version migration for schema changes
+
+### Keyboard Shortcuts
+
+<img src="/images/shortcuts.png" alt="Keyboard Shortcuts" />
+
+Power user features for efficient editing:
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+Z` | Undo last action |
+| `Ctrl+Y` | Redo last undone action |
+| `Ctrl+S` | Manual save to local storage |
+| `Delete` | Delete selected job |
+| `Ctrl+C` | Copy selected job |
+| `Ctrl+V` | Paste copied job |
+| `Ctrl+E` | Export YAML |
+| `Ctrl+I` | Import YAML |
+| `Ctrl+N` | Add new job |
+| `Ctrl+/` | Show keyboard shortcuts reference |
+| `Escape` | Close Property Panel |
+
+### Dark Mode UI
+
+<img src="/images/dark-mode.png" alt="Dark Mode" />
+
+Beautiful dark-first interface:
+
+✅ **WCAG AA Compliant**: All text meets contrast requirements  
+✅ **Tailwind CSS**: Utility-first styling  
+✅ **Custom Color Palette**: GitLab-inspired colors  
+✅ **Light Mode Toggle**: Switch themes anytime  
+✅ **Persistent Preference**: Remembers your choice
+
+**Color System:**
+- Primary: Blue (#3B82F6)
+- Accent: Purple (#8B5CF6)
+- Success: Green (#10B981)
+- Error: Red (#EF4444)
+- Warning: Yellow (#F59E0B)
+
+### Accessibility
+
+<img src="/images/accessibility.png" alt="Accessibility" />
+
+Inclusive design for all users:
+
+<AccordionGroup>
+  <Accordion title="Keyboard Navigation" icon="keyboard">
+    - All features accessible via keyboard
+    - Visible focus indicators
+    - Tab navigation through forms
+    - Arrow key navigation in lists
+  </Accordion>
+  
+  <Accordion title="Screen Reader Support" icon="audio-description">
+    - ARIA labels on all interactive elements
+    - ARIA roles for custom components
+    - ARIA live regions for status updates
+    - Semantic HTML structure
+  </Accordion>
+  
+  <Accordion title="Visual Accessibility" icon="eye">
+    - High contrast colors (WCAG AA)
+    - Resizable text
+    - No color-only indicators
+    - Clear focus states
+  </Accordion>
+</AccordionGroup>
+
+### First-Time User Experience
+
+<img src="/images/welcome.png" alt="Welcome Overlay" />
+
+Smooth onboarding for new users:
+
+<Steps>
+  <Step title="Welcome Overlay">
+    Quick-start options on first load:
+    - Start from Scratch
+    - Use "Hello World" Template
+    - Import Existing YAML
+  </Step>
+  
+  <Step title="Interactive Tutorial">
+    Step-by-step guide highlighting:
+    - Canvas interface
+    - Property Panel
+    - YAML Preview
+    - Export functionality
+  </Step>
+  
+  <Step title="Contextual Tooltips">
+    Hover tooltips on all UI elements explaining their purpose
+  </Step>
+  
+  <Step title="Example Pipelines">
+    Pre-built examples for common use cases:
+    - Node.js application
+    - Python application
+    - Docker build & deploy
+  </Step>
+</Steps>
+
+## Advanced Features
+
+### Dependency Graph Management
+
+<img src="/images/dependency-graph.png" alt="Dependency Graph" />
+
+Intelligent dependency handling:
+
+✅ **Cycle Detection**: Prevents circular dependencies automatically  
+✅ **Referential Integrity**: Validates all dependencies exist  
+✅ **Cascade Deletion**: Removes edges when jobs are deleted  
+✅ **Stage vs Needs**: Distinguishes implicit and explicit dependencies  
+✅ **Visual Feedback**: Highlights invalid dependencies in red
+
+### Multi-Project Pipelines
+
+<img src="/images/trigger-jobs.png" alt="Trigger Jobs" />
+
+Configure pipelines that trigger other projects:
+
+- Specify target project path
+- Set branch or tag
+- Pass variables to triggered pipeline
+- Configure strategy (depend or fire-and-forget)
+- Visual distinction with purple accent
+
+### Error Handling
+
+<img src="/images/error-handling.png" alt="Error Handling" />
+
+Comprehensive error handling:
+
+<CardGroup cols={2}>
+  <Card title="YAML Parsing Errors" icon="triangle-exclamation">
+    Detailed error messages with line/column numbers
+  </Card>
+  <Card title="Validation Errors" icon="circle-xmark">
+    Inline error display on canvas with tooltips
+  </Card>
+  <Card title="Network Errors" icon="wifi-slash">
+    Graceful offline mode with clear indicators
+  </Card>
+  <Card title="Storage Errors" icon="database">
+    Quota exceeded warnings with export options
+  </Card>
+</CardGroup>
+
+## Coming Soon
+
+<Note>
+  These features are planned for future releases:
+  
+  - **Collaboration**: Real-time multi-user editing
+  - **Version Control**: Built-in Git integration
+  - **Pipeline Execution**: Run pipelines directly from the editor
+  - **Advanced Analytics**: Pipeline performance insights
+  - **Custom Themes**: User-defined color schemes
+  - **Plugin System**: Extend functionality with plugins
+</Note>
+
+## Feature Comparison
+
+| Feature | Visual Editor | Manual YAML |
+|---------|--------------|-------------|
+| Syntax Errors | ❌ Prevented | ✅ Common |
+| Dependency Visualization | ✅ Built-in | ❌ Manual |
+| Real-Time Validation | ✅ Automatic | ❌ Manual |
+| Template Library | ✅ Included | ❌ Copy-paste |
+| Undo/Redo | ✅ 50 states | ❌ Git only |
+| Learning Curve | ✅ Low | ❌ High |
+| YAML Optimization | ✅ Automatic | ❌ Manual |
+
+<Card
+  title="Try It Now"
+  icon="rocket"
+  href="/quickstart"
+>
+  Get started with GitLab CI/CD Visual Editor in under 5 minutes
+</Card>

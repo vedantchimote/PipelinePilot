@@ -1,0 +1,354 @@
+---
+title: Contributing Guidelines
+description: 'How to contribute to GitLab CI/CD Visual Editor'
+---
+
+## Welcome Contributors!
+
+Thank you for your interest in contributing to GitLab CI/CD Visual Editor! This guide will help you get started.
+
+## Ways to Contribute
+
+<CardGroup cols={2}>
+  <Card title="Report Bugs" icon="bug">
+    Found a bug? Open an issue with reproduction steps
+  </Card>
+  <Card title="Suggest Features" icon="lightbulb">
+    Have an idea? Share it in a feature request
+  </Card>
+  <Card title="Write Code" icon="code">
+    Fix bugs or implement new features
+  </Card>
+  <Card title="Improve Docs" icon="book">
+    Help make our documentation better
+  </Card>
+</CardGroup>
+
+## Getting Started
+
+### 1. Fork and Clone
+
+```bash
+# Fork the repository on GitHub
+# Then clone your fork
+git clone https://github.com/YOUR_USERNAME/gitlab-cicd-visual-editor.git
+cd gitlab-cicd-visual-editor
+
+# Add upstream remote
+git remote add upstream https://github.com/original/gitlab-cicd-visual-editor.git
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Create a Branch
+
+```bash
+# Create a feature branch
+git checkout -b feature/your-feature-name
+
+# Or a bugfix branch
+git checkout -b fix/bug-description
+```
+
+### 4. Make Changes
+
+Follow our [Code Style Guide](/contributing/code-style) and write tests for your changes.
+
+### 5. Run Tests
+
+```bash
+# Run all tests
+npm run test
+
+# Run specific test suites
+npm run test:unit
+npm run test:property
+npm run test:integration
+npm run test:e2e
+
+# Check coverage
+npm run coverage
+```
+
+### 6. Commit Changes
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```bash
+# Feature
+git commit -m "feat: add template search functionality"
+
+# Bug fix
+git commit -m "fix: resolve circular dependency detection"
+
+# Documentation
+git commit -m "docs: update installation guide"
+
+# Tests
+git commit -m "test: add property tests for YAML engine"
+
+# Refactor
+git commit -m "refactor: simplify dependency graph algorithm"
+```
+
+### 7. Push and Create PR
+
+```bash
+# Push to your fork
+git push origin feature/your-feature-name
+
+# Create a Pull Request on GitHub
+```
+
+## Pull Request Guidelines
+
+### PR Title
+
+Use conventional commit format:
+
+- `feat: add keyboard shortcut for undo`
+- `fix: resolve Monaco editor theme issue`
+- `docs: improve quickstart guide`
+- `test: add E2E tests for import workflow`
+
+### PR Description
+
+Include:
+
+1. **What**: What does this PR do?
+2. **Why**: Why is this change needed?
+3. **How**: How does it work?
+4. **Testing**: How was it tested?
+5. **Screenshots**: For UI changes
+
+**Template:**
+
+```markdown
+## What
+Adds keyboard shortcut (Ctrl+Z) for undo functionality.
+
+## Why
+Users expect standard undo shortcuts to work.
+
+## How
+- Added event listener for Ctrl+Z
+- Dispatches Redux undo action
+- Updated keyboard shortcuts panel
+
+## Testing
+- Added unit tests for keyboard handler
+- Added E2E test for undo workflow
+- Manually tested in Chrome, Firefox, Safari
+
+## Screenshots
+[Screenshot of keyboard shortcuts panel]
+```
+
+### PR Checklist
+
+Before submitting, ensure:
+
+- [ ] Code follows style guidelines
+- [ ] Tests pass (`npm run test`)
+- [ ] New tests added for new features
+- [ ] Documentation updated
+- [ ] No console errors or warnings
+- [ ] Commits follow conventional format
+- [ ] Branch is up to date with main
+
+## Code Review Process
+
+1. **Automated Checks**: CI runs tests and linting
+2. **Maintainer Review**: A maintainer reviews your code
+3. **Feedback**: Address any requested changes
+4. **Approval**: Once approved, your PR will be merged
+5. **Celebration**: 🎉 Your contribution is live!
+
+## Development Workflow
+
+### Running Development Server
+
+```bash
+npm run dev
+```
+
+Application runs at `http://localhost:5173`
+
+### Code Quality
+
+```bash
+# Lint code
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Format code
+npm run format
+
+# Type check
+npm run type-check
+```
+
+### Testing
+
+```bash
+# Run tests in watch mode
+npm run test:watch
+
+# Run specific test file
+npm run test -- src/components/Canvas.test.tsx
+
+# Update snapshots
+npm run test -- -u
+```
+
+## Reporting Bugs
+
+### Before Reporting
+
+1. **Search existing issues**: Your bug might already be reported
+2. **Try latest version**: Bug might be fixed in main branch
+3. **Reproduce**: Ensure you can consistently reproduce the bug
+
+### Bug Report Template
+
+```markdown
+## Description
+Clear description of the bug
+
+## Steps to Reproduce
+1. Go to '...'
+2. Click on '...'
+3. See error
+
+## Expected Behavior
+What should happen
+
+## Actual Behavior
+What actually happens
+
+## Environment
+- OS: [e.g., macOS 13.0]
+- Browser: [e.g., Chrome 120]
+- Version: [e.g., 1.0.0]
+
+## Screenshots
+If applicable
+
+## Additional Context
+Any other relevant information
+```
+
+## Suggesting Features
+
+### Feature Request Template
+
+```markdown
+## Problem
+What problem does this feature solve?
+
+## Proposed Solution
+How should this feature work?
+
+## Alternatives Considered
+What other solutions did you consider?
+
+## Additional Context
+Mockups, examples, or references
+```
+
+## Documentation Contributions
+
+Documentation is in the `docs/` directory using Mintlify.
+
+### Running Docs Locally
+
+```bash
+# Install Mintlify CLI
+npm install -g mintlify
+
+# Run docs server
+cd docs
+mintlify dev
+```
+
+### Documentation Style
+
+- Use clear, concise language
+- Include code examples
+- Add screenshots for UI features
+- Link to related pages
+- Test all code examples
+
+## Community Guidelines
+
+### Code of Conduct
+
+We follow the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/):
+
+- Be respectful and inclusive
+- Welcome newcomers
+- Accept constructive criticism
+- Focus on what's best for the community
+
+### Communication Channels
+
+- **GitHub Issues**: Bug reports and feature requests
+- **GitHub Discussions**: Questions and general discussion
+- **Discord**: Real-time chat (link in README)
+
+## Recognition
+
+Contributors are recognized in:
+
+- README.md contributors section
+- Release notes
+- GitHub contributors page
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the MIT License.
+
+## Questions?
+
+- Check the [FAQ](/faq)
+- Ask in [GitHub Discussions](https://github.com/yourusername/gitlab-cicd-visual-editor/discussions)
+- Join our [Discord](https://discord.gg/example)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Code Style Guide"
+    icon="code"
+    href="/contributing/code-style"
+  >
+    Learn our coding standards
+  </Card>
+  <Card
+    title="Testing Requirements"
+    icon="flask"
+    href="/contributing/testing-requirements"
+  >
+    Understand testing expectations
+  </Card>
+  <Card
+    title="Development Setup"
+    icon="laptop-code"
+    href="/development/setup"
+  >
+    Set up your development environment
+  </Card>
+  <Card
+    title="Architecture"
+    icon="diagram-project"
+    href="/architecture/overview"
+  >
+    Understand the codebase architecture
+  </Card>
+</CardGroup>

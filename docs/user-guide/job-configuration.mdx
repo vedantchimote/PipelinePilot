@@ -1,0 +1,854 @@
+---
+title: Job Configuration
+description: 'Complete guide to configuring GitLab CI/CD jobs'
+---
+
+## Overview
+
+The Property Panel provides a comprehensive interface for configuring every aspect of a GitLab CI/CD job. This guide covers all available configuration options.
+
+## Opening the Property Panel
+
+<Steps>
+  <Step title="Click a Job Node">
+    Click any job node on the canvas
+  </Step>
+  
+  <Step title="Panel Opens">
+    The Property Panel slides in from the right side
+  </Step>
+  
+  <Step title="Configure">
+    Edit any field and changes save automatically
+  </Step>
+  
+  <Step title="Close">
+    Click "Close" or press Escape to close the panel
+  </Step>
+</Steps>
+
+## Basic Configuration
+
+### Job Name
+
+<ParamField path="name" type="string" required>
+  Unique identifier for the job
+</ParamField>
+
+**Rules:**
+- Must be unique within the pipeline
+- Alphanumeric characters, underscores, hyphens, and colons allowed
+- Cannot start with a dot (.)
+- Maximum 255 characters
+
+**Examples:**
+```yaml
+✅ build
+✅ test:unit
+✅ deploy-production
+✅ build_frontend_app
+
+❌ .hidden (starts with dot)
+❌ build (duplicate name)
+❌ test job (contains space)
+```
+
+### Stage
+
+<ParamField path="stage" type="string" required>
+  Pipeline stage this job belongs to
+</ParamField>
+
+**Common Stages:**
+- `build` - Compile and build artifacts
+- `test` - Run tests
+- `deploy` - Deploy to environments
+- `security` - Security scans
+- `release` - Create releases
+
+**Custom Stages:**
+You can create custom stages for your workflow:
+```yaml
+stages:
+  - prepare
+  - build
+  - test:unit
+  - test:integration
+  - test:e2e
+  - deploy:staging
+  - deploy:production
+```
+
+### Script
+
+<ParamField path="script" type="string[]" required>
+  Commands to execute in the job
+</ParamField>
+
+**Single Command:**
+```yaml
+script:
+  - npm test
+```
+
+**Multiple Commands:**
+```yaml
+script:
+  - npm install
+  - npm run lint
+  - npm run build
+  - npm test
+```
+
+**Multi-Line Commands:**
+```yaml
+script:
+  - |
+    if [ "$CI_COMMIT_BRANCH" == "main" ]; then
+      npm run build:production
+    else
+      npm run build:development
+    fi
+```
+
+<Tip>
+  Each line runs in the same shell session, so environment variables persist between lines.
+</Tip>
+
+### Image
+
+<ParamField path="image" type="string">
+  Docker image to use for the job
+</ParamField>
+
+**Common Images:**
+```yaml
+# Node.js
+image: node:18
+image: node:18-alpine
+
+# Python
+image: python:3.11
+image: python:3.11-slim
+
+# Ruby
+image: ruby:3.2
+
+# Go
+image: golang:1.21
+
+# Custom
+image: registry.example.com/my-image:latest
+```
+
+**Image with Services:**
+```yaml
+image: node:18
+services:
+  - postgres:14
+  - redis:7
+```
+
+### Tags
+
+<ParamField path="tags" type="string[]">
+  Runner tags for job assignment
+</ParamField>
+
+```yaml
+tags:
+  - docker
+  - linux
+  - high-memory
+```
+
+**Use Cases:**
+- Assign to specific runner types (docker, shell, kubernetes)
+- Require specific hardware (gpu, high-memory)
+- Target specific environments (production, staging)
+
+### When
+
+<ParamField path="when" type="string">
+  Condition for job execution
+</ParamField>
+
+<Tabs>
+  <Tab title="on_success">
+    **Default**: Run when all previous jobs succeed
+    
+    ```yaml
+    when: on_success
+    ```
+  </Tab>
+  
+  <Tab title="on_failure">
+    **Failure Handler**: Run when any previous job fails
+    
+    ```yaml
+    when: on_failure
+    ```
+    
+    Useful for cleanup or notification jobs.
+  </Tab>
+  
+  <Tab title="always">
+    **Always Run**: Run regardless of previous job status
+    
+    ```yaml
+    when: always
+    ```
+    
+    Useful for cleanup jobs.
+  </Tab>
+  
+  <Tab title="manual">
+    **Manual Trigger**: Require manual approval
+    
+    ```yaml
+    when: manual
+    ```
+    
+    Useful for production deployments.
+  </Tab>
+  
+  <Tab title="delayed">
+    **Delayed Start**: Wait before running
+    
+    ```yaml
+    when: delayed
+    start_in: 30 minutes
+    ```
+  </Tab>
+</Tabs>
+
+### Allow Failure
+
+<ParamField path="allow_failure" type="boolean">
+  Continue pipeline even if job fails
+</ParamField>
+
+```yaml
+allow_failure: true
+```
+
+**Use Cases:**
+- Experimental features
+- Non-critical tests
+- Optional security scans
+- Performance tests
+
+## Script Sections
+
+### Before Script
+
+<ParamField path="before_script" type="string[]">
+  Commands to run before the main script
+</ParamField>
+
+```yaml
+before_script:
+  - echo "Setting up environment"
+  - apt-get update
+  - apt-get install -y dependencies
+  - npm install
+```
+
+**Inheritance:**
+- Inherits from global `before_script`
+- Job-level `before_script` overrides global
+
+### After Script
+
+<ParamField path="after_script" type="string[]">
+  Commands to run after the main script (always executed)
+</ParamField>
+
+```yaml
+after_script:
+  - echo "Cleaning up"
+  - rm -rf temp/
+  - docker system prune -f
+```
+
+<Warning>
+  `after_script` runs even if the job fails. Use for cleanup tasks.
+</Warning>
+
+## Artifacts
+
+### Paths
+
+<ParamField path="artifacts.paths" type="string[]">
+  Files and directories to preserve
+</ParamField>
+
+```yaml
+artifacts:
+  paths:
+    - dist/
+    - build/
+    - coverage/
+    - "*.log"
+```
+
+**Glob Patterns:**
+- `*` - Match any characters except `/`
+- `**` - Match any characters including `/`
+- `?` - Match single character
+- `[abc]` - Match any character in brackets
+
+### Exclude
+
+<ParamField path="artifacts.exclude" type="string[]">
+  Patterns to exclude from artifacts
+</ParamField>
+
+```yaml
+artifacts:
+  paths:
+    - dist/
+  exclude:
+    - "dist/**/*.map"
+    - "dist/**/*.log"
+```
+
+### Expiration
+
+<ParamField path="artifacts.expire_in" type="string">
+  How long to keep artifacts
+</ParamField>
+
+```yaml
+artifacts:
+  expire_in: 1 week
+```
+
+**Valid Units:**
+- `30 mins`, `1 hour`, `2 hours`
+- `1 day`, `2 days`, `1 week`, `2 weeks`
+- `1 month`, `3 months`, `1 year`
+- `never` - Keep forever
+
+### Expose As
+
+<ParamField path="artifacts.expose_as" type="string">
+  Name for UI download link
+</ParamField>
+
+```yaml
+artifacts:
+  paths:
+    - coverage/
+  expose_as: "Code Coverage Report"
+```
+
+### Reports
+
+<ParamField path="artifacts.reports" type="object">
+  Test reports for GitLab UI integration
+</ParamField>
+
+```yaml
+artifacts:
+  reports:
+    junit: test-results.xml
+    coverage_report:
+      coverage_format: cobertura
+      path: coverage/cobertura-coverage.xml
+    dotenv: build.env
+```
+
+**Report Types:**
+- `junit` - Test results
+- `coverage_report` - Code coverage
+- `dotenv` - Environment variables
+- `sast` - Security scanning
+- `dependency_scanning` - Dependency vulnerabilities
+
+## Cache
+
+### Key
+
+<ParamField path="cache.key" type="string | object">
+  Cache identifier
+</ParamField>
+
+**Simple Key:**
+```yaml
+cache:
+  key: my-cache
+```
+
+**Variable-Based Key:**
+```yaml
+cache:
+  key: $CI_COMMIT_REF_SLUG
+```
+
+**File-Based Key:**
+```yaml
+cache:
+  key:
+    files:
+      - package-lock.json
+      - yarn.lock
+    prefix: npm-cache
+```
+
+### Paths
+
+<ParamField path="cache.paths" type="string[]">
+  Directories to cache
+</ParamField>
+
+```yaml
+cache:
+  paths:
+    - node_modules/
+    - .npm/
+    - vendor/
+```
+
+**Common Caches:**
+- Node.js: `node_modules/`, `.npm/`
+- Python: `venv/`, `.pip/`
+- Ruby: `vendor/ruby/`
+- Go: `.go/pkg/mod/`
+- Maven: `.m2/repository/`
+
+### Policy
+
+<ParamField path="cache.policy" type="string">
+  Cache download/upload strategy
+</ParamField>
+
+<Tabs>
+  <Tab title="pull-push">
+    **Default**: Download and upload cache
+    
+    ```yaml
+    cache:
+      policy: pull-push
+    ```
+    
+    Use for jobs that modify dependencies.
+  </Tab>
+  
+  <Tab title="pull">
+    **Read-Only**: Only download cache
+    
+    ```yaml
+    cache:
+      policy: pull
+    ```
+    
+    Use for jobs that don't modify dependencies (tests, linting).
+  </Tab>
+  
+  <Tab title="push">
+    **Write-Only**: Only upload cache
+    
+    ```yaml
+    cache:
+      policy: push
+    ```
+    
+    Use for jobs that populate the cache (install dependencies).
+  </Tab>
+</Tabs>
+
+## Variables
+
+### Job Variables
+
+<ParamField path="variables" type="object">
+  Job-specific environment variables
+</ParamField>
+
+```yaml
+variables:
+  NODE_ENV: production
+  API_URL: https://api.example.com
+  DEBUG: "false"
+  MAX_RETRIES: "3"
+```
+
+<Note>
+  All variable values must be strings. Numbers and booleans should be quoted.
+</Note>
+
+### Protected Variables
+
+<ParamField path="variables[].protected" type="boolean">
+  Only available on protected branches
+</ParamField>
+
+```yaml
+variables:
+  DEPLOY_TOKEN:
+    value: $PROTECTED_TOKEN
+    protected: true
+```
+
+### Masked Variables
+
+<ParamField path="variables[].masked" type="boolean">
+  Hidden in job logs
+</ParamField>
+
+```yaml
+variables:
+  API_KEY:
+    value: $SECRET_API_KEY
+    masked: true
+```
+
+## Rules
+
+### Conditional Execution
+
+<ParamField path="rules" type="array">
+  Conditions for when the job should run
+</ParamField>
+
+**Basic Rule:**
+```yaml
+rules:
+  - if: '$CI_COMMIT_BRANCH == "main"'
+    when: always
+  - when: never
+```
+
+**Multiple Conditions:**
+```yaml
+rules:
+  - if: '$CI_COMMIT_BRANCH == "main"'
+    when: always
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    when: manual
+  - if: '$CI_COMMIT_TAG'
+    when: on_success
+  - when: never
+```
+
+### Common Rule Patterns
+
+<AccordionGroup>
+  <Accordion title="Only on Main Branch" icon="code-branch">
+    ```yaml
+    rules:
+      - if: '$CI_COMMIT_BRANCH == "main"'
+    ```
+  </Accordion>
+  
+  <Accordion title="Only on Merge Requests" icon="code-pull-request">
+    ```yaml
+    rules:
+      - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    ```
+  </Accordion>
+  
+  <Accordion title="Only on Tags" icon="tag">
+    ```yaml
+    rules:
+      - if: '$CI_COMMIT_TAG'
+    ```
+  </Accordion>
+  
+  <Accordion title="Skip Draft MRs" icon="file-pen">
+    ```yaml
+    rules:
+      - if: '$CI_MERGE_REQUEST_TITLE =~ /^Draft:/'
+        when: never
+      - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    ```
+  </Accordion>
+  
+  <Accordion title="Only on Schedule" icon="clock">
+    ```yaml
+    rules:
+      - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    ```
+  </Accordion>
+  
+  <Accordion title="File Changes" icon="file">
+    ```yaml
+    rules:
+      - changes:
+          - "src/**/*.ts"
+          - "package.json"
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Rule Variables
+
+<ParamField path="rules[].variables" type="object">
+  Variables to set when rule matches
+</ParamField>
+
+```yaml
+rules:
+  - if: '$CI_COMMIT_BRANCH == "main"'
+    variables:
+      DEPLOY_ENV: production
+  - if: '$CI_COMMIT_BRANCH == "develop"'
+    variables:
+      DEPLOY_ENV: staging
+```
+
+## Dependencies
+
+### Needs (DAG)
+
+<ParamField path="needs" type="string[]">
+  Explicit job dependencies for DAG execution
+</ParamField>
+
+```yaml
+needs:
+  - build
+  - lint
+```
+
+**Benefits:**
+- Jobs start as soon as dependencies complete
+- Don't wait for entire stage
+- Faster pipeline execution
+
+**Advanced Needs:**
+```yaml
+needs:
+  - job: build
+    artifacts: true
+  - job: lint
+    artifacts: false
+  - project: group/project
+    job: build
+    ref: main
+```
+
+### Dependencies (Artifacts)
+
+<ParamField path="dependencies" type="string[]">
+  Jobs to download artifacts from
+</ParamField>
+
+```yaml
+dependencies:
+  - build
+```
+
+<Tip>
+  Use `needs` for execution order and `dependencies` for artifact control.
+</Tip>
+
+## Advanced Configuration
+
+### Timeout
+
+<ParamField path="timeout" type="string">
+  Maximum job execution time
+</ParamField>
+
+```yaml
+timeout: 1 hour
+```
+
+**Valid Units:**
+- `30 seconds`, `5 minutes`, `1 hour`, `2 hours`
+
+### Retry
+
+<ParamField path="retry" type="number | object">
+  Retry configuration for failed jobs
+</ParamField>
+
+**Simple Retry:**
+```yaml
+retry: 2
+```
+
+**Conditional Retry:**
+```yaml
+retry:
+  max: 2
+  when:
+    - runner_system_failure
+    - stuck_or_timeout_failure
+```
+
+**Retry Conditions:**
+- `always` - Retry on any failure
+- `unknown_failure` - Unknown failure
+- `script_failure` - Script failed
+- `api_failure` - API failure
+- `stuck_or_timeout_failure` - Timeout
+- `runner_system_failure` - Runner failure
+- `missing_dependency_failure` - Missing dependency
+- `runner_unsupported` - Unsupported runner
+
+### Parallel
+
+<ParamField path="parallel" type="number | object">
+  Run job multiple times in parallel
+</ParamField>
+
+**Simple Parallel:**
+```yaml
+parallel: 5
+```
+
+**Matrix Parallel:**
+```yaml
+parallel:
+  matrix:
+    - NODE_VERSION: ['14', '16', '18']
+      OS: ['linux', 'windows']
+```
+
+Creates 6 jobs (3 versions × 2 OSes).
+
+### Environment
+
+<ParamField path="environment" type="string | object">
+  Deployment environment
+</ParamField>
+
+**Simple Environment:**
+```yaml
+environment: production
+```
+
+**Advanced Environment:**
+```yaml
+environment:
+  name: production
+  url: https://example.com
+  on_stop: stop_production
+  auto_stop_in: 1 week
+```
+
+## Trigger Jobs
+
+### Multi-Project Pipelines
+
+<ParamField path="trigger" type="string | object">
+  Trigger another project's pipeline
+</ParamField>
+
+**Simple Trigger:**
+```yaml
+trigger: group/project
+```
+
+**Advanced Trigger:**
+```yaml
+trigger:
+  project: group/project
+  branch: main
+  strategy: depend
+```
+
+**Passing Variables:**
+```yaml
+trigger:
+  project: group/project
+  variables:
+    DEPLOY_ENV: production
+    VERSION: $CI_COMMIT_TAG
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Meaningful Names" icon="tag">
+    ✅ `build:frontend`, `test:unit`, `deploy:production`  
+    ❌ `job1`, `job2`, `my-job`
+  </Accordion>
+  
+  <Accordion title="Leverage Artifacts" icon="box">
+    Pass build outputs between jobs instead of rebuilding:
+    
+    ```yaml
+    build:
+      artifacts:
+        paths: [dist/]
+    
+    test:
+      needs: [build]
+      # Uses artifacts from build
+    ```
+  </Accordion>
+  
+  <Accordion title="Cache Dependencies" icon="database">
+    Cache dependencies, not build outputs:
+    
+    ```yaml
+    cache:
+      key: $CI_COMMIT_REF_SLUG
+      paths:
+        - node_modules/  # ✅ Cache
+        - dist/          # ❌ Don't cache
+    ```
+  </Accordion>
+  
+  <Accordion title="Use Rules Over Only/Except" icon="gavel">
+    Rules are more powerful and flexible:
+    
+    ```yaml
+    # ✅ Modern
+    rules:
+      - if: '$CI_COMMIT_BRANCH == "main"'
+    
+    # ❌ Deprecated
+    only:
+      - main
+    ```
+  </Accordion>
+  
+  <Accordion title="Fail Fast" icon="bolt">
+    Run quick checks first:
+    
+    ```yaml
+    stages:
+      - lint      # Fast
+      - test:unit # Medium
+      - test:e2e  # Slow
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Creating Pipelines"
+    icon="diagram-project"
+    href="/user-guide/creating-pipelines"
+  >
+    Learn pipeline creation workflows
+  </Card>
+  <Card
+    title="Templates"
+    icon="layer-group"
+    href="/user-guide/templates"
+  >
+    Use pre-built job templates
+  </Card>
+  <Card
+    title="Validation"
+    icon="check"
+    href="/user-guide/validation"
+  >
+    Validate with GitLab API
+  </Card>
+  <Card
+    title="Import/Export"
+    icon="file-export"
+    href="/user-guide/import-export"
+  >
+    Work with YAML files
+  </Card>
+</CardGroup>

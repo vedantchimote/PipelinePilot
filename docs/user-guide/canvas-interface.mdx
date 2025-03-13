@@ -1,0 +1,518 @@
+---
+title: Canvas Interface
+description: 'Master the visual canvas for pipeline composition'
+---
+
+## Overview
+
+The Canvas is the heart of GitLab CI/CD Visual Editor. It provides a node-based interface where jobs are visual nodes and dependencies are edges connecting them.
+
+## Canvas Layout
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Toolbar                                                 │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  Canvas (60%)              │  YAML Preview (40%)       │
+│                            │                            │
+│  [Job Nodes]               │  Monaco Editor             │
+│  [Dependency Edges]        │  (Read-only)               │
+│  [Stage Swim Lanes]        │                            │
+│                            │                            │
+│                            │                            │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Job Nodes
+
+### Node Structure
+
+Each job appears as a visual node:
+
+```
+┌─────────────────────────┐
+│ 🔧 build-frontend       │  ← Job name with icon
+├─────────────────────────┤
+│ Stage: build            │  ← Stage label
+│ Image: node:18          │  ← Docker image
+│ Script: 2 lines         │  ← Script summary
+└─────────────────────────┘
+```
+
+### Node States
+
+<Tabs>
+  <Tab title="Default">
+    **Normal State**
+    - Dark background (#374151)
+    - Blue border (#3B82F6)
+    - White text
+    
+    Indicates a valid, unselected job.
+  </Tab>
+  
+  <Tab title="Selected">
+    **Selected State**
+    - Highlighted border with glow
+    - Brighter blue border
+    - Property Panel opens
+    
+    Click a node to select it.
+  </Tab>
+  
+  <Tab title="Error">
+    **Error State**
+    - Red border (#EF4444)
+    - Error icon (⚠️)
+    - Error count badge
+    
+    Indicates validation errors. Hover to see details.
+  </Tab>
+  
+  <Tab title="Trigger Job">
+    **Trigger Job State**
+    - Purple accent (#8B5CF6)
+    - Special icon (🔗)
+    - Distinct styling
+    
+    Indicates a multi-project trigger job.
+  </Tab>
+</Tabs>
+
+### Node Interactions
+
+<AccordionGroup>
+  <Accordion title="Click" icon="hand-pointer">
+    **Single Click**: Select node and open Property Panel
+    
+    ```typescript
+    // Dispatches selectNode action
+    onClick={() => dispatch(selectNode(jobId))}
+    ```
+  </Accordion>
+  
+  <Accordion title="Drag" icon="hand">
+    **Click and Drag**: Move node to new position
+    
+    - Position updates in real-time
+    - Edges follow the node
+    - Snaps to grid (optional)
+    
+    ```typescript
+    // Dispatches moveJob action
+    onNodeDragStop={(event, node) => {
+      dispatch(moveJob({ jobId: node.id, position: node.position }));
+    }}
+    ```
+  </Accordion>
+  
+  <Accordion title="Delete" icon="trash">
+    **Delete Key**: Remove selected node
+    
+    - Confirmation dialog appears
+    - All connected edges are removed
+    - Undo available (Ctrl+Z)
+    
+    ```typescript
+    // Dispatches deleteJob action
+    onKeyDown={(e) => {
+      if (e.key === 'Delete' && selectedNodeId) {
+        dispatch(deleteJob(selectedNodeId));
+      }
+    }}
+    ```
+  </Accordion>
+  
+  <Accordion title="Copy/Paste" icon="copy">
+    **Ctrl+C / Ctrl+V**: Duplicate node
+    
+    - Copies all job configuration
+    - Generates new unique ID
+    - Appends number to name (e.g., "build" → "build_2")
+    - Pastes at cursor position
+  </Accordion>
+</AccordionGroup>
+
+## Dependency Edges
+
+### Edge Types
+
+<CardGroup cols={2}>
+  <Card title="Needs Dependency" icon="arrow-right">
+    Explicit DAG dependency using `needs` keyword
+    
+    **Visual**: Solid blue arrow
+  </Card>
+  <Card title="Artifact Dependency" icon="box">
+    Artifact dependency using `dependencies` keyword
+    
+    **Visual**: Dashed blue arrow
+  </Card>
+  <Card title="Invalid Dependency" icon="circle-xmark">
+    Circular or invalid dependency
+    
+    **Visual**: Red arrow with warning
+  </Card>
+  <Card title="Stage Dependency" icon="layer-group">
+    Implicit stage-based dependency
+    
+    **Visual**: Gray background connection
+  </Card>
+</CardGroup>
+
+### Creating Edges
+
+<Steps>
+  <Step title="Hover Over Source Node">
+    Output handle appears on the right side of the node
+  </Step>
+  
+  <Step title="Click and Drag">
+    Drag from the output handle
+  </Step>
+  
+  <Step title="Drop on Target Node">
+    Drop on the input handle (left side) of the target node
+  </Step>
+  
+  <Step title="Validation">
+    System checks for circular dependencies
+    - ✅ Valid: Edge is created
+    - ❌ Invalid: Error message appears
+  </Step>
+</Steps>
+
+### Deleting Edges
+
+<Tabs>
+  <Tab title="Click Edge">
+    Click the edge to select it, then press Delete key
+  </Tab>
+  
+  <Tab title="Property Panel">
+    Open target job's Property Panel and remove from "Needs" list
+  </Tab>
+  
+  <Tab title="Delete Source Job">
+    Deleting a job automatically removes all connected edges
+  </Tab>
+</Tabs>
+
+## Stage Swim Lanes
+
+### Visual Organization
+
+Jobs are organized into horizontal swim lanes by stage:
+
+```
+┌─────────────────────────────────────────┐
+│ build                                   │
+│  [build-frontend]  [build-backend]     │
+├─────────────────────────────────────────┤
+│ test                                    │
+│  [test-unit]  [test-integration]       │
+├─────────────────────────────────────────┤
+│ deploy                                  │
+│  [deploy-staging]  [deploy-production] │
+└─────────────────────────────────────────┘
+```
+
+### Stage Management
+
+<AccordionGroup>
+  <Accordion title="Add Stage" icon="plus">
+    Stages are created automatically when you add a job with a new stage name.
+    
+    Or manually:
+    1. Click "Manage Stages" in toolbar
+    2. Enter stage name
+    3. Click "Add"
+  </Accordion>
+  
+  <Accordion title="Reorder Stages" icon="arrows-up-down">
+    1. Click "Manage Stages"
+    2. Drag stages to reorder
+    3. Click "Save"
+    
+    Jobs automatically reposition to match new stage order.
+  </Accordion>
+  
+  <Accordion title="Delete Stage" icon="trash">
+    1. Click "Manage Stages"
+    2. Click delete icon next to stage
+    3. Confirm deletion
+    
+    <Warning>
+      All jobs in the stage must be moved or deleted first.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+## Navigation Controls
+
+### Zoom
+
+<CardGroup cols={3}>
+  <Card title="Mouse Wheel" icon="computer-mouse">
+    Scroll up/down to zoom in/out
+  </Card>
+  <Card title="Zoom Buttons" icon="magnifying-glass">
+    Click +/- buttons in bottom-right
+  </Card>
+  <Card title="Keyboard" icon="keyboard">
+    Ctrl + Mouse Wheel for precise zoom
+  </Card>
+</CardGroup>
+
+**Zoom Levels:**
+- Minimum: 10% (overview of large pipelines)
+- Maximum: 200% (detailed view)
+- Default: 100%
+
+### Pan
+
+<CardGroup cols={3}>
+  <Card title="Click and Drag" icon="hand">
+    Click empty space and drag to pan
+  </Card>
+  <Card title="Arrow Keys" icon="keyboard">
+    Use arrow keys for small movements
+  </Card>
+  <Card title="Space + Drag" icon="hand">
+    Hold Space and drag for pan mode
+  </Card>
+</CardGroup>
+
+### Fit to Screen
+
+Click the "Fit View" button to automatically zoom and pan to show all jobs.
+
+```typescript
+// Programmatically fit view
+reactFlowInstance.fitView({
+  padding: 0.2, // 20% padding
+  duration: 300 // 300ms animation
+});
+```
+
+## Canvas Controls
+
+### Bottom-Right Controls
+
+```
+┌─────────────┐
+│ [+]  Zoom In│
+│ [-]  Zoom Out│
+│ [⊡]  Fit View│
+│ [⊞]  Lock    │
+└─────────────┘
+```
+
+<AccordionGroup>
+  <Accordion title="Zoom In (+)" icon="magnifying-glass-plus">
+    Increases zoom by 10%
+  </Accordion>
+  
+  <Accordion title="Zoom Out (-)" icon="magnifying-glass-minus">
+    Decreases zoom by 10%
+  </Accordion>
+  
+  <Accordion title="Fit View (⊡)" icon="expand">
+    Fits all nodes in viewport
+  </Accordion>
+  
+  <Accordion title="Lock (⊞)" icon="lock">
+    Locks canvas to prevent accidental changes
+    - Disables dragging
+    - Disables edge creation
+    - Disables node deletion
+  </Accordion>
+</AccordionGroup>
+
+## Selection
+
+### Single Selection
+
+Click a node to select it:
+- Node border highlights
+- Property Panel opens
+- Keyboard shortcuts apply to selected node
+
+### Multiple Selection
+
+<Tabs>
+  <Tab title="Shift + Click">
+    Hold Shift and click nodes to add to selection
+  </Tab>
+  
+  <Tab title="Drag Selection">
+    Click and drag on empty space to create selection box
+  </Tab>
+  
+  <Tab title="Ctrl + A">
+    Select all nodes
+  </Tab>
+</Tabs>
+
+**Multi-Selection Actions:**
+- Delete: Remove all selected nodes
+- Copy: Copy all selected nodes
+- Move: Drag to move all together
+
+## Context Menu
+
+Right-click on a node to open context menu:
+
+```
+┌─────────────────────┐
+│ Edit Job            │
+│ Duplicate Job       │
+│ Delete Job          │
+├─────────────────────┤
+│ Copy Job ID         │
+│ View YAML           │
+└─────────────────────┘
+```
+
+## Mini-Map
+
+For large pipelines (20+ jobs), a mini-map appears in the bottom-left:
+
+```
+┌─────────────┐
+│ ┌─────────┐ │
+│ │ ▪ ▪ ▪   │ │  ← Overview
+│ │ ▪ ▪     │ │
+│ │   ▪ ▪   │ │
+│ │ [====]  │ │  ← Viewport
+│ └─────────┘ │
+└─────────────┘
+```
+
+Click on the mini-map to jump to that area.
+
+## Performance Tips
+
+<AccordionGroup>
+  <Accordion title="Large Pipelines (50+ jobs)" icon="gauge-high">
+    - Use zoom to focus on specific areas
+    - Use mini-map for navigation
+    - Consider splitting into multiple pipelines
+    - Use stages to organize visually
+  </Accordion>
+  
+  <Accordion title="Smooth Interactions" icon="bolt">
+    - Avoid excessive zoom in/out
+    - Use keyboard shortcuts for efficiency
+    - Lock canvas when not editing
+    - Close Property Panel when not needed
+  </Accordion>
+  
+  <Accordion title="Organization" icon="diagram-project">
+    - Group related jobs in same stage
+    - Use consistent naming (prefix by type)
+    - Minimize edge crossings
+    - Align nodes horizontally/vertically
+  </Accordion>
+</AccordionGroup>
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Click` | Select node |
+| `Drag` | Move node |
+| `Delete` | Delete selected node(s) |
+| `Ctrl+C` | Copy selected node(s) |
+| `Ctrl+V` | Paste copied node(s) |
+| `Ctrl+A` | Select all nodes |
+| `Ctrl+Z` | Undo last action |
+| `Ctrl+Y` | Redo last undone action |
+| `Arrow Keys` | Pan canvas |
+| `Ctrl+Wheel` | Zoom in/out |
+| `Space+Drag` | Pan mode |
+| `Escape` | Deselect all |
+
+## Accessibility
+
+<AccordionGroup>
+  <Accordion title="Keyboard Navigation" icon="keyboard">
+    - Tab through nodes
+    - Arrow keys to move between nodes
+    - Enter to open Property Panel
+    - Space to toggle selection
+  </Accordion>
+  
+  <Accordion title="Screen Reader Support" icon="audio-description">
+    - ARIA labels on all nodes
+    - ARIA live regions for status updates
+    - Semantic HTML structure
+  </Accordion>
+  
+  <Accordion title="Visual Accessibility" icon="eye">
+    - High contrast colors (WCAG AA)
+    - No color-only indicators
+    - Clear focus states
+    - Resizable text
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Canvas is blank" icon="circle-question">
+    **Possible causes:**
+    - No jobs added yet → Click "Add Job"
+    - Zoomed out too far → Click "Fit View"
+    - Jobs outside viewport → Use mini-map to navigate
+  </Accordion>
+  
+  <Accordion title="Can't create edge" icon="link-slash">
+    **Possible causes:**
+    - Would create circular dependency → Check dependency path
+    - Source/target handles not visible → Hover over nodes
+    - Canvas is locked → Unlock in bottom-right controls
+  </Accordion>
+  
+  <Accordion title="Performance issues" icon="gauge">
+    **Solutions:**
+    - Close unused browser tabs
+    - Reduce number of jobs (split pipeline)
+    - Disable animations in settings
+    - Use Chrome/Firefox (better performance)
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Job Configuration"
+    icon="sliders"
+    href="/user-guide/job-configuration"
+  >
+    Configure job properties in detail
+  </Card>
+  <Card
+    title="Creating Pipelines"
+    icon="diagram-project"
+    href="/user-guide/creating-pipelines"
+  >
+    Learn pipeline creation workflows
+  </Card>
+  <Card
+    title="Keyboard Shortcuts"
+    icon="keyboard"
+    href="/user-guide/keyboard-shortcuts"
+  >
+    Master all keyboard shortcuts
+  </Card>
+  <Card
+    title="Templates"
+    icon="layer-group"
+    href="/user-guide/templates"
+  >
+    Use pre-built job templates
+  </Card>
+</CardGroup>

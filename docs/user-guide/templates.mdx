@@ -1,0 +1,722 @@
+---
+title: Templates
+description: 'Use and create reusable job templates'
+---
+
+## Overview
+
+Templates are pre-configured job definitions that you can quickly add to your pipeline. They save time and ensure consistency across projects.
+
+## Template Library
+
+### Opening the Library
+
+<Steps>
+  <Step title="Click Template Button">
+    Click the "Templates" button in the toolbar
+  </Step>
+  
+  <Step title="Browse Templates">
+    The Template Library panel opens on the left side
+  </Step>
+  
+  <Step title="Search and Filter">
+    Use search and filters to find the right template
+  </Step>
+  
+  <Step title="Apply Template">
+    Drag onto canvas or click "Use Template"
+  </Step>
+</Steps>
+
+### Template Categories
+
+<CardGroup cols={2}>
+  <Card title="Build" icon="hammer">
+    Compile and build applications
+    - Docker Build
+    - Node.js Build
+    - Maven Build
+    - Go Build
+  </Card>
+  <Card title="Test" icon="flask">
+    Run tests and generate reports
+    - Unit Tests
+    - Integration Tests
+    - E2E Tests
+    - Code Coverage
+  </Card>
+  <Card title="Deploy" icon="rocket">
+    Deploy to various platforms
+    - Kubernetes
+    - AWS
+    - Heroku
+    - Netlify
+  </Card>
+  <Card title="Security" icon="shield">
+    Security scanning and analysis
+    - SAST
+    - DAST
+    - Dependency Scanning
+    - Container Scanning
+  </Card>
+</CardGroup>
+
+## Official GitLab Templates
+
+### Node.js Templates
+
+<Tabs>
+  <Tab title="Install Dependencies">
+    ```yaml
+    install:
+      stage: build
+      image: node:18
+      script:
+        - npm ci
+      cache:
+        key: $CI_COMMIT_REF_SLUG
+        paths:
+          - node_modules/
+      artifacts:
+        paths:
+          - node_modules/
+        expire_in: 1 hour
+    ```
+  </Tab>
+  
+  <Tab title="Run Tests">
+    ```yaml
+    test:
+      stage: test
+      image: node:18
+      needs: [install]
+      script:
+        - npm test
+      coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+      artifacts:
+        reports:
+          junit: junit.xml
+          coverage_report:
+            coverage_format: cobertura
+            path: coverage/cobertura-coverage.xml
+    ```
+  </Tab>
+  
+  <Tab title="Build Application">
+    ```yaml
+    build:
+      stage: build
+      image: node:18
+      needs: [install]
+      script:
+        - npm run build
+      artifacts:
+        paths:
+          - dist/
+        expire_in: 1 week
+    ```
+  </Tab>
+  
+  <Tab title="Deploy to Netlify">
+    ```yaml
+    deploy:
+      stage: deploy
+      image: node:18
+      needs: [build]
+      script:
+        - npm install -g netlify-cli
+        - netlify deploy --prod --dir=dist
+      environment:
+        name: production
+        url: https://example.netlify.app
+      only:
+        - main
+    ```
+  </Tab>
+</Tabs>
+
+### Docker Templates
+
+<Tabs>
+  <Tab title="Build Image">
+    ```yaml
+    docker:build:
+      stage: build
+      image: docker:latest
+      services:
+        - docker:dind
+      script:
+        - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+        - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+      only:
+        - main
+    ```
+  </Tab>
+  
+  <Tab title="Push to Registry">
+    ```yaml
+    docker:push:
+      stage: deploy
+      image: docker:latest
+      services:
+        - docker:dind
+      needs: [docker:build]
+      script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+        - docker push $CI_REGISTRY_IMAGE:latest
+      only:
+        - main
+    ```
+  </Tab>
+  
+  <Tab title="Security Scan">
+    ```yaml
+    docker:scan:
+      stage: test
+      image: aquasec/trivy:latest
+      needs: [docker:build]
+      script:
+        - trivy image --exit-code 0 --severity HIGH,CRITICAL $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      allow_failure: true
+    ```
+  </Tab>
+</Tabs>
+
+### Python Templates
+
+<Tabs>
+  <Tab title="Setup Environment">
+    ```yaml
+    setup:
+      stage: build
+      image: python:3.11
+      script:
+        - python -m venv venv
+        - source venv/bin/activate
+        - pip install -r requirements.txt
+      cache:
+        key: $CI_COMMIT_REF_SLUG
+        paths:
+          - venv/
+      artifacts:
+        paths:
+          - venv/
+        expire_in: 1 hour
+    ```
+  </Tab>
+  
+  <Tab title="Run Tests">
+    ```yaml
+    test:
+      stage: test
+      image: python:3.11
+      needs: [setup]
+      script:
+        - source venv/bin/activate
+        - pytest --cov=. --cov-report=xml --junitxml=junit.xml
+      coverage: '/TOTAL.*\s+(\d+%)$/'
+      artifacts:
+        reports:
+          junit: junit.xml
+          coverage_report:
+            coverage_format: cobertura
+            path: coverage.xml
+    ```
+  </Tab>
+  
+  <Tab title="Lint Code">
+    ```yaml
+    lint:
+      stage: test
+      image: python:3.11
+      needs: [setup]
+      script:
+        - source venv/bin/activate
+        - pip install flake8 black mypy
+        - flake8 .
+        - black --check .
+        - mypy .
+    ```
+  </Tab>
+</Tabs>
+
+### Kubernetes Deployment
+
+```yaml
+deploy:k8s:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl config set-cluster k8s --server="$KUBE_URL" --insecure-skip-tls-verify=true
+    - kubectl config set-credentials admin --token="$KUBE_TOKEN"
+    - kubectl config set-context default --cluster=k8s --user=admin
+    - kubectl config use-context default
+    - kubectl apply -f k8s/deployment.yaml
+    - kubectl rollout status deployment/my-app
+  environment:
+    name: production
+    url: https://example.com
+    kubernetes:
+      namespace: production
+  only:
+    - main
+```
+
+### Security Scanning
+
+<Tabs>
+  <Tab title="SAST">
+    ```yaml
+    sast:
+      stage: test
+      image: returntocorp/semgrep
+      script:
+        - semgrep --config=auto --json --output=sast-report.json .
+      artifacts:
+        reports:
+          sast: sast-report.json
+      allow_failure: true
+    ```
+  </Tab>
+  
+  <Tab title="Dependency Scanning">
+    ```yaml
+    dependency_scanning:
+      stage: test
+      image: aquasec/trivy:latest
+      script:
+        - trivy fs --format json --output dependency-report.json .
+      artifacts:
+        reports:
+          dependency_scanning: dependency-report.json
+      allow_failure: true
+    ```
+  </Tab>
+  
+  <Tab title="Secret Detection">
+    ```yaml
+    secret_detection:
+      stage: test
+      image: trufflesecurity/trufflehog:latest
+      script:
+        - trufflehog filesystem . --json > secret-report.json
+      artifacts:
+        paths:
+          - secret-report.json
+      allow_failure: true
+    ```
+  </Tab>
+</Tabs>
+
+## Using Templates
+
+### Drag and Drop
+
+<Steps>
+  <Step title="Find Template">
+    Search or browse the Template Library
+  </Step>
+  
+  <Step title="Drag to Canvas">
+    Click and drag the template card onto the canvas
+  </Step>
+  
+  <Step title="Drop at Position">
+    Release at the desired position
+  </Step>
+  
+  <Step title="Customize">
+    Property Panel opens automatically for customization
+  </Step>
+</Steps>
+
+### Click to Apply
+
+<Steps>
+  <Step title="Select Template">
+    Click on a template card in the library
+  </Step>
+  
+  <Step title="Preview">
+    Template preview appears
+  </Step>
+  
+  <Step title="Click Use Template">
+    Click the "Use Template" button
+  </Step>
+  
+  <Step title="Customize">
+    Edit the job configuration as needed
+  </Step>
+</Steps>
+
+## Creating Custom Templates
+
+### Save Job as Template
+
+<Steps>
+  <Step title="Configure Job">
+    Create and configure a job on the canvas
+  </Step>
+  
+  <Step title="Open Property Panel">
+    Click the job to open the Property Panel
+  </Step>
+  
+  <Step title="Click Save as Template">
+    Click the "Save as Template" button at the bottom
+  </Step>
+  
+  <Step title="Enter Details">
+    Provide template name, description, and category
+  </Step>
+  
+  <Step title="Save">
+    Click "Save" - template appears in Custom Templates
+  </Step>
+</Steps>
+
+### Template Metadata
+
+<ParamField path="name" type="string" required>
+  Template name (unique identifier)
+</ParamField>
+
+<ParamField path="description" type="string">
+  Brief description of what the template does
+</ParamField>
+
+<ParamField path="category" type="string">
+  Category for organization (build, test, deploy, security, custom)
+</ParamField>
+
+<ParamField path="tags" type="string[]">
+  Tags for searchability
+</ParamField>
+
+**Example:**
+```json
+{
+  "name": "Node.js Test with Coverage",
+  "description": "Run Jest tests with code coverage reporting",
+  "category": "test",
+  "tags": ["nodejs", "jest", "coverage", "testing"],
+  "config": {
+    "stage": "test",
+    "image": "node:18",
+    "script": ["npm test"],
+    "coverage": "/All files[^|]*\\|[^|]*\\s+([\\d\\.]+)/",
+    "artifacts": {
+      "reports": {
+        "coverage_report": {
+          "coverage_format": "cobertura",
+          "path": "coverage/cobertura-coverage.xml"
+        }
+      }
+    }
+  }
+}
+```
+
+## Managing Custom Templates
+
+### Edit Template
+
+<Steps>
+  <Step title="Find Template">
+    Locate your custom template in the library
+  </Step>
+  
+  <Step title="Click Edit">
+    Click the edit icon on the template card
+  </Step>
+  
+  <Step title="Modify">
+    Update name, description, or configuration
+  </Step>
+  
+  <Step title="Save Changes">
+    Click "Save" to update the template
+  </Step>
+</Steps>
+
+### Delete Template
+
+<Steps>
+  <Step title="Find Template">
+    Locate the template to delete
+  </Step>
+  
+  <Step title="Click Delete">
+    Click the delete icon on the template card
+  </Step>
+  
+  <Step title="Confirm">
+    Confirm deletion in the dialog
+  </Step>
+</Steps>
+
+<Warning>
+  Deleting a template cannot be undone. Consider exporting it first.
+</Warning>
+
+### Export/Import Templates
+
+**Export Template:**
+```bash
+# Export single template
+localStorage.getItem('custom_templates')
+
+# Export all templates
+const templates = JSON.parse(localStorage.getItem('custom_templates'));
+const blob = new Blob([JSON.stringify(templates, null, 2)], { type: 'application/json' });
+// Download blob as templates.json
+```
+
+**Import Template:**
+```bash
+# Import from JSON file
+const templates = JSON.parse(fileContent);
+localStorage.setItem('custom_templates', JSON.stringify(templates));
+```
+
+## Template Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Descriptive Names" icon="tag">
+    ✅ "Node.js Build with TypeScript"  
+    ❌ "Build Template 1"
+    
+    Include technology and purpose in the name.
+  </Accordion>
+  
+  <Accordion title="Add Helpful Descriptions" icon="file-lines">
+    Explain what the template does and when to use it:
+    
+    ```
+    "Builds a Node.js application with TypeScript compilation,
+    runs linting, and generates source maps. Use for TypeScript
+    projects that need production builds."
+    ```
+  </Accordion>
+  
+  <Accordion title="Use Variables for Flexibility" icon="dollar-sign">
+    Make templates reusable with variables:
+    
+    ```yaml
+    variables:
+      NODE_VERSION: "18"
+      BUILD_COMMAND: "npm run build"
+    
+    script:
+      - npm run $BUILD_COMMAND
+    ```
+  </Accordion>
+  
+  <Accordion title="Include Comments" icon="comment">
+    Add comments to explain configuration:
+    
+    ```yaml
+    script:
+      # Install dependencies with clean install
+      - npm ci
+      # Run build with production optimizations
+      - npm run build:prod
+    ```
+  </Accordion>
+  
+  <Accordion title="Tag Appropriately" icon="tags">
+    Use relevant tags for searchability:
+    
+    ```json
+    {
+      "tags": ["nodejs", "typescript", "build", "production"]
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Template Examples
+
+### Full-Stack Application
+
+```yaml
+# Frontend Build
+build:frontend:
+  stage: build
+  image: node:18
+  script:
+    - cd frontend
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/
+  cache:
+    key: frontend-$CI_COMMIT_REF_SLUG
+    paths:
+      - frontend/node_modules/
+
+# Backend Build
+build:backend:
+  stage: build
+  image: node:18
+  script:
+    - cd backend
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - backend/dist/
+  cache:
+    key: backend-$CI_COMMIT_REF_SLUG
+    paths:
+      - backend/node_modules/
+
+# Frontend Tests
+test:frontend:
+  stage: test
+  image: node:18
+  needs: [build:frontend]
+  script:
+    - cd frontend
+    - npm test
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+
+# Backend Tests
+test:backend:
+  stage: test
+  image: node:18
+  needs: [build:backend]
+  script:
+    - cd backend
+    - npm test
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+
+# Deploy
+deploy:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  needs: [test:frontend, test:backend]
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  only:
+    - main
+```
+
+### Microservices Pipeline
+
+```yaml
+# Service 1
+build:service1:
+  stage: build
+  image: golang:1.21
+  script:
+    - cd service1
+    - go build -o bin/service1
+  artifacts:
+    paths:
+      - service1/bin/
+
+test:service1:
+  stage: test
+  image: golang:1.21
+  needs: [build:service1]
+  script:
+    - cd service1
+    - go test ./...
+
+# Service 2
+build:service2:
+  stage: build
+  image: python:3.11
+  script:
+    - cd service2
+    - pip install -r requirements.txt
+    - python setup.py build
+  artifacts:
+    paths:
+      - service2/dist/
+
+test:service2:
+  stage: test
+  image: python:3.11
+  needs: [build:service2]
+  script:
+    - cd service2
+    - pytest
+
+# Integration Tests
+test:integration:
+  stage: test
+  image: docker:latest
+  services:
+    - docker:dind
+  needs: [build:service1, build:service2]
+  script:
+    - docker-compose up -d
+    - ./run-integration-tests.sh
+    - docker-compose down
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Template not appearing" icon="eye-slash">
+    **Possible causes:**
+    - Template not saved properly → Check localStorage
+    - Search filter active → Clear search
+    - Wrong category selected → Select "All"
+  </Accordion>
+  
+  <Accordion title="Template fails to apply" icon="circle-xmark">
+    **Possible causes:**
+    - Name conflict → Template auto-renames
+    - Invalid configuration → Check template JSON
+    - Missing required fields → Add stage and script
+  </Accordion>
+  
+  <Accordion title="Can't edit template" icon="lock">
+    **Possible causes:**
+    - Official template → Can't edit, create custom version
+    - Template in use → No restriction, edit freely
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Creating Pipelines"
+    icon="diagram-project"
+    href="/user-guide/creating-pipelines"
+  >
+    Learn pipeline creation workflows
+  </Card>
+  <Card
+    title="Job Configuration"
+    icon="sliders"
+    href="/user-guide/job-configuration"
+  >
+    Configure job properties in detail
+  </Card>
+  <Card
+    title="Import/Export"
+    icon="file-export"
+    href="/user-guide/import-export"
+  >
+    Work with YAML files
+  </Card>
+  <Card
+    title="Validation"
+    icon="check"
+    href="/user-guide/validation"
+  >
+    Validate with GitLab API
+  </Card>
+</CardGroup>

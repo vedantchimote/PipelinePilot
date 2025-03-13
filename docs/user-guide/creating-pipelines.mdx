@@ -1,0 +1,575 @@
+---
+title: Creating Pipelines
+description: 'Complete guide to creating GitLab CI/CD pipelines visually'
+---
+
+## Overview
+
+Creating pipelines in the Visual Editor is intuitive and error-free. This guide walks you through the entire process from blank canvas to production-ready YAML.
+
+## Starting a New Pipeline
+
+When you open the application, you have three options:
+
+<CardGroup cols={3}>
+  <Card title="Start from Scratch" icon="file">
+    Begin with an empty canvas
+  </Card>
+  <Card title="Use Template" icon="layer-group">
+    Start with a pre-built template
+  </Card>
+  <Card title="Import YAML" icon="file-import">
+    Import existing `.gitlab-ci.yml`
+  </Card>
+</CardGroup>
+
+### Option 1: Start from Scratch
+
+<Steps>
+  <Step title="Click 'Start from Scratch'">
+    The welcome overlay closes and you see an empty canvas
+  </Step>
+  
+  <Step title="Define Stages">
+    Stages are created automatically when you add jobs, but you can pre-define them:
+    - Click "Manage Stages" in the toolbar
+    - Add stages: `build`, `test`, `deploy`
+    - Click "Save"
+  </Step>
+  
+  <Step title="Add Your First Job">
+    Click the "Add Job" button or press `Ctrl+N`
+  </Step>
+</Steps>
+
+### Option 2: Use Template
+
+<Steps>
+  <Step title="Click 'Use Template'">
+    The Template Library opens
+  </Step>
+  
+  <Step title="Browse Templates">
+    - Search by name or description
+    - Filter by category (build, test, deploy, security)
+    - Preview template content
+  </Step>
+  
+  <Step title="Apply Template">
+    Drag the template onto the canvas or click "Use Template"
+  </Step>
+  
+  <Step title="Customize">
+    The Property Panel opens - customize the job for your needs
+  </Step>
+</Steps>
+
+### Option 3: Import YAML
+
+<Steps>
+  <Step title="Click 'Import YAML'">
+    A file picker opens
+  </Step>
+  
+  <Step title="Select File">
+    Choose your `.gitlab-ci.yml` file
+  </Step>
+  
+  <Step title="Review Import">
+    Jobs appear on the canvas with auto-layout applied
+  </Step>
+  
+  <Step title="Edit Visually">
+    Make changes using the visual interface
+  </Step>
+</Steps>
+
+## Adding Jobs
+
+### Basic Job Creation
+
+<Steps>
+  <Step title="Click Add Job">
+    Click the "Add Job" button in the toolbar or press `Ctrl+N`
+  </Step>
+  
+  <Step title="Configure Basic Properties">
+    The Property Panel opens. Fill in required fields:
+    
+    ```yaml
+    Job Name: build-app
+    Stage: build
+    Script: npm install && npm run build
+    ```
+  </Step>
+  
+  <Step title="Save Job">
+    Click "Save" or press `Ctrl+S`. The job appears on the canvas!
+  </Step>
+</Steps>
+
+### Job Configuration Options
+
+<Tabs>
+  <Tab title="Basic Configuration">
+    **Required Fields:**
+    - **Job Name**: Unique identifier (alphanumeric, underscores, hyphens)
+    - **Stage**: Pipeline stage (build, test, deploy, etc.)
+    - **Script**: Commands to execute (at least one line)
+    
+    **Optional Fields:**
+    - **Image**: Docker image (e.g., `node:18`, `python:3.11`)
+    - **Tags**: Runner tags for job assignment
+    - **When**: Execution condition (on_success, on_failure, always, manual, delayed)
+    - **Allow Failure**: Continue pipeline even if job fails
+  </Tab>
+  
+  <Tab title="Scripts">
+    **Script Sections:**
+    
+    ```yaml
+    before_script:
+      - echo "Setting up environment"
+      - npm install
+    
+    script:
+      - npm run lint
+      - npm run test
+      - npm run build
+    
+    after_script:
+      - echo "Cleaning up"
+      - rm -rf node_modules
+    ```
+    
+    <Note>
+      `after_script` always runs, even if the job fails
+    </Note>
+  </Tab>
+  
+  <Tab title="Artifacts">
+    **Preserve Build Outputs:**
+    
+    ```yaml
+    artifacts:
+      paths:
+        - dist/
+        - build/
+      exclude:
+        - "**/*.log"
+      expire_in: 1 week
+      expose_as: "Build Artifacts"
+      when: on_success
+    ```
+    
+    **Common Patterns:**
+    - Build outputs: `dist/`, `build/`, `target/`
+    - Test reports: `coverage/`, `test-results/`
+    - Documentation: `docs/`, `public/`
+  </Tab>
+  
+  <Tab title="Cache">
+    **Speed Up Builds:**
+    
+    ```yaml
+    cache:
+      key: $CI_COMMIT_REF_SLUG
+      paths:
+        - node_modules/
+        - .npm/
+      policy: pull-push
+    ```
+    
+    **Cache Strategies:**
+    - `pull-push`: Download and upload (default)
+    - `pull`: Only download (for jobs that don't modify cache)
+    - `push`: Only upload (for jobs that populate cache)
+  </Tab>
+  
+  <Tab title="Variables">
+    **Job-Specific Variables:**
+    
+    ```yaml
+    variables:
+      NODE_ENV: production
+      API_URL: https://api.example.com
+      DEBUG: "false"
+    ```
+    
+    **Variable Options:**
+    - **Protected**: Only available on protected branches
+    - **Masked**: Hidden in job logs
+    - **Inherited**: View global variables
+  </Tab>
+  
+  <Tab title="Rules">
+    **Conditional Execution:**
+    
+    ```yaml
+    rules:
+      - if: '$CI_COMMIT_BRANCH == "main"'
+        when: always
+      - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+        when: manual
+      - when: never
+    ```
+    
+    **Common Patterns:**
+    - Only on main: `$CI_COMMIT_BRANCH == "main"`
+    - Only on MRs: `$CI_PIPELINE_SOURCE == "merge_request_event"`
+    - Only on tags: `$CI_COMMIT_TAG`
+    - Skip on drafts: `$CI_MERGE_REQUEST_TITLE !~ /^Draft:/`
+  </Tab>
+</Tabs>
+
+## Creating Dependencies
+
+Dependencies define the execution order of jobs. There are two types:
+
+### Stage-Based Dependencies (Implicit)
+
+Jobs in later stages automatically wait for all jobs in earlier stages:
+
+```
+build stage → test stage → deploy stage
+```
+
+All `test` jobs wait for all `build` jobs to complete.
+
+### Explicit Dependencies (DAG)
+
+Use the `needs` keyword for fine-grained control:
+
+<Steps>
+  <Step title="Select Source Job">
+    Click on the job that should run first
+  </Step>
+  
+  <Step title="Drag to Target Job">
+    Drag from the source job's output handle to the target job's input handle
+  </Step>
+  
+  <Step title="Verify Connection">
+    A directed arrow appears showing the dependency
+  </Step>
+</Steps>
+
+**Example:**
+
+```yaml
+build:
+  stage: build
+  script: npm run build
+
+test:unit:
+  stage: test
+  needs: [build]
+  script: npm run test:unit
+
+test:e2e:
+  stage: test
+  needs: [build]
+  script: npm run test:e2e
+
+deploy:
+  stage: deploy
+  needs: [test:unit, test:e2e]
+  script: npm run deploy
+```
+
+<Tip>
+  Using `needs` allows jobs in later stages to start as soon as their dependencies complete, without waiting for the entire stage.
+</Tip>
+
+### Preventing Circular Dependencies
+
+The editor automatically prevents circular dependencies:
+
+<Warning>
+  If you try to create a dependency that would form a cycle, you'll see an error:
+  
+  **"Cannot create dependency: would create circular dependency"**
+  
+  The cycle path is highlighted in red: `Job A → Job B → Job C → Job A`
+</Warning>
+
+## Organizing Large Pipelines
+
+### Stage Swim Lanes
+
+Jobs are automatically organized into stage swim lanes:
+
+```
+┌─────────────────────────────────────────┐
+│ build                                   │
+│  [build-frontend]  [build-backend]     │
+├─────────────────────────────────────────┤
+│ test                                    │
+│  [test-unit]  [test-integration]       │
+├─────────────────────────────────────────┤
+│ deploy                                  │
+│  [deploy-staging]  [deploy-production] │
+└─────────────────────────────────────────┘
+```
+
+### Canvas Navigation
+
+<CardGroup cols={2}>
+  <Card title="Zoom" icon="magnifying-glass">
+    - Mouse wheel to zoom in/out
+    - Zoom controls in bottom-right
+    - Fit to screen button
+  </Card>
+  <Card title="Pan" icon="hand">
+    - Click and drag empty space
+    - Arrow keys for small movements
+    - Mini-map for large pipelines
+  </Card>
+</CardGroup>
+
+### Job Organization Tips
+
+<AccordionGroup>
+  <Accordion title="Group Related Jobs">
+    Place related jobs near each other on the canvas for visual clarity
+  </Accordion>
+  
+  <Accordion title="Use Consistent Naming">
+    Prefix job names by type: `build:frontend`, `test:unit`, `deploy:staging`
+  </Accordion>
+  
+  <Accordion title="Color Code by Type">
+    Jobs are automatically color-coded:
+    - Regular jobs: Blue
+    - Trigger jobs: Purple
+    - Failed validation: Red
+  </Accordion>
+  
+  <Accordion title="Minimize Edge Crossings">
+    Arrange jobs to minimize dependency edge crossings for better readability
+  </Accordion>
+</AccordionGroup>
+
+## Common Pipeline Patterns
+
+### Simple Linear Pipeline
+
+```yaml
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script: npm run build
+
+test:
+  stage: test
+  script: npm run test
+
+deploy:
+  stage: deploy
+  script: npm run deploy
+```
+
+### Parallel Testing
+
+```yaml
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script: npm run build
+  artifacts:
+    paths: [dist/]
+
+test:unit:
+  stage: test
+  needs: [build]
+  script: npm run test:unit
+
+test:integration:
+  stage: test
+  needs: [build]
+  script: npm run test:integration
+
+test:e2e:
+  stage: test
+  needs: [build]
+  script: npm run test:e2e
+
+deploy:
+  stage: deploy
+  needs: [test:unit, test:integration, test:e2e]
+  script: npm run deploy
+```
+
+### Multi-Environment Deployment
+
+```yaml
+stages:
+  - build
+  - test
+  - deploy:staging
+  - deploy:production
+
+build:
+  stage: build
+  script: npm run build
+
+test:
+  stage: test
+  needs: [build]
+  script: npm run test
+
+deploy:staging:
+  stage: deploy:staging
+  needs: [test]
+  script: npm run deploy:staging
+  environment:
+    name: staging
+    url: https://staging.example.com
+
+deploy:production:
+  stage: deploy:production
+  needs: [deploy:staging]
+  script: npm run deploy:production
+  when: manual
+  environment:
+    name: production
+    url: https://example.com
+```
+
+### Monorepo Pipeline
+
+```yaml
+stages:
+  - build
+  - test
+  - deploy
+
+build:frontend:
+  stage: build
+  script: cd frontend && npm run build
+  artifacts:
+    paths: [frontend/dist/]
+
+build:backend:
+  stage: build
+  script: cd backend && npm run build
+  artifacts:
+    paths: [backend/dist/]
+
+test:frontend:
+  stage: test
+  needs: [build:frontend]
+  script: cd frontend && npm test
+
+test:backend:
+  stage: test
+  needs: [build:backend]
+  script: cd backend && npm test
+
+deploy:frontend:
+  stage: deploy
+  needs: [test:frontend]
+  script: cd frontend && npm run deploy
+
+deploy:backend:
+  stage: deploy
+  needs: [test:backend]
+  script: cd backend && npm run deploy
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Meaningful Job Names" icon="tag">
+    - ✅ `build:frontend`, `test:unit`, `deploy:production`
+    - ❌ `job1`, `job2`, `my-job`
+  </Accordion>
+  
+  <Accordion title="Leverage Artifacts" icon="box">
+    Pass build outputs between jobs instead of rebuilding:
+    
+    ```yaml
+    build:
+      artifacts:
+        paths: [dist/]
+    
+    test:
+      needs: [build]
+      # Uses artifacts from build job
+    ```
+  </Accordion>
+  
+  <Accordion title="Use Cache Wisely" icon="database">
+    Cache dependencies, not build outputs:
+    
+    ```yaml
+    cache:
+      key: $CI_COMMIT_REF_SLUG
+      paths:
+        - node_modules/  # ✅ Cache dependencies
+        - dist/          # ❌ Don't cache build outputs
+    ```
+  </Accordion>
+  
+  <Accordion title="Fail Fast" icon="bolt">
+    Run quick tests first, expensive tests later:
+    
+    ```yaml
+    stages:
+      - lint      # Fast
+      - test:unit # Medium
+      - test:e2e  # Slow
+    ```
+  </Accordion>
+  
+  <Accordion title="Use Manual Gates" icon="hand">
+    Require manual approval for production deployments:
+    
+    ```yaml
+    deploy:production:
+      when: manual
+      environment: production
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Job Configuration"
+    icon="sliders"
+    href="/user-guide/job-configuration"
+  >
+    Deep dive into all job configuration options
+  </Card>
+  <Card
+    title="Templates"
+    icon="layer-group"
+    href="/user-guide/templates"
+  >
+    Use and create reusable job templates
+  </Card>
+  <Card
+    title="Import/Export"
+    icon="file-export"
+    href="/user-guide/import-export"
+  >
+    Work with existing YAML files
+  </Card>
+  <Card
+    title="Validation"
+    icon="check"
+    href="/user-guide/validation"
+  >
+    Validate pipelines with GitLab API
+  </Card>
+</CardGroup>

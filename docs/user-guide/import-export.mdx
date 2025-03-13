@@ -1,0 +1,670 @@
+---
+title: Import & Export
+description: 'Work with existing YAML files and export your pipelines'
+---
+
+## Overview
+
+GitLab CI/CD Visual Editor provides bidirectional YAML synchronization, allowing you to import existing `.gitlab-ci.yml` files and export your visual pipelines as optimized YAML.
+
+## Importing YAML
+
+### Import from File
+
+<Steps>
+  <Step title="Click Import">
+    Click the "Import YAML" button in the toolbar or press `Ctrl+I`
+  </Step>
+  
+  <Step title="Select File">
+    Choose your `.gitlab-ci.yml` file from the file picker
+  </Step>
+  
+  <Step title="Parsing">
+    The YAML is parsed and validated
+  </Step>
+  
+  <Step title="Visualization">
+    Jobs appear on the canvas with auto-layout applied
+  </Step>
+</Steps>
+
+### Import from Text
+
+<Steps>
+  <Step title="Click Import">
+    Click "Import YAML" → "From Text"
+  </Step>
+  
+  <Step title="Paste YAML">
+    Paste your YAML content into the text area
+  </Step>
+  
+  <Step title="Click Import">
+    Click "Import" button
+  </Step>
+  
+  <Step title="Review">
+    Jobs appear on the canvas
+  </Step>
+</Steps>
+
+### What Gets Imported
+
+<Tabs>
+  <Tab title="Jobs">
+    **All job definitions:**
+    - Job name and stage
+    - Scripts (script, before_script, after_script)
+    - Image and services
+    - Variables
+    - Artifacts and cache
+    - Rules and dependencies
+    - All other job properties
+  </Tab>
+  
+  <Tab title="Global Config">
+    **Global configuration:**
+    - Default image
+    - Global variables
+    - Global cache
+    - Global before_script/after_script
+    - Stages definition
+  </Tab>
+  
+  <Tab title="Dependencies">
+    **Dependency relationships:**
+    - Explicit dependencies (needs)
+    - Artifact dependencies (dependencies)
+    - Stage-based ordering
+    
+    Visualized as edges on the canvas.
+  </Tab>
+  
+  <Tab title="Advanced Features">
+    **Advanced GitLab CI features:**
+    - Anchors and aliases (resolved automatically)
+    - Includes (expanded inline)
+    - Extends (merged into jobs)
+    - Templates (expanded)
+  </Tab>
+</Tabs>
+
+### Import Examples
+
+**Simple Pipeline:**
+```yaml
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+
+test:
+  stage: test
+  script:
+    - npm test
+  needs:
+    - build
+```
+
+**Result:**
+- 2 jobs on canvas
+- "build" in build stage swim lane
+- "test" in test stage swim lane
+- Edge from build → test
+
+**Complex Pipeline with Anchors:**
+```yaml
+.cache_template: &cache_config
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - node_modules/
+
+build:
+  stage: build
+  cache: *cache_config
+  script:
+    - npm build
+
+test:
+  stage: test
+  cache: *cache_config
+  script:
+    - npm test
+```
+
+**Result:**
+- Anchors resolved automatically
+- Both jobs have cache configuration
+- Visual editor may regenerate anchors on export
+
+## Handling Import Errors
+
+### Syntax Errors
+
+<Warning>
+  If YAML has syntax errors, import fails with detailed error message.
+</Warning>
+
+**Error Display:**
+```
+YAML Parsing Error (Line 15, Column 3)
+Invalid indentation: expected 2 spaces, found 3
+
+Suggestion: Check that all indentation uses consistent spacing
+```
+
+**Common Syntax Errors:**
+
+<AccordionGroup>
+  <Accordion title="Indentation Errors" icon="indent">
+    ```yaml
+    # ❌ Wrong
+    build:
+      script:
+         - npm build  # 3 spaces
+    
+    # ✅ Correct
+    build:
+      script:
+        - npm build  # 2 spaces
+    ```
+  </Accordion>
+  
+  <Accordion title="Missing Colons" icon="colon-sign">
+    ```yaml
+    # ❌ Wrong
+    build
+      script:
+        - npm build
+    
+    # ✅ Correct
+    build:
+      script:
+        - npm build
+    ```
+  </Accordion>
+  
+  <Accordion title="Unclosed Quotes" icon="quote-left">
+    ```yaml
+    # ❌ Wrong
+    script:
+      - echo "Hello
+    
+    # ✅ Correct
+    script:
+      - echo "Hello"
+    ```
+  </Accordion>
+  
+  <Accordion title="Invalid Characters" icon="exclamation">
+    ```yaml
+    # ❌ Wrong
+    build@job:  # @ not allowed in job names
+      script:
+        - npm build
+    
+    # ✅ Correct
+    build_job:
+      script:
+        - npm build
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Semantic Errors
+
+**Unsupported Features:**
+
+Some GitLab CI features may not be fully supported in the visual editor:
+
+<Tabs>
+  <Tab title="Includes">
+    **External includes are expanded:**
+    
+    ```yaml
+    include:
+      - remote: 'https://example.com/template.yml'
+    ```
+    
+    The editor fetches and expands the included content inline.
+  </Tab>
+  
+  <Tab title="Extends">
+    **Extends are merged:**
+    
+    ```yaml
+    .template:
+      script:
+        - npm install
+    
+    build:
+      extends: .template
+      script:
+        - npm build
+    ```
+    
+    The editor merges the template into the job.
+  </Tab>
+  
+  <Tab title="Hidden Jobs">
+    **Hidden jobs (starting with .) are preserved:**
+    
+    ```yaml
+    .template:
+      script:
+        - echo "template"
+    ```
+    
+    Not displayed on canvas but preserved in export.
+  </Tab>
+</Tabs>
+
+### Name Conflicts
+
+If imported jobs have duplicate names:
+
+1. **First job**: Keeps original name
+2. **Subsequent jobs**: Appended with number (e.g., `build_2`, `build_3`)
+3. **Warning displayed**: "Renamed 2 jobs due to name conflicts"
+
+## Exporting YAML
+
+### Export to File
+
+<Steps>
+  <Step title="Click Export">
+    Click "Export YAML" button in toolbar or press `Ctrl+E`
+  </Step>
+  
+  <Step title="Download">
+    Browser downloads `.gitlab-ci.yml` file
+  </Step>
+  
+  <Step title="Commit">
+    Commit the file to your repository
+  </Step>
+</Steps>
+
+### Export to Clipboard
+
+<Steps>
+  <Step title="Click Export">
+    Click "Export YAML" → "Copy to Clipboard"
+  </Step>
+  
+  <Step title="Paste">
+    Paste into your editor or GitLab Web IDE
+  </Step>
+</Steps>
+
+### What Gets Exported
+
+<Tabs>
+  <Tab title="Jobs">
+    **All job configuration:**
+    - Name, stage, script
+    - Image, services, tags
+    - Variables, cache, artifacts
+    - Rules, dependencies, needs
+    - All other properties
+  </Tab>
+  
+  <Tab title="Global Config">
+    **Global configuration:**
+    - Default image
+    - Global variables
+    - Global cache
+    - Stages (ordered)
+  </Tab>
+  
+  <Tab title="Optimizations">
+    **YAML optimizations:**
+    - Anchors for repeated config
+    - Aliases to reduce duplication
+    - Proper job ordering by stage
+    - Clean formatting
+  </Tab>
+  
+  <Tab title="Not Exported">
+    **UI-specific data (not exported):**
+    - Node positions
+    - Viewport state
+    - Selection state
+    - UI preferences
+  </Tab>
+</Tabs>
+
+### Export Example
+
+**Visual Pipeline:**
+- Job 1: build (stage: build, cache: node_modules/)
+- Job 2: test (stage: test, cache: node_modules/)
+- Job 3: deploy (stage: deploy)
+
+**Exported YAML:**
+```yaml
+.cache_template: &cache_0
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - node_modules/
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  cache: *cache_0
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+
+test:
+  stage: test
+  cache: *cache_0
+  needs:
+    - build
+  script:
+    - npm test
+
+deploy:
+  stage: deploy
+  needs:
+    - test
+  script:
+    - npm run deploy
+  environment:
+    name: production
+  only:
+    - main
+```
+
+**Optimizations Applied:**
+- Cache config extracted as anchor `&cache_0`
+- Both build and test use alias `*cache_0`
+- Jobs ordered by stage
+- Clean 2-space indentation
+
+## YAML Optimization
+
+### Anchor Generation
+
+The editor automatically detects repeated configuration and generates anchors:
+
+**Before Optimization:**
+```yaml
+build:
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+  script:
+    - npm build
+
+test:
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+  script:
+    - npm test
+```
+
+**After Optimization:**
+```yaml
+.cache_template: &cache_0
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - node_modules/
+
+build:
+  cache: *cache_0
+  script:
+    - npm build
+
+test:
+  cache: *cache_0
+  script:
+    - npm test
+```
+
+**Anchor Detection Rules:**
+- Configuration must be identical (JSON comparison)
+- Must be used by 2+ jobs
+- Applies to: cache, variables, before_script, after_script
+
+### Job Ordering
+
+Jobs are ordered for readability:
+
+1. **By Stage**: Jobs grouped by stage in stage order
+2. **Alphabetically**: Within each stage, jobs sorted alphabetically
+3. **Hidden Jobs First**: Hidden jobs (starting with .) appear at top
+
+**Example:**
+```yaml
+# Hidden jobs first
+.template:
+  script: [echo "template"]
+
+# Stage 1: build
+build:
+  stage: build
+  script: [npm build]
+
+build_docker:
+  stage: build
+  script: [docker build]
+
+# Stage 2: test
+test:
+  stage: test
+  script: [npm test]
+
+test_e2e:
+  stage: test
+  script: [npm run test:e2e]
+```
+
+## Export JSON (Backup)
+
+### Export Pipeline State
+
+<Steps>
+  <Step title="Click Export">
+    Click "Export" → "Export JSON"
+  </Step>
+  
+  <Step title="Download">
+    Browser downloads `pipeline-state.json`
+  </Step>
+  
+  <Step title="Store">
+    Store as backup or version control
+  </Step>
+</Steps>
+
+### JSON Format
+
+```json
+{
+  "version": "1.0",
+  "metadata": {
+    "created": "2024-01-01T00:00:00Z",
+    "modified": "2024-01-02T12:00:00Z",
+    "name": "My Pipeline"
+  },
+  "global": {
+    "image": "node:18",
+    "variables": {
+      "NODE_ENV": "production"
+    }
+  },
+  "stages": ["build", "test", "deploy"],
+  "jobs": {
+    "build": {
+      "id": "build",
+      "name": "build",
+      "stage": "build",
+      "script": ["npm build"],
+      "cache": {
+        "key": "$CI_COMMIT_REF_SLUG",
+        "paths": ["node_modules/"]
+      }
+    }
+  },
+  "ui": {
+    "nodes": {
+      "build": { "x": 0, "y": 0 }
+    },
+    "viewport": { "x": 0, "y": 0, "zoom": 1 }
+  }
+}
+```
+
+### Import JSON
+
+<Steps>
+  <Step title="Click Import">
+    Click "Import" → "Import JSON"
+  </Step>
+  
+  <Step title="Select File">
+    Choose your `pipeline-state.json` file
+  </Step>
+  
+  <Step title="Restore">
+    Pipeline is restored exactly as exported
+  </Step>
+</Steps>
+
+<Tip>
+  JSON export/import preserves UI state (node positions, viewport) unlike YAML export.
+</Tip>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Version Control YAML" icon="code-branch">
+    Commit `.gitlab-ci.yml` to your repository:
+    
+    ```bash
+    git add .gitlab-ci.yml
+    git commit -m "Update CI/CD pipeline"
+    git push
+    ```
+  </Accordion>
+  
+  <Accordion title="Backup JSON Periodically" icon="floppy-disk">
+    Export JSON for complex pipelines:
+    - Before major changes
+    - After completing a feature
+    - Weekly for active projects
+  </Accordion>
+  
+  <Accordion title="Test Before Committing" icon="flask">
+    Validate your pipeline before committing:
+    1. Export YAML
+    2. Check validation status (green checkmark)
+    3. Review generated YAML
+    4. Commit to repository
+  </Accordion>
+  
+  <Accordion title="Use Comments" icon="comment">
+    Add comments in the visual editor:
+    - Job descriptions
+    - Configuration notes
+    - TODO items
+    
+    Comments are preserved in YAML export (best effort).
+  </Accordion>
+  
+  <Accordion title="Review Optimizations" icon="magnifying-glass">
+    Check generated anchors:
+    - Ensure they make sense
+    - Verify aliases are correct
+    - Test in GitLab if unsure
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Import fails with syntax error" icon="triangle-exclamation">
+    **Solution:**
+    1. Copy error message
+    2. Check line and column number
+    3. Fix syntax in text editor
+    4. Try import again
+    
+    Or use GitLab's CI Lint to validate first.
+  </Accordion>
+  
+  <Accordion title="Jobs missing after import" icon="eye-slash">
+    **Possible causes:**
+    - Hidden jobs (starting with .) → Not displayed on canvas
+    - Invalid job names → Check error messages
+    - Unsupported features → Check console for warnings
+  </Accordion>
+  
+  <Accordion title="Export doesn't match original" icon="not-equal">
+    **Expected differences:**
+    - Anchor/alias optimization
+    - Job reordering
+    - Formatting changes
+    - Comment placement
+    
+    **Semantic meaning is preserved.**
+  </Accordion>
+  
+  <Accordion title="Can't download exported file" icon="download">
+    **Solutions:**
+    - Check browser download settings
+    - Try "Copy to Clipboard" instead
+    - Check browser console for errors
+    - Try different browser
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Validation"
+    icon="check"
+    href="/user-guide/validation"
+  >
+    Validate pipelines with GitLab API
+  </Card>
+  <Card
+    title="Creating Pipelines"
+    icon="diagram-project"
+    href="/user-guide/creating-pipelines"
+  >
+    Learn pipeline creation workflows
+  </Card>
+  <Card
+    title="Templates"
+    icon="layer-group"
+    href="/user-guide/templates"
+  >
+    Use pre-built job templates
+  </Card>
+  <Card
+    title="YAML Engine API"
+    icon="code"
+    href="/api-reference/yaml-engine"
+  >
+    Technical details of YAML conversion
+  </Card>
+</CardGroup>

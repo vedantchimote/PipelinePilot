@@ -1,0 +1,153 @@
+---
+title: Introduction
+description: 'Welcome to GitLab CI/CD Pipeline Visual Editor - A modern, visual approach to building GitLab CI/CD pipelines'
+---
+
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.png"
+  alt="Hero Light"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.png"
+  alt="Hero Dark"
+/>
+
+## What is GitLab CI/CD Visual Editor?
+
+GitLab CI/CD Pipeline Visual Editor is a web-based GUI application that revolutionizes how you create and manage GitLab CI/CD pipelines. Instead of manually writing YAML files, you can visually compose pipelines using an intuitive drag-and-drop interface.
+
+<CardGroup cols={2}>
+  <Card
+    title="Visual Canvas"
+    icon="diagram-project"
+    href="/user-guide/canvas-interface"
+  >
+    Drag and drop jobs, create dependencies, and visualize your entire pipeline at a glance
+  </Card>
+  <Card
+    title="Real-Time YAML"
+    icon="code"
+    href="/user-guide/import-export"
+  >
+    See your YAML generated in real-time with optimizations like anchors and aliases
+  </Card>
+  <Card
+    title="GitLab Integration"
+    icon="gitlab"
+    href="/user-guide/validation"
+  >
+    Validate your pipelines against GitLab's API before committing
+  </Card>
+  <Card
+    title="Template Library"
+    icon="layer-group"
+    href="/user-guide/templates"
+  >
+    Use pre-built templates for common CI/CD patterns
+  </Card>
+</CardGroup>
+
+## Key Features
+
+<AccordionGroup>
+  <Accordion icon="palette" title="Visual Pipeline Composition">
+    Create CI/CD pipelines using a node-based canvas where jobs are visual nodes and dependencies are edges. No more YAML syntax errors!
+  </Accordion>
+  <Accordion icon="bolt" title="Real-Time Validation">
+    Integrate with GitLab's CI Lint API to validate your pipeline configuration in real-time as you build.
+  </Accordion>
+  <Accordion icon="arrows-rotate" title="Bidirectional YAML Sync">
+    Import existing `.gitlab-ci.yml` files to visualize them, or export your visual pipeline to optimized YAML.
+  </Accordion>
+  <Accordion icon="puzzle-piece" title="Template System">
+    Access official GitLab templates and create your own reusable job templates for common patterns.
+  </Accordion>
+  <Accordion icon="moon" title="Dark Mode First">
+    Beautiful dark mode interface designed for developers who work in low-light environments.
+  </Accordion>
+  <Accordion icon="keyboard" title="Keyboard Shortcuts">
+    Power user features with comprehensive keyboard shortcuts for efficient pipeline editing.
+  </Accordion>
+</AccordionGroup>
+
+## Why Visual Editor?
+
+Traditional YAML editing for CI/CD pipelines has several challenges:
+
+- **Syntax Errors**: Easy to make indentation or formatting mistakes
+- **Complex Dependencies**: Hard to visualize job dependencies and execution order
+- **Repetition**: Lots of duplicated configuration across jobs
+- **Learning Curve**: Requires memorizing GitLab CI/CD YAML syntax
+
+GitLab CI/CD Visual Editor solves these problems by providing:
+
+✅ **Visual Clarity**: See your entire pipeline structure at a glance  
+✅ **Error Prevention**: Form-based configuration prevents syntax errors  
+✅ **Smart Optimization**: Automatic YAML anchors/aliases reduce duplication  
+✅ **Instant Feedback**: Real-time validation catches issues before commit  
+✅ **Faster Onboarding**: Intuitive interface requires minimal training
+
+## Who Is This For?
+
+<CardGroup cols={3}>
+  <Card title="DevOps Engineers" icon="user-gear">
+    Build complex multi-stage pipelines with ease
+  </Card>
+  <Card title="Developers" icon="code">
+    Create CI/CD pipelines without YAML expertise
+  </Card>
+  <Card title="Teams" icon="users">
+    Standardize pipeline patterns with templates
+  </Card>
+</CardGroup>
+
+## Getting Started
+
+<Steps>
+  <Step title="Install Dependencies">
+    Clone the repository and install dependencies with npm or yarn
+  </Step>
+  <Step title="Start Development Server">
+    Run the development server and open the application in your browser
+  </Step>
+  <Step title="Create Your First Pipeline">
+    Use the visual canvas to add jobs, configure properties, and create dependencies
+  </Step>
+  <Step title="Export YAML">
+    Export your pipeline as a `.gitlab-ci.yml` file ready to commit
+  </Step>
+</Steps>
+
+<Card
+  title="Quick Start Guide"
+  icon="rocket"
+  href="/quickstart"
+>
+  Follow our quick start guide to create your first pipeline in under 5 minutes
+</Card>
+
+## Technology Stack
+
+The GitLab CI/CD Visual Editor is built with modern web technologies:
+
+- **React 18+** with TypeScript for type-safe component development
+- **React Flow** for the node-based canvas interface
+- **Redux Toolkit** for centralized state management
+- **Monaco Editor** for YAML preview (same engine as VS Code)
+- **Tailwind CSS** for beautiful dark mode UI
+- **js-yaml** for YAML parsing and generation
+- **Axios** for GitLab API integration
+
+## Open Source
+
+GitLab CI/CD Visual Editor is open source and welcomes contributions from the community. Check out our [Contributing Guide](/contributing/guidelines) to get started.
+
+<Card
+  title="View on GitHub"
+  icon="github"
+  href="https://github.com/yourusername/gitlab-cicd-visual-editor"
+>
+  Star the repository and contribute to the project
+</Card>
