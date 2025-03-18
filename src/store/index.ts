@@ -5,6 +5,7 @@ import uiReducer from './uiSlice';
 import templatesReducer from './templatesSlice';
 import persistenceReducer from './persistenceSlice';
 import { validationMiddleware } from './middleware/validationMiddleware';
+import { persistenceMiddleware } from './middleware/persistenceMiddleware';
 
 export const store = configureStore({
   reducer: {
@@ -19,7 +20,7 @@ export const store = configureStore({
         // Ignore these action types for serialization check
         ignoredActions: ['pipeline/importYAML'],
       },
-    }).concat(validationMiddleware),
+    }).concat(validationMiddleware, persistenceMiddleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
