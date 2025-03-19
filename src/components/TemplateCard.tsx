@@ -59,7 +59,7 @@ export const TemplateCard = memo(({ template }: TemplateCardProps) => {
       <p className="text-gray-400 text-xs mb-3 line-clamp-2">{template.description}</p>
 
       <div className="flex items-center justify-between">
-        <span className={`text-xs px-2 py-1 rounded ${getCategoryColor(template.category)}`}>
+        <span className={`text-xs px-2 py-1 rounded ${getCategoryColor(template.category || 'other')}`}>
           {template.category}
         </span>
 

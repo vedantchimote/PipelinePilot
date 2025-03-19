@@ -27,7 +27,7 @@ export const TemplateLibrary = () => {
       // Search filter
       const matchesSearch = 
         template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        template.description.toLowerCase().includes(searchQuery.toLowerCase());
+        template.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Category filter
       const matchesCategory = 
@@ -89,7 +89,7 @@ export const TemplateLibrary = () => {
             {categories.map((category) => (
               <button
                 key={category}
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => setSelectedCategory(category || 'all')}
                 className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category
                     ? 'bg-blue-600 text-white'

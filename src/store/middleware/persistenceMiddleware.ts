@@ -6,16 +6,16 @@
 import { Middleware } from '@reduxjs/toolkit';
 import type { RootState } from '@/types';
 
+// Debounce timer
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
 const AUTOSAVE_KEY = 'pipeline_autosave';
 const AUTOSAVE_TIMESTAMP_KEY = 'pipeline_autosave_timestamp';
 const AUTOSAVE_DELAY = 30000; // 30 seconds
 
-let saveTimer: NodeJS.Timeout | null = null;
-
 /**
  * Middleware that auto-saves pipeline state to localStorage
  */
-export const persistenceMiddleware: Middleware<{}, RootState> = (store) => (next) => (action) => {
+export const persistenceMiddleware: Middleware<{}, RootState> = (store) => (next) => (action: any) => {
   const result = next(action);
 
   // Only save on pipeline actions
@@ -26,7 +26,7 @@ export const persistenceMiddleware: Middleware<{}, RootState> = (store) => (next
     }
 
     // Debounce save
-    saveTimer = setTimeout(() => {
+    saveTimer = setTimeout(async () => {
       const state = store.getState();
       const pipelineState = state.pipeline.present;
 
@@ -36,8 +36,8 @@ export const persistenceMiddleware: Middleware<{}, RootState> = (store) => (next
         localStorage.setItem(AUTOSAVE_TIMESTAMP_KEY, new Date().toISOString());
 
         // Update persistence state
-        const { setLastSaved } = require('../persistenceSlice');
-        store.dispatch(setLastSaved(new Date().toISOString()));
+        const { markSaved } = await import('../persistenceSlice');
+        store.dispatch(markSaved());
       } catch (error) {
         // Handle quota exceeded
         if (error instanceof Error && error.name === 'QuotaExceededError') {
@@ -45,7 +45,7 @@ export const persistenceMiddleware: Middleware<{}, RootState> = (store) => (next
           
           // Offer to export
           if (confirm('Storage quota exceeded. Would you like to export your pipeline?')) {
-            const { exportYAMLFile } = require('@/utils/import-export');
+            const { exportYAMLFile } = await import('@/utils/import-export');
             exportYAMLFile(pipelineState);
           }
         } else {

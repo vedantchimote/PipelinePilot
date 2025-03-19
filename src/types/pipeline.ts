@@ -192,15 +192,19 @@ export interface LintResult {
   errors: string[];
   warnings?: string[];
   merged_yaml?: string; // Expanded YAML with includes resolved
+  mergedYaml?: string; // Alias for merged_yaml
 }
 
 export interface Template {
-  key: string;
+  id: string;
+  key?: string;
   name: string;
   description?: string;
   content?: string; // May be lazy-loaded
   category?: string;
   tags?: string[];
+  source?: 'official' | 'custom';
+  yaml?: string;
 }
 
 // ============================================================================

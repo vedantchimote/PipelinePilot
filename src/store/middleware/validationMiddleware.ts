@@ -10,13 +10,13 @@ import { setValidationStatus, setValidationErrors } from '@/store/uiSlice';
 import type { RootState } from '@/types';
 
 // Debounce timer
-let validationTimer: NodeJS.Timeout | null = null;
+let validationTimer: ReturnType<typeof setTimeout> | null = null;
 const VALIDATION_DELAY = 500; // ms
 
 /**
  * Middleware that triggers YAML validation on pipeline changes
  */
-export const validationMiddleware: Middleware<{}, RootState> = (store) => (next) => (action) => {
+export const validationMiddleware: Middleware<{}, RootState> = (store) => (next) => (action: any) => {
   const result = next(action);
 
   // Only validate on pipeline actions
