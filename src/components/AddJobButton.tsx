@@ -7,6 +7,7 @@ import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { addJob } from '@/store/pipelineSlice';
 import type { Job_Node_Config } from '@/types';
+import Tooltip from './Tooltip';
 
 export const AddJobButton = () => {
   const dispatch = useAppDispatch();
@@ -36,25 +37,28 @@ export const AddJobButton = () => {
   }, [dispatch, jobs, stages]);
 
   return (
-    <button
-      onClick={handleAddJob}
-      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
-    >
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
+    <Tooltip content="Add a new job to the pipeline">
+      <button
+        onClick={handleAddJob}
+        aria-label="Add Job"
+        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 4v16m8-8H4"
-        />
-      </svg>
-      Add Job
-    </button>
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        Add Job
+      </button>
+    </Tooltip>
   );
 };
 

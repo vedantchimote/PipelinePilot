@@ -437,7 +437,7 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Mark tutorial as completed in localStorage
     - _Requirements: 9.3_
 
-  - [ ] 16.3 Add tooltips to UI elements
+  - [x] 16.3 Add tooltips to UI elements
     - Add tooltips to all toolbar buttons
     - Add tooltips to form fields in Property Panel
     - Add tooltips to canvas controls
