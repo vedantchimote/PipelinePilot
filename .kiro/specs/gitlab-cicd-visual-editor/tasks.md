@@ -379,11 +379,11 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Test quota exceeded handling
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-- [ ] 14. Checkpoint - Ensure all tests pass
+- [x] 14. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 15. Implement toolbar and app layout
-  - [ ] 15.1 Create Toolbar component
+- [x] 15. Implement toolbar and app layout
+  - [x] 15.1 Create Toolbar component
     - Add buttons: New Pipeline, Import YAML, Export YAML, Undo, Redo, Save, Add Job
     - Display validation status indicator
     - Add keyboard shortcuts reference button (Ctrl+/)
@@ -391,7 +391,7 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Use Tailwind CSS for dark mode styling
     - _Requirements: 5.4, 10.3, 14.4, 15.1, 15.2, 15.6_
 
-  - [ ] 15.2 Create App layout component
+  - [x] 15.2 Create App layout component
     - Implement split-view layout: Canvas (left 60%) and Monaco Preview (right 40%)
     - Make split resizable with drag handle
     - Position Property Panel as overlay on right side
@@ -399,7 +399,7 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Ensure responsive layout for different screen sizes
     - _Requirements: 3.5_
 
-  - [ ] 15.3 Implement keyboard shortcuts
+  - [x] 15.3 Implement keyboard shortcuts
     - Ctrl+Z: Undo
     - Ctrl+Y: Redo
     - Ctrl+S: Manual save
@@ -409,7 +409,7 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Ctrl+/: Show keyboard shortcuts reference
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5, 15.6_
 
-  - [ ] 15.4 Create keyboard shortcuts reference panel
+  - [x] 15.4 Create keyboard shortcuts reference panel
     - Display modal with all keyboard shortcuts
     - Organize by category (Editing, Navigation, File Operations)
     - Open with Ctrl+/ or toolbar button
@@ -421,12 +421,13 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Test split-view resizing
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5_
 
-- [ ] 16. Implement first-time user experience
-  - [ ] 16.1 Create welcome overlay
+- [-] 16. Implement first-time user experience
+  - [x] 16.1 Create welcome overlay and integrate into app
     - Display on first app load (check localStorage flag)
     - Show quick-start options: Start from Scratch, Use Template, Import YAML
     - Provide "Hello World" template button
     - Add "Don't show again" checkbox
+    - Initialize UI state from localStorage on app load
     - _Requirements: 9.1, 9.2_
 
   - [ ] 16.2 Create interactive tutorial

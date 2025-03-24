@@ -8,12 +8,16 @@ import PropertyPanel from './components/PropertyPanel';
 import MonacoPreview from './components/MonacoPreview';
 import TemplateLibrary from './components/TemplateLibrary';
 import KeyboardShortcutsPanel from './components/KeyboardShortcutsPanel';
-import { toggleKeyboardShortcuts } from './store/uiSlice';
+import WelcomeOverlay from './components/WelcomeOverlay';
+import { toggleKeyboardShortcuts, initializeUI } from './store/uiSlice';
 import { markSaved } from './store/persistenceSlice';
 import { exportYAMLFile } from './utils/import-export';
 
 function AppContent() {
   useEffect(() => {
+    // Initialize UI state from localStorage
+    store.dispatch(initializeUI());
+    
     // Apply dark mode class to html element
     document.documentElement.classList.add('dark');
 
@@ -89,6 +93,9 @@ function AppContent() {
 
       {/* Keyboard Shortcuts Panel */}
       <KeyboardShortcutsPanel />
+
+      {/* Welcome Overlay */}
+      <WelcomeOverlay />
     </div>
   );
 }
