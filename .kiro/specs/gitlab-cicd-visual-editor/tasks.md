@@ -444,7 +444,7 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Use ARIA labels for accessibility
     - _Requirements: 9.4, 15.7_
 
-  - [ ] 16.4 Create example pipeline templates
+  - [x] 16.4 Create example pipeline templates
     - Node.js pipeline (install, lint, test, build, deploy)
     - Python pipeline (setup, test, coverage, deploy)
     - Docker pipeline (build, scan, push)

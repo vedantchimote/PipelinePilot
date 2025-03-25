@@ -203,7 +203,7 @@ export interface Template {
   content?: string; // May be lazy-loaded
   category?: string;
   tags?: string[];
-  source?: 'official' | 'custom';
+  source?: 'official' | 'custom' | 'example';
   yaml?: string;
 }
 

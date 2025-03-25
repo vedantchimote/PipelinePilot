@@ -51,6 +51,7 @@ export interface UIState {
 export interface TemplatesState {
   official: Template[];
   custom: Template[];
+  examples: Template[];
   loading: boolean;
   error: string | null;
   searchQuery: string;

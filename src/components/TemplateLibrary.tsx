@@ -12,15 +12,15 @@ import TemplateCard from './TemplateCard';
 export const TemplateLibrary = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector((state) => state.ui.templateLibraryOpen);
-  const { official, custom, loading, error } = useAppSelector((state) => state.templates);
+  const { official, custom, examples, loading, error } = useAppSelector((state) => state.templates);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedSource, setSelectedSource] = useState<'all' | 'official' | 'custom'>('all');
+  const [selectedSource, setSelectedSource] = useState<'all' | 'official' | 'custom' | 'example'>('all');
 
   const allTemplates = useMemo(() => {
-    return [...official, ...custom];
-  }, [official, custom]);
+    return [...examples, ...official, ...custom];
+  }, [examples, official, custom]);
 
   const filteredTemplates = useMemo(() => {
     return allTemplates.filter((template) => {
@@ -106,7 +106,7 @@ export const TemplateLibrary = () => {
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Source</label>
           <div className="flex gap-2">
-            {(['all', 'official', 'custom'] as const).map((source) => (
+            {(['all', 'example', 'official', 'custom'] as const).map((source) => (
               <button
                 key={source}
                 onClick={() => setSelectedSource(source)}

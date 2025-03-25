@@ -49,11 +49,18 @@ export const TemplateCard = memo(({ template }: TemplateCardProps) => {
     >
       <div className="flex items-start justify-between mb-2">
         <h3 className="text-white font-medium text-sm flex-1">{template.name}</h3>
-        {template.source === 'official' && (
-          <span className="text-xs text-blue-400 bg-blue-900/30 px-2 py-0.5 rounded">
-            Official
-          </span>
-        )}
+        <div className="flex gap-1">
+          {template.source === 'example' && (
+            <span className="text-xs text-yellow-400 bg-yellow-900/30 px-2 py-0.5 rounded">
+              Example
+            </span>
+          )}
+          {template.source === 'official' && (
+            <span className="text-xs text-blue-400 bg-blue-900/30 px-2 py-0.5 rounded">
+              Official
+            </span>
+          )}
+        </div>
       </div>
 
       <p className="text-gray-400 text-xs mb-3 line-clamp-2">{template.description}</p>

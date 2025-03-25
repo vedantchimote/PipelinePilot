@@ -4,6 +4,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { TemplatesState, Template } from '@/types';
+import { EXAMPLE_TEMPLATES } from '@/data/example-templates';
 
 const initialState: TemplatesState = {
   official: [],
@@ -12,6 +13,7 @@ const initialState: TemplatesState = {
   error: null,
   searchQuery: '',
   selectedCategory: null,
+  examples: EXAMPLE_TEMPLATES,
 };
 
 const templatesSlice = createSlice({
