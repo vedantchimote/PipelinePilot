@@ -458,7 +458,7 @@ The implementation follows a bottom-up approach: core data models and state mana
     - _Requirements: 9.1, 9.2, 9.3, 9.5_
 
 - [ ] 17. Implement accessibility features
-  - [ ] 17.1 Add ARIA labels and roles
+  - [x] 17.1 Add ARIA labels and roles
     - Add aria-label to all interactive elements
     - Add role attributes to custom components
     - Add aria-describedby for form field help text

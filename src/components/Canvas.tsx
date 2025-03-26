@@ -159,7 +159,18 @@ export const Canvas = () => {
   );
 
   return (
-    <div className="w-full h-full bg-gray-900">
+    <div className="w-full h-full bg-gray-900" role="main" aria-label="Pipeline canvas">
+      {/* Validation Status Live Region */}
+      {validationErrorsArray.length > 0 && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="sr-only"
+        >
+          {validationErrorsArray.length} validation error{validationErrorsArray.length > 1 ? 's' : ''} found
+        </div>
+      )}
+      
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -175,6 +186,7 @@ export const Canvas = () => {
         fitView
         deleteKeyCode="Delete"
         multiSelectionKeyCode="Shift"
+        aria-label="Pipeline diagram"
       >
         <Background color="#374151" gap={16} />
         <Controls className="bg-gray-800 border-gray-700" />
