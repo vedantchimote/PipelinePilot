@@ -3,9 +3,10 @@
  * Modal displaying all keyboard shortcuts
  */
 
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { closeKeyboardShortcuts } from '@/store/uiSlice';
+import { trapFocus, focusFirstElement } from '@/utils/focus-trap';
 
 const shortcuts = [
   {
@@ -38,17 +39,42 @@ const shortcuts = [
 export const KeyboardShortcutsPanel = memo(() => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector((state) => state.ui.keyboardShortcutsOpen);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      // Focus first element when modal opens
+      focusFirstElement(modalRef.current);
+
+      // Handle keyboard events
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (modalRef.current) {
+          trapFocus(modalRef.current, e);
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="shortcuts-title"
+        className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+      >
         {/* Header */}
         <div className="p-6 border-b border-gray-700 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white">Keyboard Shortcuts</h2>
+          <h2 id="shortcuts-title" className="text-2xl font-bold text-white">Keyboard Shortcuts</h2>
           <button
             onClick={() => dispatch(closeKeyboardShortcuts())}
+            aria-label="Close keyboard shortcuts"
             className="text-gray-400 hover:text-white transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

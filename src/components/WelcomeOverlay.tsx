@@ -3,12 +3,13 @@
  * First-time user welcome screen with quick-start options
  */
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { closeWelcomeOverlay } from '@/store/uiSlice';
 import { addJob } from '@/store/pipelineSlice';
 import { importYAMLFile } from '@/utils/import-export';
 import { toggleTemplateLibrary } from '@/store/uiSlice';
+import { trapFocus, focusFirstElement } from '@/utils/focus-trap';
 
 const HELLO_WORLD_JOB = {
   id: 'hello_world',
@@ -21,6 +22,24 @@ export const WelcomeOverlay = memo(() => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector((state) => state.ui.welcomeOverlayOpen);
   const showWelcome = useAppSelector((state) => state.ui.showWelcome);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen && showWelcome && modalRef.current) {
+      // Focus first element when modal opens
+      focusFirstElement(modalRef.current);
+
+      // Handle keyboard events
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (modalRef.current) {
+          trapFocus(modalRef.current, e);
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen, showWelcome]);
 
   const handleClose = useCallback(() => {
     dispatch(closeWelcomeOverlay());
@@ -53,10 +72,16 @@ export const WelcomeOverlay = memo(() => {
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-3xl p-8">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="welcome-title"
+        className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-3xl p-8"
+      >
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-3">
+          <h1 id="welcome-title" className="text-4xl font-bold text-white mb-3">
             Welcome to GitLab CI/CD Pipeline Editor
           </h1>
           <p className="text-gray-400 text-lg">

@@ -34,6 +34,18 @@ export const PropertyPanel = () => {
     }
   }, [job]);
 
+  useEffect(() => {
+    // Handle Escape key to close panel
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedNodeId) {
+        dispatch(selectNode(null));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedNodeId, dispatch]);
+
   const validationErrors = useMemo(() => {
     return validateJobConfig(formData, allJobs);
   }, [formData, allJobs]);

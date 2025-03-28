@@ -52,6 +52,18 @@ export const TemplateLibrary = () => {
     }
   }, [isOpen, official.length, loading, error, dispatch]);
 
+  useEffect(() => {
+    // Handle Escape key to close library
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        dispatch(closeTemplateLibrary());
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, dispatch]);
+
   if (!isOpen) return null;
 
   return (
