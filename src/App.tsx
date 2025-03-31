@@ -9,6 +9,7 @@ import MonacoPreview from './components/MonacoPreview';
 import TemplateLibrary from './components/TemplateLibrary';
 import KeyboardShortcutsPanel from './components/KeyboardShortcutsPanel';
 import WelcomeOverlay from './components/WelcomeOverlay';
+import ErrorBoundary from './components/ErrorBoundary';
 import { toggleKeyboardShortcuts, initializeUI } from './store/uiSlice';
 import { markSaved } from './store/persistenceSlice';
 import { exportYAMLFile } from './utils/import-export';
@@ -102,9 +103,11 @@ function AppContent() {
 
 function App() {
   return (
-    <Provider store={store}>
-      <AppContent />
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <AppContent />
+      </Provider>
+    </ErrorBoundary>
   );
 }
 
