@@ -493,7 +493,7 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Log errors to console for debugging
     - _Requirements: All (robustness)_
 
-  - [ ] 18.2 Implement circular dependency detection UI
+  - [x] 18.2 Implement circular dependency detection UI
     - Highlight cycle path on canvas with red edges
     - Display modal with cycle description (Job A → Job B → Job C → Job A)
     - Prevent edge creation when cycle detected

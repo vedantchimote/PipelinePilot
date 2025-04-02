@@ -3,7 +3,7 @@
  * Main canvas for visual pipeline editing with React Flow
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -26,9 +26,10 @@ import {
   deleteJob,
 } from '@/store/pipelineSlice';
 import { selectNode } from '@/store/uiSlice';
-import { wouldCreateCycle } from '@/utils/dependency-graph';
+import { wouldCreateCycle, detectCycle } from '@/utils/dependency-graph';
 import JobNode from './JobNode';
 import DependencyEdge from './DependencyEdge';
+import CircularDependencyModal from './CircularDependencyModal';
 
 const nodeTypes: NodeTypes = {
   job: JobNode,
@@ -47,6 +48,8 @@ export const Canvas = () => {
   const validationErrorsArray = Object.entries(validationErrors).flatMap(([jobId, errors]) =>
     errors.map((error) => ({ jobId, message: error }))
   );
+
+  const [circularDependencyCycle, setCircularDependencyCycle] = useState<string[] | null>(null);
 
   // Convert jobs to React Flow nodes
   const nodes: Node[] = useMemo(() => {
@@ -119,7 +122,13 @@ export const Canvas = () => {
 
       // Check for cycle
       if (wouldCreateCycle(jobs, connection.target, connection.source)) {
-        alert('Cannot create dependency: would create a circular dependency');
+        // Detect the cycle path
+        const cycle = detectCycle(jobs, connection.target, connection.source);
+        if (cycle) {
+          // Map job IDs to job names for display
+          const cycleNames = cycle.map((jobId) => jobs[jobId]?.name || jobId);
+          setCircularDependencyCycle(cycleNames);
+        }
         return;
       }
 
@@ -212,6 +221,14 @@ export const Canvas = () => {
           </div>
         ))}
       </div>
+
+      {/* Circular Dependency Modal */}
+      {circularDependencyCycle && (
+        <CircularDependencyModal
+          cycle={circularDependencyCycle}
+          onClose={() => setCircularDependencyCycle(null)}
+        />
+      )}
     </div>
   );
 };

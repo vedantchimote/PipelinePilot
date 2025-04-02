@@ -8,9 +8,30 @@ import type { Job_Node_Config } from '@/types';
 /**
  * Detects cycles in the dependency graph using depth-first search
  * @param jobs - Record of all jobs in the pipeline
+ * @param fromJobId - Optional: Job that will depend on toJobId (for testing a potential edge)
+ * @param toJobId - Optional: Job that fromJobId will depend on (for testing a potential edge)
  * @returns Array of job IDs forming a cycle, or empty array if no cycle
  */
-export function detectCycle(jobs: Record<string, Job_Node_Config>): string[] {
+export function detectCycle(
+  jobs: Record<string, Job_Node_Config>,
+  fromJobId?: string,
+  toJobId?: string
+): string[] {
+  // If testing a potential edge, create temporary jobs with that edge
+  let testJobs = jobs;
+  if (fromJobId && toJobId) {
+    testJobs = { ...jobs };
+    const fromJob = testJobs[fromJobId];
+    if (fromJob) {
+      const updatedJob = { ...fromJob };
+      const currentNeeds = updatedJob.needs 
+        ? (Array.isArray(updatedJob.needs) ? updatedJob.needs : [updatedJob.needs])
+        : [];
+      updatedJob.needs = [...currentNeeds, toJobId] as any;
+      testJobs[fromJobId] = updatedJob;
+    }
+  }
+
   const visited = new Set<string>();
   const recursionStack = new Set<string>();
   const path: string[] = [];
@@ -19,7 +40,7 @@ export function detectCycle(jobs: Record<string, Job_Node_Config>): string[] {
     if (recursionStack.has(jobId)) {
       // Found a cycle - return the path from this job
       const cycleStart = path.indexOf(jobId);
-      return path.slice(cycleStart).concat(jobId);
+      return path.slice(cycleStart);
     }
 
     if (visited.has(jobId)) {
@@ -30,7 +51,7 @@ export function detectCycle(jobs: Record<string, Job_Node_Config>): string[] {
     recursionStack.add(jobId);
     path.push(jobId);
 
-    const job = jobs[jobId];
+    const job = testJobs[jobId];
     if (job?.needs) {
       const needs = Array.isArray(job.needs) ? job.needs : [job.needs];
       
@@ -49,7 +70,7 @@ export function detectCycle(jobs: Record<string, Job_Node_Config>): string[] {
   }
 
   // Check all jobs as potential starting points
-  for (const jobId of Object.keys(jobs)) {
+  for (const jobId of Object.keys(testJobs)) {
     if (!visited.has(jobId)) {
       const cycle = dfs(jobId);
       if (cycle) {
