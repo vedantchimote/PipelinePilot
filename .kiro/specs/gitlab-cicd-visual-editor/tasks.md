@@ -499,7 +499,7 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Prevent edge creation when cycle detected
     - _Requirements: 1.5, 8.1_
 
-  - [ ] 18.3 Implement YAML parsing error UI
+  - [x] 18.3 Implement YAML parsing error UI
     - Display error modal with line/column information
     - Highlight problematic line in preview pane
     - Provide suggestions for common syntax errors

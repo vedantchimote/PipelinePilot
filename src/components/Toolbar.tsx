@@ -3,7 +3,7 @@
  * Main toolbar with actions and status indicators
  */
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { ActionCreators } from 'redux-undo';
 import { clearPipeline } from '@/store/pipelineSlice';
@@ -13,6 +13,7 @@ import { markSaved } from '@/store/persistenceSlice';
 import ValidationStatus from './ValidationStatus';
 import AddJobButton from './AddJobButton';
 import Tooltip from './Tooltip';
+import YAMLParseErrorModal from './YAMLParseErrorModal';
 
 export const Toolbar = memo(() => {
   const dispatch = useAppDispatch();
@@ -20,6 +21,12 @@ export const Toolbar = memo(() => {
   const canUndo = useAppSelector((state) => state.pipeline.past.length > 0);
   const canRedo = useAppSelector((state) => state.pipeline.future.length > 0);
   const theme = useAppSelector((state) => state.ui.theme);
+  const [yamlError, setYamlError] = useState<{
+    message: string;
+    line?: number;
+    column?: number;
+    snippet?: string;
+  } | null>(null);
 
   const handleNewPipeline = useCallback(() => {
     if (confirm('Create new pipeline? This will clear the current pipeline.')) {
@@ -28,10 +35,12 @@ export const Toolbar = memo(() => {
   }, [dispatch]);
 
   const handleImport = useCallback(async () => {
-    const imported = await importYAMLFile();
-    if (imported) {
+    const result = await importYAMLFile();
+    if (result.success && result.data) {
       const { importYAML } = await import('@/store/pipelineSlice');
-      dispatch(importYAML(imported));
+      dispatch(importYAML(result.data));
+    } else if (result.error) {
+      setYamlError(result.error);
     }
   }, [dispatch]);
 
@@ -62,6 +71,7 @@ export const Toolbar = memo(() => {
   }, [dispatch]);
 
   return (
+    <>
     <div className="h-16 bg-gray-800 border-b border-gray-700 px-4 flex items-center justify-between">
       {/* Left Section - Main Actions */}
       <div className="flex items-center gap-3">
@@ -189,6 +199,16 @@ export const Toolbar = memo(() => {
         </Tooltip>
       </div>
     </div>
+
+    {/* YAML Parse Error Modal */}
+    {yamlError && (
+      <YAMLParseErrorModal
+        error={yamlError}
+        onClose={() => setYamlError(null)}
+        onRetry={handleImport}
+      />
+    )}
+  </>
   );
 });
 

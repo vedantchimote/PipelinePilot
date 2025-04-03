@@ -55,12 +55,13 @@ export const WelcomeOverlay = memo(() => {
   }, [dispatch]);
 
   const handleImportYAML = useCallback(async () => {
-    const imported = await importYAMLFile();
-    if (imported) {
+    const result = await importYAMLFile();
+    if (result.success && result.data) {
       const { importYAML } = await import('@/store/pipelineSlice');
-      dispatch(importYAML(imported));
+      dispatch(importYAML(result.data));
       dispatch(closeWelcomeOverlay());
     }
+    // Note: Error handling is done in Toolbar component
   }, [dispatch]);
 
   const handleHelloWorld = useCallback(() => {

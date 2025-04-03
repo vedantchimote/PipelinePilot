@@ -8,7 +8,16 @@ import type { Pipeline_State } from '@/types';
 /**
  * Imports YAML file and parses to Pipeline_State
  */
-export async function importYAMLFile(): Promise<Pipeline_State | null> {
+export async function importYAMLFile(): Promise<{
+  success: boolean;
+  data?: Pipeline_State;
+  error?: {
+    message: string;
+    line?: number;
+    column?: number;
+    snippet?: string;
+  };
+}> {
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -17,18 +26,57 @@ export async function importYAMLFile(): Promise<Pipeline_State | null> {
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) {
-        resolve(null);
+        resolve({ success: false });
         return;
       }
 
       try {
         const content = await file.text();
         const pipelineState = fromYAML(content);
-        resolve(pipelineState);
+        resolve({ success: true, data: pipelineState });
       } catch (error) {
         console.error('Failed to import YAML:', error);
-        alert(`Failed to import YAML: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        resolve(null);
+        
+        // Get file content for snippet
+        const content = await file.text();
+        
+        // Extract error details
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        let line: number | undefined;
+        let column: number | undefined;
+        let snippet: string | undefined;
+
+        // Try to extract line/column from error message
+        const lineMatch = errorMessage.match(/line (\d+)/i);
+        const columnMatch = errorMessage.match(/column (\d+)/i);
+        
+        if (lineMatch) line = parseInt(lineMatch[1], 10);
+        if (columnMatch) column = parseInt(columnMatch[1], 10);
+
+        // Get snippet if we have line number
+        if (line !== undefined) {
+          const lines = content.split('\n');
+          const startLine = Math.max(0, line - 3);
+          const endLine = Math.min(lines.length, line + 2);
+          snippet = lines
+            .slice(startLine, endLine)
+            .map((l: string, i: number) => {
+              const lineNum = startLine + i + 1;
+              const marker = lineNum === line ? '→ ' : '  ';
+              return `${marker}${lineNum.toString().padStart(4, ' ')} | ${l}`;
+            })
+            .join('\n');
+        }
+
+        resolve({
+          success: false,
+          error: {
+            message: errorMessage,
+            line,
+            column,
+            snippet,
+          },
+        });
       }
     };
 
