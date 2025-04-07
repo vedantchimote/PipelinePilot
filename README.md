@@ -86,6 +86,7 @@ npm run lint:fix         # Fix linting issues
 npm run format           # Format code
 npm run format:check     # Check formatting
 npm run type-check       # Type check
+npm run benchmark        # Run performance benchmarks
 ```
 
 ### Project Structure

@@ -16,7 +16,20 @@ export const MonacoPreview = () => {
   // Memoize YAML generation to avoid unnecessary recalculation
   const yamlContent = useMemo(() => {
     try {
-      return toYAML(pipelineState);
+      const startTime = performance.now();
+      const yaml = toYAML(pipelineState);
+      const endTime = performance.now();
+      
+      // Log performance in development mode
+      if (import.meta.env.DEV) {
+        const duration = endTime - startTime;
+        const jobCount = Object.keys(pipelineState.jobs).length;
+        if (duration > 50) {
+          console.warn(`⚠️ YAML generation took ${duration.toFixed(2)}ms for ${jobCount} jobs`);
+        }
+      }
+      
+      return yaml;
     } catch (error) {
       return `# Error generating YAML\n# ${error instanceof Error ? error.message : 'Unknown error'}`;
     }

@@ -55,7 +55,7 @@ export const ValidationStatus = memo(() => {
 
   return (
     <div
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${config.bg} ${config.color} text-sm font-medium`}
+      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${config.bg} ${config.color} text-sm font-medium validation-status`}
       role="status"
       aria-live="polite"
       aria-label={`Validation status: ${config.text}`}

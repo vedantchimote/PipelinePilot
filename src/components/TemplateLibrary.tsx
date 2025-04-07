@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '@/store';
 import { closeTemplateLibrary } from '@/store/uiSlice';
 import { fetchTemplates } from '@/store/templatesSlice';
 import TemplateCard from './TemplateCard';
+import SkeletonLoader from './SkeletonLoader';
 
 export const TemplateLibrary = () => {
   const dispatch = useAppDispatch();
@@ -69,7 +70,7 @@ export const TemplateLibrary = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed left-0 top-0 h-full w-96 bg-gray-800 border-r border-gray-700 shadow-2xl overflow-hidden z-50 flex flex-col">
+    <div className="fixed left-0 top-0 h-full w-96 bg-gray-800 border-r border-gray-700 shadow-2xl overflow-hidden z-50 flex flex-col slide-in-left">
       {/* Header */}
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center justify-between mb-4">
@@ -167,9 +168,8 @@ export const TemplateLibrary = () => {
         )}
 
         {loading && (
-          <div className="text-center text-gray-400 py-8">
-            <div className="animate-spin text-2xl mb-2">⟳</div>
-            <div>Loading templates...</div>
+          <div className="space-y-3">
+            <SkeletonLoader type="card" count={5} />
           </div>
         )}
 

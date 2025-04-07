@@ -3,7 +3,7 @@
  * Main canvas for visual pipeline editing with React Flow
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -45,11 +45,26 @@ export const Canvas = () => {
   const { nodes: nodePositions, viewport } = useAppSelector((state) => state.pipeline.present.ui);
   const selectedNodeId = useAppSelector((state) => state.ui.selectedNodeId);
   const validationErrors = useAppSelector((state) => state.ui.validationErrors);
-  const validationErrorsArray = Object.entries(validationErrors).flatMap(([jobId, errors]) =>
-    errors.map((error) => ({ jobId, message: error }))
+  
+  // Memoize validation errors array to avoid recalculation
+  const validationErrorsArray = useMemo(() => 
+    Object.entries(validationErrors).flatMap(([jobId, errors]) =>
+      errors.map((error) => ({ jobId, message: error }))
+    ),
+    [validationErrors]
   );
 
   const [circularDependencyCycle, setCircularDependencyCycle] = useState<string[] | null>(null);
+
+  // Performance monitoring in development
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      const jobCount = Object.keys(jobs).length;
+      if (jobCount > 50) {
+        console.log(`📊 Canvas rendering ${jobCount} jobs`);
+      }
+    }
+  }, [jobs]);
 
   // Convert jobs to React Flow nodes
   const nodes: Node[] = useMemo(() => {

@@ -12,12 +12,12 @@ interface CircularDependencyModalProps {
 
 export const CircularDependencyModal = memo(({ cycle, onClose }: CircularDependencyModalProps) => {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="cycle-title"
-        className="bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full mx-4"
+        className="bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full mx-4 scale-in"
       >
         {/* Header */}
         <div className="p-6 border-b border-gray-700">

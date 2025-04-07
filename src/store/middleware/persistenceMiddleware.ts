@@ -31,9 +31,25 @@ export const persistenceMiddleware: Middleware<{}, RootState> = (store) => (next
       const pipelineState = state.pipeline.present;
 
       try {
+        // Performance monitoring
+        const startTime = performance.now();
+        
         // Save to localStorage
         localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(pipelineState));
         localStorage.setItem(AUTOSAVE_TIMESTAMP_KEY, new Date().toISOString());
+
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+
+        // Log performance in development mode
+        if (import.meta.env.DEV) {
+          const jobCount = Object.keys(pipelineState.jobs).length;
+          console.log(`💾 Auto-save completed in ${duration.toFixed(2)}ms (${jobCount} jobs)`);
+          
+          if (duration > 20) {
+            console.warn(`⚠️ Auto-save took ${duration.toFixed(2)}ms (threshold: 20ms)`);
+          }
+        }
 
         // Update persistence state
         const { markSaved } = await import('../persistenceSlice');

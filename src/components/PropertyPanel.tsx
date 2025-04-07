@@ -69,7 +69,7 @@ export const PropertyPanel = () => {
   if (!job || !selectedNodeId) return null;
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 bg-gray-800 border-l border-gray-700 shadow-2xl overflow-y-auto z-50">
+    <div className="fixed right-0 top-0 h-full w-96 bg-gray-800 border-l border-gray-700 shadow-2xl overflow-y-auto z-50 slide-in-right">
       {/* Header */}
       <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white">Job Configuration</h2>
