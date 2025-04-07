@@ -15,7 +15,7 @@ const AUTOSAVE_DELAY = 30000; // 30 seconds
 /**
  * Middleware that auto-saves pipeline state to localStorage
  */
-export const persistenceMiddleware: Middleware<{}, RootState> = (store) => (next) => (action: any) => {
+export const persistenceMiddleware: Middleware<Record<string, never>, RootState> = (store) => (next) => (action: any) => {
   const result = next(action);
 
   // Only save on pipeline actions

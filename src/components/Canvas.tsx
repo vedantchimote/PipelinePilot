@@ -78,7 +78,7 @@ export const Canvas = () => {
         hasErrors: validationErrorsArray.some((err) => err.jobId === job.id),
       },
     }));
-  }, [jobs, nodePositions, selectedNodeId, validationErrors]);
+  }, [jobs, nodePositions, selectedNodeId, validationErrorsArray]);
 
   // Convert dependencies to React Flow edges
   const edges: Edge[] = useMemo(() => {

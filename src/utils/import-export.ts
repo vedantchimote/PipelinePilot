@@ -37,35 +37,44 @@ export async function importYAMLFile(): Promise<{
       } catch (error) {
         console.error('Failed to import YAML:', error);
         
-        // Get file content for snippet
-        const content = await file.text();
-        
         // Extract error details
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         let line: number | undefined;
         let column: number | undefined;
         let snippet: string | undefined;
 
-        // Try to extract line/column from error message
-        const lineMatch = errorMessage.match(/line (\d+)/i);
-        const columnMatch = errorMessage.match(/column (\d+)/i);
-        
-        if (lineMatch) line = parseInt(lineMatch[1], 10);
-        if (columnMatch) column = parseInt(columnMatch[1], 10);
+        // Check if error has line/column info (from YAMLParseError)
+        if (error && typeof error === 'object' && 'line' in error) {
+          line = (error as any).line;
+          column = (error as any).column;
+          snippet = (error as any).snippet;
+        } else {
+          // Try to extract line/column from error message
+          const lineMatch = errorMessage.match(/line (\d+)/i);
+          const columnMatch = errorMessage.match(/column (\d+)/i);
+          
+          if (lineMatch) line = parseInt(lineMatch[1], 10);
+          if (columnMatch) column = parseInt(columnMatch[1], 10);
 
-        // Get snippet if we have line number
-        if (line !== undefined) {
-          const lines = content.split('\n');
-          const startLine = Math.max(0, line - 3);
-          const endLine = Math.min(lines.length, line + 2);
-          snippet = lines
-            .slice(startLine, endLine)
-            .map((l: string, i: number) => {
-              const lineNum = startLine + i + 1;
-              const marker = lineNum === line ? '→ ' : '  ';
-              return `${marker}${lineNum.toString().padStart(4, ' ')} | ${l}`;
-            })
-            .join('\n');
+          // Get snippet if we have line number
+          if (line !== undefined) {
+            try {
+              const content = await file.text();
+              const lines = content.split('\n');
+              const startLine = Math.max(0, line - 3);
+              const endLine = Math.min(lines.length, line + 2);
+              snippet = lines
+                .slice(startLine, endLine)
+                .map((l: string, i: number) => {
+                  const lineNum = startLine + i + 1;
+                  const marker = lineNum === line ? '→ ' : '  ';
+                  return `${marker}${lineNum.toString().padStart(4, ' ')} | ${l}`;
+                })
+                .join('\n');
+            } catch (snippetError) {
+              console.error('Failed to generate snippet:', snippetError);
+            }
+          }
         }
 
         resolve({

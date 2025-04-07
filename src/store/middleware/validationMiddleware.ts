@@ -16,7 +16,7 @@ const VALIDATION_DELAY = 500; // ms
 /**
  * Middleware that triggers YAML validation on pipeline changes
  */
-export const validationMiddleware: Middleware<{}, RootState> = (store) => (next) => (action: any) => {
+export const validationMiddleware: Middleware<Record<string, never>, RootState> = (store) => (next) => (action: any) => {
   const result = next(action);
 
   // Only validate on pipeline actions
