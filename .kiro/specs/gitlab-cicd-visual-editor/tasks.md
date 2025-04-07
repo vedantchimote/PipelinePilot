@@ -506,7 +506,7 @@ The implementation follows a bottom-up approach: core data models and state mana
     - Allow in-place editing or cancel import
     - _Requirements: 7.6_
 
-  - [ ] 18.4 Implement offline mode handling
+  - [x] 18.4 Implement offline mode handling
     - Display "Offline Mode" banner when GitLab API unreachable
     - Disable validation and template fetching
     - Allow continued editing and export

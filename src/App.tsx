@@ -10,6 +10,7 @@ import TemplateLibrary from './components/TemplateLibrary';
 import KeyboardShortcutsPanel from './components/KeyboardShortcutsPanel';
 import WelcomeOverlay from './components/WelcomeOverlay';
 import ErrorBoundary from './components/ErrorBoundary';
+import OfflineBanner from './components/OfflineBanner';
 import { toggleKeyboardShortcuts, initializeUI } from './store/uiSlice';
 import { markSaved } from './store/persistenceSlice';
 import { exportYAMLFile } from './utils/import-export';
@@ -72,6 +73,9 @@ function AppContent() {
     <div className="h-screen w-screen flex flex-col bg-gray-900 overflow-hidden">
       {/* Toolbar */}
       <Toolbar />
+
+      {/* Offline Banner */}
+      <OfflineBanner />
 
       {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
