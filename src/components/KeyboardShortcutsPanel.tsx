@@ -14,9 +14,8 @@ const shortcuts = [
     items: [
       { key: 'Ctrl+Z', description: 'Undo last action' },
       { key: 'Ctrl+Y', description: 'Redo last undone action' },
-      { key: 'Ctrl+C', description: 'Copy selected job' },
-      { key: 'Ctrl+V', description: 'Paste copied job' },
       { key: 'Delete', description: 'Delete selected job' },
+      { key: 'Shift+Click', description: 'Multi-select nodes' },
     ],
   },
   {
@@ -24,7 +23,6 @@ const shortcuts = [
     items: [
       { key: 'Ctrl+S', description: 'Save pipeline' },
       { key: 'Ctrl+E', description: 'Export YAML' },
-      { key: 'Ctrl+I', description: 'Import YAML' },
     ],
   },
   {
@@ -61,39 +59,40 @@ export const KeyboardShortcutsPanel = memo(() => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 fade-in">
       <div
         ref={modalRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="shortcuts-title"
-        className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+        className="rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden scale-in"
+        style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }}
       >
         {/* Header */}
-        <div className="p-6 border-b border-gray-700 flex items-center justify-between">
-          <h2 id="shortcuts-title" className="text-2xl font-bold text-white">Keyboard Shortcuts</h2>
+        <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: 'var(--border-primary)' }}>
+          <h2 id="shortcuts-title" className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Keyboard Shortcuts</h2>
           <button
             onClick={() => dispatch(closeKeyboardShortcuts())}
             aria-label="Close keyboard shortcuts"
-            className="text-gray-400 hover:text-white transition-colors"
+            className="toolbar-btn"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
-          <div className="space-y-8">
+        <div className="p-5 overflow-y-auto max-h-[calc(80vh-140px)]">
+          <div className="space-y-6">
             {shortcuts.map((section) => (
               <div key={section.category}>
-                <h3 className="text-lg font-semibold text-white mb-4">{section.category}</h3>
-                <div className="space-y-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>{section.category}</h3>
+                <div className="space-y-2">
                   {section.items.map((shortcut) => (
-                    <div key={shortcut.key} className="flex items-center justify-between">
-                      <span className="text-gray-300">{shortcut.description}</span>
-                      <kbd className="px-3 py-1.5 bg-gray-700 border border-gray-600 rounded-lg text-white font-mono text-sm">
+                    <div key={shortcut.key} className="flex items-center justify-between py-1">
+                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{shortcut.description}</span>
+                      <kbd className="px-2 py-1 rounded-md text-xs font-mono font-medium" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)', border: '1px solid var(--border-primary)' }}>
                         {shortcut.key}
                       </kbd>
                     </div>
@@ -105,12 +104,12 @@ export const KeyboardShortcutsPanel = memo(() => {
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-700 flex justify-end">
+        <div className="p-5 border-t flex justify-end" style={{ borderColor: 'var(--border-primary)' }}>
           <button
             onClick={() => dispatch(closeKeyboardShortcuts())}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            className="btn-primary px-4 py-2 rounded-lg text-sm font-semibold"
           >
-            Close
+            Done
           </button>
         </div>
       </div>

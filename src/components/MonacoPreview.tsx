@@ -12,6 +12,7 @@ import type { editor } from 'monaco-editor';
 export const MonacoPreview = () => {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const pipelineState = useAppSelector((state) => state.pipeline.present);
+  const theme = useAppSelector((state) => state.ui.theme);
 
   // Memoize YAML generation to avoid unnecessary recalculation
   const yamlContent = useMemo(() => {
@@ -50,27 +51,38 @@ export const MonacoPreview = () => {
   }, [yamlContent]);
 
   return (
-    <div className="h-full w-full bg-gray-900">
-      <Editor
-        height="100%"
-        defaultLanguage="yaml"
-        value={yamlContent}
-        theme="vs-dark"
-        onMount={handleEditorDidMount}
-        options={{
-          readOnly: true,
-          minimap: { enabled: false },
-          lineNumbers: 'on',
-          folding: true,
-          scrollBeyondLastLine: false,
-          wordWrap: 'on',
-          fontSize: 14,
-          fontFamily: 'Consolas, "Courier New", monospace',
-          renderLineHighlight: 'none',
-          contextmenu: false,
-          automaticLayout: true,
-        }}
-      />
+    <div className="h-full w-full flex flex-col" style={{ background: 'var(--bg-secondary)' }}>
+      {/* File Tab Header */}
+      <div className="h-9 flex items-center gap-2 px-3 border-b" style={{ borderColor: 'var(--border-primary)', background: 'var(--bg-tertiary)' }}>
+        <svg className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+        <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>.gitlab-ci.yml</span>
+        <div className="flex-1" />
+        <div className="w-2 h-2 rounded-full bg-emerald-500 opacity-60" title="Auto-synced" />
+      </div>
+      <div className="flex-1">
+        <Editor
+          height="100%"
+          defaultLanguage="yaml"
+          value={yamlContent}
+          theme={theme === 'dark' ? 'vs-dark' : 'light'}
+          onMount={handleEditorDidMount}
+          options={{
+            readOnly: true,
+            minimap: { enabled: false },
+            lineNumbers: 'on',
+            folding: true,
+            scrollBeyondLastLine: false,
+            wordWrap: 'on',
+            fontSize: 13,
+            fontFamily: "'JetBrains Mono', Consolas, 'Courier New', monospace",
+            renderLineHighlight: 'none',
+            contextmenu: false,
+            automaticLayout: true,
+            padding: { top: 12 },
+            lineDecorationsWidth: 8,
+          }}
+        />
+      </div>
     </div>
   );
 };

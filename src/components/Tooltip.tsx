@@ -51,7 +51,8 @@ export const Tooltip = ({ content, children, position = 'top', delay = 300 }: To
       {children}
       {isVisible && (
         <div
-          className={`absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg whitespace-nowrap pointer-events-none ${positionClasses[position]}`}
+          className={`absolute z-50 px-2.5 py-1.5 text-[11px] font-medium rounded-lg whitespace-nowrap pointer-events-none scale-in ${positionClasses[position]}`}
+          style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)', border: '1px solid var(--border-primary)', boxShadow: 'var(--shadow-lg)' }}
           role="tooltip"
         >
           {content}

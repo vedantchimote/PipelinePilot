@@ -69,10 +69,10 @@ export const PropertyPanel = () => {
   if (!job || !selectedNodeId) return null;
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 bg-gray-800 border-l border-gray-700 shadow-2xl overflow-y-auto z-50 slide-in-right">
+    <div className="fixed right-0 top-0 h-full w-96 glass border-l shadow-2xl overflow-y-auto z-50 slide-in-right" style={{ borderColor: 'var(--border-primary)' }}>
       {/* Header */}
-      <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">Job Configuration</h2>
+      <div className="sticky top-0 border-b p-4 flex items-center justify-between z-10" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
+        <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Job Configuration</h2>
         <button
           onClick={handleClose}
           className="text-gray-400 hover:text-white transition-colors"
@@ -87,7 +87,7 @@ export const PropertyPanel = () => {
       <div className="p-4 space-y-6">
         {/* Basic Section */}
         <section>
-          <h3 className="text-sm font-semibold text-gray-300 mb-3">Basic</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>Basic</h3>
           <div className="space-y-3">
             <TextInput
               label="Job Name"
@@ -250,17 +250,17 @@ export const PropertyPanel = () => {
       </div>
 
       {/* Footer */}
-      <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-4 flex gap-2">
+      <div className="sticky bottom-0 border-t p-4 flex gap-2" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
         <button
           onClick={handleSave}
           disabled={hasErrors}
-          className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 btn-primary px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Save
         </button>
         <button
           onClick={handleClose}
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+          className="toolbar-btn toolbar-btn-labeled px-4 py-2 rounded-lg text-sm"
         >
           Cancel
         </button>

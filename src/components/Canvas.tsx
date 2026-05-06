@@ -3,7 +3,7 @@
  * Main canvas for visual pipeline editing with React Flow
  */
 
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -15,6 +15,8 @@ import ReactFlow, {
   MiniMap,
   NodeTypes,
   EdgeTypes,
+  ReactFlowProvider,
+  useReactFlow,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -39,7 +41,7 @@ const edgeTypes: EdgeTypes = {
   dependency: DependencyEdge,
 };
 
-export const Canvas = () => {
+export const CanvasInner = () => {
   const dispatch = useAppDispatch();
   const { jobs, stages } = useAppSelector((state) => state.pipeline.present);
   const { nodes: nodePositions, viewport } = useAppSelector((state) => state.pipeline.present.ui);
@@ -55,6 +57,24 @@ export const Canvas = () => {
   );
 
   const [circularDependencyCycle, setCircularDependencyCycle] = useState<string[] | null>(null);
+  const { fitView } = useReactFlow();
+  const prevJobCountRef = useRef(Object.keys(jobs).length);
+
+  // Auto-fit view when job count changes significantly (e.g., template import, clear)
+  useEffect(() => {
+    const currentJobCount = Object.keys(jobs).length;
+    const prevCount = prevJobCountRef.current;
+    prevJobCountRef.current = currentJobCount;
+
+    // Fit view when jobs are added/removed (especially on template import)
+    if (currentJobCount !== prevCount && currentJobCount > 0) {
+      // Small delay to let React Flow finish laying out nodes
+      const timer = setTimeout(() => {
+        fitView({ padding: 0.2, duration: 300 });
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [jobs, fitView]);
 
   // Performance monitoring in development
   useEffect(() => {
@@ -183,7 +203,7 @@ export const Canvas = () => {
   );
 
   return (
-    <div className="w-full h-full bg-gray-900" role="main" aria-label="Pipeline canvas">
+    <div className="w-full h-full" style={{ background: 'var(--bg-primary)' }} role="main" aria-label="Pipeline canvas">
       {/* Validation Status Live Region */}
       {validationErrorsArray.length > 0 && (
         <div
@@ -212,7 +232,7 @@ export const Canvas = () => {
         multiSelectionKeyCode="Shift"
         aria-label="Pipeline diagram"
       >
-        <Background color="#374151" gap={16} />
+        <Background color="var(--border-primary)" gap={20} size={1} />
         <Controls className="bg-gray-800 border-gray-700" />
         <MiniMap
           className="bg-gray-800 border-gray-700"
@@ -229,10 +249,10 @@ export const Canvas = () => {
         {stages.map((stage, index) => (
           <div
             key={stage}
-            className="absolute left-0 right-0 border-t border-gray-700"
-            style={{ top: `${index * 200}px`, height: '200px' }}
+            className="absolute left-0 right-0"
+            style={{ top: `${index * 200}px`, height: '200px', borderTop: '1px solid var(--border-primary)' }}
           >
-            <div className="text-gray-500 text-sm font-medium p-2">{stage}</div>
+            <div className="text-xs font-medium px-3 py-2 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{stage}</div>
           </div>
         ))}
       </div>
@@ -247,5 +267,12 @@ export const Canvas = () => {
     </div>
   );
 };
+
+// Wrap with ReactFlowProvider so useReactFlow() hook works
+const Canvas = () => (
+  <ReactFlowProvider>
+    <CanvasInner />
+  </ReactFlowProvider>
+);
 
 export default Canvas;
