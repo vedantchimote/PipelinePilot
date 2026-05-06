@@ -20,8 +20,9 @@ function AppContent() {
     // Initialize UI state from localStorage
     store.dispatch(initializeUI());
     
-    // Apply dark mode class to html element
-    document.documentElement.classList.add('dark');
+    // Apply theme class to html element based on stored preference
+    const currentTheme = store.getState().ui.theme;
+    document.documentElement.classList.toggle('dark', currentTheme === 'dark');
 
     // Global keyboard shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -70,9 +71,12 @@ function AppContent() {
   }, []);
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-900 overflow-hidden">
+    <div className="h-screen w-screen flex flex-col overflow-hidden" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       {/* Toolbar */}
       <Toolbar />
+
+      {/* Accent Line */}
+      <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, var(--accent), transparent 50%)' }} />
 
       {/* Offline Banner */}
       <OfflineBanner />
@@ -88,7 +92,7 @@ function AppContent() {
         </div>
 
         {/* Monaco Preview (Right 40%) */}
-        <div className="w-2/5 border-l border-gray-700">
+        <div className="w-2/5 border-l" style={{ borderColor: 'var(--border-primary)' }}>
           <MonacoPreview />
         </div>
 

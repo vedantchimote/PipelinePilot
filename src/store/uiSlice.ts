@@ -5,16 +5,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { UIState, ValidationStatus } from '@/types';
 
+// Read persisted preferences synchronously to avoid flash of initial state
+const storedHideWelcome = typeof window !== 'undefined' && localStorage.getItem('hideWelcome') === 'true';
+const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') as 'dark' | 'light' | null : null;
+
 const initialState: UIState = {
   selectedNodeId: null,
   propertyPanelOpen: false,
   templateLibraryOpen: false,
-  welcomeOverlayOpen: true, // Show on first load
+  welcomeOverlayOpen: !storedHideWelcome, // Respect persisted preference from first render
   keyboardShortcutsOpen: false,
   validationStatus: 'idle',
   validationErrors: {},
-  theme: 'dark',
-  showWelcome: true,
+  theme: storedTheme || 'dark',
+  showWelcome: !storedHideWelcome, // Respect persisted preference from first render
   showTutorial: false,
   canvasLocked: false,
 };
