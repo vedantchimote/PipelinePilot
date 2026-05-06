@@ -46,23 +46,38 @@ export const validationMiddleware: Middleware<Record<string, never>, RootState> 
           store.dispatch(setValidationStatus('valid'));
           store.dispatch(setValidationErrors({}));
         } else {
-          store.dispatch(setValidationStatus('invalid'));
-          
-          // Parse errors and map to job IDs
-          const errorsByJob: Record<string, string[]> = {};
-          
-          result.errors.forEach((error) => {
-            // Try to extract job name from error message
-            const jobMatch = error.match(/job '([^']+)'/i) || error.match(/\b(\w+)\b/);
-            const jobId = jobMatch ? jobMatch[1] : 'global';
-            
-            if (!errorsByJob[jobId]) {
-              errorsByJob[jobId] = [];
-            }
-            errorsByJob[jobId].push(error);
-          });
+          // Check if errors are from API misconfiguration (not real YAML errors)
+          const isApiError = result.errors.some((error) =>
+            error.includes('Unauthorized') ||
+            error.includes('not found') ||
+            error.includes('Forbidden') ||
+            error.includes('Network error') ||
+            error.includes('timed out')
+          );
 
-          store.dispatch(setValidationErrors(errorsByJob));
+          if (isApiError) {
+            // API not configured or unreachable — don't show as validation error
+            store.dispatch(setValidationStatus('offline'));
+            store.dispatch(setValidationErrors({}));
+          } else {
+            store.dispatch(setValidationStatus('invalid'));
+            
+            // Parse errors and map to job IDs
+            const errorsByJob: Record<string, string[]> = {};
+            
+            result.errors.forEach((error) => {
+              // Try to extract job name from error message
+              const jobMatch = error.match(/job '([^']+)'/i) || error.match(/\b(\w+)\b/);
+              const jobId = jobMatch ? jobMatch[1] : 'global';
+              
+              if (!errorsByJob[jobId]) {
+                errorsByJob[jobId] = [];
+              }
+              errorsByJob[jobId].push(error);
+            });
+
+            store.dispatch(setValidationErrors(errorsByJob));
+          }
         }
       } catch (error) {
         // Network error or offline

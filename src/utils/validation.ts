@@ -72,9 +72,12 @@ export function validateJobConfig(
  * Validates Docker image format
  */
 function isValidDockerImage(image: string): boolean {
-  // Basic validation: registry/repo:tag or repo:tag
-  const pattern = /^([a-z0-9.-]+\/)?[a-z0-9._-]+(:[a-z0-9._-]+)?$/i;
-  return pattern.test(image);
+  // Allow CI variable interpolation ($VAR, ${VAR}), multi-level paths, and standard image:tag formats
+  // Examples: node:18-alpine, $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG, registry.example.com/org/repo/image:tag
+  if (image.trim() === '') return false;
+  // Reject obviously invalid characters
+  const invalidChars = /[<>"|?;]/;
+  return !invalidChars.test(image);
 }
 
 /**

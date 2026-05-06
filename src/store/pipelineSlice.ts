@@ -52,6 +52,38 @@ const pipelineSlice = createSlice({
         if (updates.stage && !state.stages.includes(updates.stage)) {
           state.stages.push(updates.stage);
         }
+
+        // Re-key job if name changed (name is used as the YAML key and display label)
+        if (updates.name && updates.name !== jobId) {
+          const newId = updates.name;
+          // Move job entry to new key
+          state.jobs[newId] = { ...state.jobs[jobId], id: newId };
+          delete state.jobs[jobId];
+          // Move UI node position to new key
+          if (state.ui.nodes[jobId]) {
+            state.ui.nodes[newId] = state.ui.nodes[jobId];
+            delete state.ui.nodes[jobId];
+          }
+          // Update all dependency references in other jobs
+          Object.values(state.jobs).forEach((job) => {
+            if (job.needs && Array.isArray(job.needs)) {
+              job.needs = job.needs.map((need) => {
+                if (typeof need === 'string') {
+                  return need === jobId ? newId : need;
+                }
+                if (need.job === jobId) {
+                  return { ...need, job: newId };
+                }
+                return need;
+              }) as any;
+            }
+            if (job.dependencies) {
+              job.dependencies = job.dependencies.map((dep) =>
+                dep === jobId ? newId : dep
+              );
+            }
+          });
+        }
       }
     },
 
