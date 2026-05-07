@@ -49,6 +49,17 @@ export const CanvasInner = () => {
   const { nodes: nodePositions, viewport } = useAppSelector((state) => state.pipeline.present.ui);
   const selectedNodeId = useAppSelector((state) => state.ui.selectedNodeId);
   const validationErrors = useAppSelector((state) => state.ui.validationErrors);
+  const theme = useAppSelector((state) => state.ui.theme);
+
+  // Compute live CSS variable values for SVG Background (SVG attrs can't use CSS vars)
+  const [bgColors, setBgColors] = useState({ bg: '#0c1222', dots: '#1e2d4a' });
+  useEffect(() => {
+    const styles = getComputedStyle(document.documentElement);
+    setBgColors({
+      bg: styles.getPropertyValue('--bg-primary').trim() || '#0c1222',
+      dots: styles.getPropertyValue('--border-primary').trim() || '#1e2d4a',
+    });
+  }, [theme]);
   
   // Memoize validation errors array to avoid recalculation
   const validationErrorsArray = useMemo(() => 
@@ -258,7 +269,7 @@ export const CanvasInner = () => {
         multiSelectionKeyCode="Shift"
         aria-label="Pipeline diagram"
       >
-        <Background color="var(--border-primary)" gap={20} size={1} />
+        <Background color={bgColors.dots} gap={20} size={1} style={{ backgroundColor: bgColors.bg }} />
         <Controls className="react-flow-controls-themed" showInteractive={false} />
         <MiniMap
           className="react-flow-minimap-themed"

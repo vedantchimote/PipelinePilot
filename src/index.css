@@ -169,6 +169,15 @@ body {
 }
 
 /* ===== REACT FLOW OVERRIDES ===== */
+.react-flow {
+  background-color: var(--bg-primary) !important;
+}
+
+.react-flow__renderer,
+.react-flow__pane {
+  background-color: var(--bg-primary) !important;
+}
+
 .react-flow__node {
   font-size: 12px;
 }

@@ -64,7 +64,7 @@ export const MonacoPreview = () => {
           height="100%"
           defaultLanguage="yaml"
           value={yamlContent}
-          theme={theme === 'dark' ? 'vs-dark' : 'light'}
+          theme={theme === 'light' ? 'light' : 'vs-dark'}
           onMount={handleEditorDidMount}
           options={{
             readOnly: true,
