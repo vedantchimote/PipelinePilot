@@ -11,6 +11,7 @@ import KeyboardShortcutsPanel from './components/KeyboardShortcutsPanel';
 import WelcomeOverlay from './components/WelcomeOverlay';
 import ErrorBoundary from './components/ErrorBoundary';
 import OfflineBanner from './components/OfflineBanner';
+import BulkActionsBar from './components/BulkActionsBar';
 import { toggleKeyboardShortcuts, initializeUI } from './store/uiSlice';
 import { markSaved } from './store/persistenceSlice';
 import { exportYAMLFile } from './utils/import-export';
@@ -105,6 +106,9 @@ function AppContent() {
 
       {/* Welcome Overlay */}
       <WelcomeOverlay />
+
+      {/* Bulk Actions Bar (multi-select) */}
+      <BulkActionsBar />
     </div>
   );
 }

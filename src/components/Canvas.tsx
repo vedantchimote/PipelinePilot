@@ -28,7 +28,7 @@ import {
   deleteJob,
   duplicateJob,
 } from '@/store/pipelineSlice';
-import { selectNode } from '@/store/uiSlice';
+import { selectNode, toggleNodeSelection, clearMultiSelect } from '@/store/uiSlice';
 import { wouldCreateCycle, detectCycle } from '@/utils/dependency-graph';
 import JobNode from './JobNode';
 import DependencyEdge from './DependencyEdge';
@@ -61,6 +61,8 @@ export const CanvasInner = () => {
   const [circularDependencyCycle, setCircularDependencyCycle] = useState<string[] | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null);
   const searchQuery = useAppSelector((state) => (state.ui as any).searchQuery || '');
+  const selectedNodeIds = useAppSelector((state) => (state.ui as any).selectedNodeIds || []);
+  const activeSimJobs = useAppSelector((state) => (state.ui as any).activeSimJobs || []);
   const { fitView } = useReactFlow();
   const prevJobCountRef = useRef(Object.keys(jobs).length);
 
@@ -102,9 +104,11 @@ export const CanvasInner = () => {
         selected: selectedNodeId === job.id,
         hasErrors: validationErrorsArray.some((err) => err.jobId === job.id),
         dimmed: sq ? !(job.name.toLowerCase().includes(sq) || job.stage.toLowerCase().includes(sq)) : false,
+        multiSelected: selectedNodeIds.includes(job.id),
+        simActive: activeSimJobs.includes(job.id),
       },
     }));
-  }, [jobs, nodePositions, selectedNodeId, validationErrorsArray, searchQuery]);
+  }, [jobs, nodePositions, selectedNodeId, validationErrorsArray, searchQuery, selectedNodeIds, activeSimJobs]);
 
   // Convert dependencies to React Flow edges
   const edges: Edge[] = useMemo(() => {
@@ -183,10 +187,15 @@ export const CanvasInner = () => {
     [dispatch, jobs]
   );
 
-  // Handle node click
+  // Handle node click — supports Shift+click for multi-select
   const onNodeClick = useCallback(
-    (_event: React.MouseEvent, node: Node) => {
-      dispatch(selectNode(node.id));
+    (event: React.MouseEvent, node: Node) => {
+      if (event.shiftKey) {
+        dispatch(toggleNodeSelection(node.id));
+      } else {
+        dispatch(clearMultiSelect());
+        dispatch(selectNode(node.id));
+      }
     },
     [dispatch]
   );

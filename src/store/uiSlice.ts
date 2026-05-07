@@ -9,7 +9,7 @@ import type { UIState, ValidationStatus } from '@/types';
 const storedHideWelcome = typeof window !== 'undefined' && localStorage.getItem('hideWelcome') === 'true';
 const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') as 'dark' | 'light' | null : null;
 
-const initialState: UIState & { searchQuery: string } = {
+const initialState: UIState & { searchQuery: string; selectedNodeIds: string[]; simulatorRunning: boolean; simulatorStep: number; activeSimJobs: string[] } = {
   selectedNodeId: null,
   propertyPanelOpen: false,
   templateLibraryOpen: false,
@@ -22,6 +22,10 @@ const initialState: UIState & { searchQuery: string } = {
   showTutorial: false,
   canvasLocked: false,
   searchQuery: '',
+  selectedNodeIds: [],
+  simulatorRunning: false,
+  simulatorStep: -1,
+  activeSimJobs: [],
 };
 
 const uiSlice = createSlice({
@@ -147,6 +151,43 @@ const uiSlice = createSlice({
     setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
     },
+
+    // Multi-select
+    toggleNodeSelection: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      const idx = state.selectedNodeIds.indexOf(id);
+      if (idx >= 0) {
+        state.selectedNodeIds.splice(idx, 1);
+      } else {
+        state.selectedNodeIds.push(id);
+      }
+    },
+
+    setSelectedNodeIds: (state, action: PayloadAction<string[]>) => {
+      state.selectedNodeIds = action.payload;
+    },
+
+    clearMultiSelect: (state) => {
+      state.selectedNodeIds = [];
+    },
+
+    // Simulator
+    startSimulator: (state) => {
+      state.simulatorRunning = true;
+      state.simulatorStep = 0;
+      state.activeSimJobs = [];
+    },
+
+    advanceSimulator: (state, action: PayloadAction<string[]>) => {
+      state.simulatorStep += 1;
+      state.activeSimJobs = action.payload;
+    },
+
+    stopSimulator: (state) => {
+      state.simulatorRunning = false;
+      state.simulatorStep = -1;
+      state.activeSimJobs = [];
+    },
   },
 });
 
@@ -172,6 +213,12 @@ export const {
   setCanvasLocked,
   initializeUI,
   setSearchQuery,
+  toggleNodeSelection,
+  setSelectedNodeIds,
+  clearMultiSelect,
+  startSimulator,
+  advanceSimulator,
+  stopSimulator,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

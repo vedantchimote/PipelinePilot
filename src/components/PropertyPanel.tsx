@@ -123,6 +123,12 @@ export const PropertyPanel = () => {
               placeholder="node:18-alpine"
               error={getFieldError(validationErrors, 'image')}
             />
+            <Dropdown
+              label="Extends"
+              value={formData.extends || ''}
+              options={['', ...Object.keys(allJobs).filter(k => k.startsWith('.'))]}
+              onChange={(value) => updateField('extends', value || undefined)}
+            />
           </div>
         </Section>
 

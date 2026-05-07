@@ -33,6 +33,7 @@ export type {
   JobStatus,
   ValidationStatus,
   ThemeMode,
+  IncludeEntry,
 } from './pipeline';
 
 export {

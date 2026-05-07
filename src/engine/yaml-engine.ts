@@ -11,6 +11,7 @@ import type {
   AnchorMap,
   NodePosition,
   YAMLParseError,
+  IncludeEntry,
 } from '@/types';
 
 // ============================================================================
@@ -86,12 +87,27 @@ export function fromYAML(yamlString: string): Pipeline_State {
           environment: jobConfig.environment,
           coverage: jobConfig.coverage,
           parallel: jobConfig.parallel,
+          extends: jobConfig.extends,
         };
       }
     }
 
     // Generate UI metadata with auto-layout
     const nodePositions = generateLayout(jobs, stages);
+
+    // Parse includes
+    let includes: IncludeEntry[] | undefined;
+    if (parsed.include) {
+      const rawIncludes = Array.isArray(parsed.include) ? parsed.include : [parsed.include];
+      includes = rawIncludes.map((inc: any) => {
+        if (typeof inc === 'string') return { type: 'local' as const, value: inc };
+        if (inc.local) return { type: 'local' as const, value: inc.local };
+        if (inc.template) return { type: 'template' as const, value: inc.template };
+        if (inc.remote) return { type: 'remote' as const, value: inc.remote };
+        if (inc.project) return { type: 'project' as const, value: inc.project, ref: inc.ref, file: inc.file };
+        return { type: 'local' as const, value: String(inc) };
+      });
+    }
 
     const pipelineState: Pipeline_State = {
       version: '1.0',
@@ -102,6 +118,7 @@ export function fromYAML(yamlString: string): Pipeline_State {
       global,
       stages,
       jobs,
+      ...(includes && { includes }),
       ui: {
         nodes: nodePositions,
         viewport: { x: 0, y: 0, zoom: 1 },
@@ -135,6 +152,22 @@ export function toYAML(state: Pipeline_State): string {
 
   // Build YAML object
   const yamlObj: any = {};
+
+  // Add includes at the top
+  if (state.includes && state.includes.length > 0) {
+    yamlObj.include = state.includes.map((inc) => {
+      if (inc.type === 'local') return { local: inc.value };
+      if (inc.type === 'template') return { template: inc.value };
+      if (inc.type === 'remote') return { remote: inc.value };
+      if (inc.type === 'project') {
+        const entry: any = { project: inc.value };
+        if (inc.ref) entry.ref = inc.ref;
+        if (inc.file) entry.file = inc.file;
+        return entry;
+      }
+      return inc.value;
+    });
+  }
 
   // Add global configuration
   if (state.global.image) yamlObj.image = state.global.image;
@@ -186,6 +219,7 @@ export function toYAML(state: Pipeline_State): string {
     if (job.coverage) jobConfig.coverage = job.coverage;
     if (job.parallel) jobConfig.parallel = job.parallel;
     if (job.trigger) jobConfig.trigger = job.trigger;
+    if (job.extends) jobConfig.extends = job.extends;
 
     yamlObj[job.name] = jobConfig;
   }

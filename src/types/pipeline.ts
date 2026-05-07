@@ -13,6 +13,7 @@ export interface Pipeline_State {
   global: GlobalConfig;
   stages: string[];
   jobs: Record<string, Job_Node_Config>;
+  includes?: IncludeEntry[];
   ui: UIMetadata;
 }
 
@@ -58,6 +59,7 @@ export interface Job_Node_Config {
   environment?: string | EnvironmentConfig;
   coverage?: string;
   parallel?: number | ParallelConfig;
+  extends?: string; // Reference to a hidden job template (.base_*)
 }
 
 export interface Variable {
@@ -104,6 +106,13 @@ export interface TriggerConfig {
   branch?: string;
   strategy?: 'depend';
   include?: string | string[];
+}
+
+export interface IncludeEntry {
+  type: 'local' | 'remote' | 'template' | 'project';
+  value: string;
+  ref?: string;
+  file?: string;
 }
 
 export interface RetryConfig {

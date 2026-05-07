@@ -6,7 +6,7 @@
 import { memo, useCallback, useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { ActionCreators } from 'redux-undo';
-import { clearPipeline, importYAML } from '@/store/pipelineSlice';
+import { clearPipeline, importYAML, autoLayout } from '@/store/pipelineSlice';
 import { toggleTemplateLibrary, toggleTheme, toggleKeyboardShortcuts, setSearchQuery } from '@/store/uiSlice';
 import { importYAMLFile, exportYAMLFile } from '@/utils/import-export';
 import { markSaved } from '@/store/persistenceSlice';
@@ -16,6 +16,8 @@ import AddJobButton from './AddJobButton';
 import Tooltip from './Tooltip';
 import YAMLParseErrorModal from './YAMLParseErrorModal';
 import StageManager from './StageManager';
+import IncludeManager from './IncludeManager';
+import SimulatorPanel from './SimulatorPanel';
 
 export const Toolbar = memo(() => {
   const dispatch = useAppDispatch();
@@ -32,6 +34,8 @@ export const Toolbar = memo(() => {
   } | null>(null);
   const [showNewConfirm, setShowNewConfirm] = useState(false);
   const [showStageManager, setShowStageManager] = useState(false);
+  const [showIncludeManager, setShowIncludeManager] = useState(false);
+  const [showSimulator, setShowSimulator] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [pasteToast, setPasteToast] = useState<string | null>(null);
 
@@ -183,6 +187,41 @@ export const Toolbar = memo(() => {
             Stages
           </button>
         </Tooltip>
+
+        <Tooltip content="Manage includes">
+          <button
+            onClick={() => setShowIncludeManager(true)}
+            aria-label="Manage Includes"
+            className="toolbar-btn toolbar-btn-labeled text-xs flex items-center gap-1"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+            Includes
+          </button>
+        </Tooltip>
+
+        <div className="w-px h-6" style={{ background: 'var(--border-primary)' }} />
+
+        <Tooltip content="Auto-arrange nodes by stage">
+          <button
+            onClick={() => dispatch(autoLayout())}
+            aria-label="Auto Layout"
+            className="toolbar-btn toolbar-btn-labeled text-xs flex items-center gap-1"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
+            Layout
+          </button>
+        </Tooltip>
+
+        <Tooltip content="Simulate pipeline execution">
+          <button
+            onClick={() => setShowSimulator(!showSimulator)}
+            aria-label="Pipeline Simulator"
+            className={`toolbar-btn toolbar-btn-labeled text-xs flex items-center gap-1 ${showSimulator ? 'text-green-400' : ''}`}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Simulate
+          </button>
+        </Tooltip>
       </div>
 
       {/* Right Section - Search, Status and Settings */}
@@ -294,6 +333,14 @@ export const Toolbar = memo(() => {
     {showStageManager && (
       <StageManager onClose={() => setShowStageManager(false)} />
     )}
+
+    {/* Include Manager Modal */}
+    {showIncludeManager && (
+      <IncludeManager onClose={() => setShowIncludeManager(false)} />
+    )}
+
+    {/* Pipeline Simulator */}
+    {showSimulator && <SimulatorPanel />}
   </>
   );
 });

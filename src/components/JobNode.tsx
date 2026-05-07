@@ -12,6 +12,8 @@ interface JobNodeData {
   selected: boolean;
   hasErrors: boolean;
   dimmed?: boolean;
+  multiSelected?: boolean;
+  simActive?: boolean;
 }
 
 const STAGE_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
@@ -40,7 +42,7 @@ const DEFAULT_DARK  = { bg: 'rgba(148,163,184,0.12)', text: '#94a3b8', dot: '#64
 const DEFAULT_LIGHT = { bg: 'rgba(100,116,139,0.08)', text: '#475569', dot: '#64748b' };
 
 export const JobNode = memo(({ data }: NodeProps<JobNodeData>) => {
-  const { job, selected, hasErrors, dimmed } = data;
+  const { job, selected, hasErrors, dimmed, multiSelected, simActive } = data;
   const isTrigger = !!job.trigger;
 
   // Detect theme from the document class (set by App.tsx)
@@ -56,19 +58,23 @@ export const JobNode = memo(({ data }: NodeProps<JobNodeData>) => {
         min-w-[220px] max-w-[300px]
         ${selected
           ? 'ring-2 ring-indigo-500/60 shadow-[0_0_20px_rgba(99,102,241,0.15)]'
-          : hasErrors
-            ? 'ring-2 ring-red-500/60 shadow-[0_0_20px_rgba(239,68,68,0.15)]'
-            : isTrigger
-              ? 'ring-1 ring-purple-500/40'
-              : 'ring-1 ring-transparent hover:ring-indigo-500/30'
+          : multiSelected
+            ? 'ring-2 ring-cyan-400/60 shadow-[0_0_20px_rgba(34,211,238,0.15)]'
+            : simActive
+              ? 'ring-2 ring-green-400/60 shadow-[0_0_24px_rgba(34,197,94,0.25)]'
+              : hasErrors
+                ? 'ring-2 ring-red-500/60 shadow-[0_0_20px_rgba(239,68,68,0.15)]'
+                : isTrigger
+                  ? 'ring-1 ring-purple-500/40'
+                  : 'ring-1 ring-transparent hover:ring-indigo-500/30'
         }
       `}
       style={{
         background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-primary)',
+        border: `1px solid ${simActive ? 'rgba(34,197,94,0.4)' : 'var(--border-primary)'}`,
         boxShadow: selected ? undefined : 'var(--shadow-lg)',
         opacity: dimmed ? 0.3 : 1,
-        transition: 'opacity 0.2s',
+        transition: 'all 0.3s ease',
       }}
     >
       {/* Input Handle */}
