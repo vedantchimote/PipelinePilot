@@ -12,8 +12,8 @@ interface TextAreaProps {
 
 export const TextArea = memo(({ label, value, onChange, placeholder, rows = 3, required, error }: TextAreaProps) => {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-300 mb-1">
+    <div className="min-w-0">
+      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
         {label} {required && <span className="text-red-400">*</span>}
       </label>
       <textarea
@@ -21,9 +21,17 @@ export const TextArea = memo(({ label, value, onChange, placeholder, rows = 3, r
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+        className="w-full px-3 py-2 rounded-lg text-sm resize-none transition-colors font-mono"
+        style={{
+          background: 'var(--bg-tertiary)',
+          border: '1px solid var(--border-primary)',
+          color: 'var(--text-primary)',
+          outline: 'none',
+        }}
+        onFocus={(e) => { e.target.style.borderColor = 'var(--accent)'; e.target.style.boxShadow = '0 0 0 2px var(--accent-glow)'; }}
+        onBlur={(e) => { e.target.style.borderColor = 'var(--border-primary)'; e.target.style.boxShadow = 'none'; }}
       />
-      {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
+      {error && <p className="mt-1 text-[11px] text-red-400">{error}</p>}
     </div>
   );
 });

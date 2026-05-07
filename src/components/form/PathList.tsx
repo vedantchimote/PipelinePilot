@@ -22,40 +22,47 @@ export const PathList = memo(({ label, value, onChange, placeholder }: PathListP
   };
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
-      <div className="space-y-2">
+    <div className="min-w-0">
+      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>{label}</label>
+      <div className="space-y-1.5">
         {value.map((path, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <input
-              type="text"
-              value={path}
-              readOnly
-              className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm"
-            />
+          <div key={index} className="flex items-center gap-1.5 min-w-0">
+            <div className="flex-1 min-w-0 px-2.5 py-1.5 rounded-md text-xs font-mono truncate" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}>
+              {path}
+            </div>
             <button
               onClick={() => handleRemove(index)}
-              className="p-2 text-red-400 hover:text-red-300"
+              className="flex-shrink-0 p-1 rounded hover:bg-red-500/10 text-red-400 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
         ))}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 min-w-0">
           <input
             type="text"
             value={newPath}
             onChange={(e) => setNewPath(e.target.value)}
             placeholder={placeholder}
-            className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 min-w-0 px-2.5 py-1.5 rounded-md text-xs"
+            style={{
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border-primary)',
+              color: 'var(--text-primary)',
+              outline: 'none',
+            }}
+            onFocus={(e) => { e.target.style.borderColor = 'var(--accent)'; }}
+            onBlur={(e) => { e.target.style.borderColor = 'var(--border-primary)'; }}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
           />
           <button
             onClick={handleAdd}
-            className="p-2 text-blue-400 hover:text-blue-300"
+            className="flex-shrink-0 p-1 rounded transition-colors"
+            style={{ color: 'var(--accent)' }}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </button>

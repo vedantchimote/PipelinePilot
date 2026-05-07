@@ -16,8 +16,8 @@ export const TextInput = memo(({ label, value, onChange, placeholder, required, 
   const errorId = error ? `${inputId}-error` : undefined;
 
   return (
-    <div>
-      <label htmlFor={inputId} className="block text-sm font-medium text-gray-300 mb-1">
+    <div className="min-w-0">
+      <label htmlFor={inputId} className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
         {label} {required && <span className="text-red-400">*</span>}
       </label>
       <input
@@ -29,10 +29,18 @@ export const TextInput = memo(({ label, value, onChange, placeholder, required, 
         aria-required={required}
         aria-invalid={!!error}
         aria-describedby={[helpId, errorId].filter(Boolean).join(' ') || undefined}
-        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full px-3 py-2 rounded-lg text-sm transition-colors"
+        style={{
+          background: 'var(--bg-tertiary)',
+          border: '1px solid var(--border-primary)',
+          color: 'var(--text-primary)',
+          outline: 'none',
+        }}
+        onFocus={(e) => { e.target.style.borderColor = 'var(--accent)'; e.target.style.boxShadow = '0 0 0 2px var(--accent-glow)'; }}
+        onBlur={(e) => { e.target.style.borderColor = 'var(--border-primary)'; e.target.style.boxShadow = 'none'; }}
       />
-      {helpText && <p id={helpId} className="mt-1 text-xs text-gray-400">{helpText}</p>}
-      {error && <p id={errorId} className="mt-1 text-sm text-red-400">{error}</p>}
+      {helpText && <p id={helpId} className="mt-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>{helpText}</p>}
+      {error && <p id={errorId} className="mt-1 text-[11px] text-red-400">{error}</p>}
     </div>
   );
 });

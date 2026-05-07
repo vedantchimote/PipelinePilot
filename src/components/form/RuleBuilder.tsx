@@ -7,10 +7,10 @@ interface RuleBuilderProps {
 }
 
 const COMMON_PATTERNS = [
-  { label: 'Only main branch', rule: { if: '$CI_COMMIT_BRANCH == "main"' } },
-  { label: 'Only merge requests', rule: { if: '$CI_PIPELINE_SOURCE == "merge_request_event"' } },
-  { label: 'Only tags', rule: { if: '$CI_COMMIT_TAG' } },
-  { label: 'Manual trigger', rule: { when: 'manual' as const } },
+  { label: 'Main branch', rule: { if: '$CI_COMMIT_BRANCH == "main"' } },
+  { label: 'Merge requests', rule: { if: '$CI_PIPELINE_SOURCE == "merge_request_event"' } },
+  { label: 'Tags only', rule: { if: '$CI_COMMIT_TAG' } },
+  { label: 'Manual', rule: { when: 'manual' as const } },
 ];
 
 export const RuleBuilder = memo(({ value, onChange }: RuleBuilderProps) => {
@@ -34,23 +34,30 @@ export const RuleBuilder = memo(({ value, onChange }: RuleBuilderProps) => {
     onChange(value.filter((_, i) => i !== index));
   };
 
+  const inputStyle = {
+    background: 'var(--bg-tertiary)',
+    border: '1px solid var(--border-primary)',
+    color: 'var(--text-primary)',
+    outline: 'none',
+  };
+
   return (
-    <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-300">Rules</label>
-      
+    <div className="space-y-2.5 min-w-0">
+      <label className="block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Rules</label>
+
       {/* Existing Rules */}
       {value.map((rule, index) => (
-        <div key={index} className="flex items-center gap-2 p-3 bg-gray-700 rounded-lg">
-          <div className="flex-1 text-sm text-white">
-            {rule.if && <div><span className="text-gray-400">if:</span> {rule.if}</div>}
-            {rule.when && <div><span className="text-gray-400">when:</span> {rule.when}</div>}
-            {rule.changes && <div><span className="text-gray-400">changes:</span> {rule.changes.join(', ')}</div>}
+        <div key={index} className="flex items-start gap-1.5 p-2.5 rounded-lg min-w-0" style={{ background: 'var(--bg-tertiary)' }}>
+          <div className="flex-1 min-w-0 text-xs font-mono space-y-0.5">
+            {rule.if && <div className="truncate"><span style={{ color: 'var(--text-muted)' }}>if:</span> <span style={{ color: 'var(--text-primary)' }}>{rule.if}</span></div>}
+            {rule.when && <div className="truncate"><span style={{ color: 'var(--text-muted)' }}>when:</span> <span style={{ color: 'var(--accent)' }}>{rule.when}</span></div>}
+            {rule.changes && <div className="truncate"><span style={{ color: 'var(--text-muted)' }}>changes:</span> <span style={{ color: 'var(--text-primary)' }}>{rule.changes.join(', ')}</span></div>}
           </div>
           <button
             onClick={() => handleRemove(index)}
-            className="p-2 text-red-400 hover:text-red-300"
+            className="flex-shrink-0 p-1 rounded hover:bg-red-500/10 text-red-400 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -58,14 +65,17 @@ export const RuleBuilder = memo(({ value, onChange }: RuleBuilderProps) => {
       ))}
 
       {/* Common Patterns */}
-      <div className="space-y-2">
-        <div className="text-xs text-gray-400 font-medium">Common Patterns</div>
-        <div className="grid grid-cols-2 gap-2">
+      <div className="space-y-1.5">
+        <div className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Quick add</div>
+        <div className="flex flex-wrap gap-1.5">
           {COMMON_PATTERNS.map((pattern, index) => (
             <button
               key={index}
               onClick={() => handleAddPattern(pattern.rule)}
-              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg transition-colors text-left"
+              className="px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors"
+              style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border-primary)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-primary)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
             >
               {pattern.label}
             </button>
@@ -77,23 +87,28 @@ export const RuleBuilder = memo(({ value, onChange }: RuleBuilderProps) => {
       {!showCustom ? (
         <button
           onClick={() => setShowCustom(true)}
-          className="w-full px-3 py-2 bg-gray-700 hover:bg-gray-600 text-blue-400 text-sm rounded-lg transition-colors"
+          className="w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors text-center"
+          style={{ background: 'var(--bg-tertiary)', color: 'var(--accent)', border: '1px dashed var(--border-secondary)' }}
         >
           + Add Custom Rule
         </button>
       ) : (
-        <div className="space-y-2 p-3 bg-gray-700 rounded-lg">
+        <div className="space-y-2 p-3 rounded-lg" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
           <input
             type="text"
             value={customIf}
             onChange={(e) => setCustomIf(e.target.value)}
             placeholder='$CI_COMMIT_BRANCH == "develop"'
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-2.5 py-1.5 rounded-md text-xs font-mono"
+            style={inputStyle}
+            onFocus={(e) => { e.target.style.borderColor = 'var(--accent)'; }}
+            onBlur={(e) => { e.target.style.borderColor = 'var(--border-primary)'; }}
           />
           <select
             value={customWhen}
             onChange={(e) => setCustomWhen(e.target.value as any)}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-2.5 py-1.5 rounded-md text-xs"
+            style={inputStyle}
           >
             <option value="on_success">on_success</option>
             <option value="on_failure">on_failure</option>
@@ -101,16 +116,16 @@ export const RuleBuilder = memo(({ value, onChange }: RuleBuilderProps) => {
             <option value="manual">manual</option>
             <option value="delayed">delayed</option>
           </select>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             <button
               onClick={handleAddCustom}
-              className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+              className="btn-primary flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold"
             >
               Add
             </button>
             <button
               onClick={() => setShowCustom(false)}
-              className="px-3 py-2 bg-gray-600 hover:bg-gray-500 text-white text-sm rounded-lg transition-colors"
+              className="toolbar-btn toolbar-btn-labeled px-3 py-1.5 rounded-lg text-xs"
             >
               Cancel
             </button>
