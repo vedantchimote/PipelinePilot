@@ -15,15 +15,16 @@ import BulkActionsBar from './components/BulkActionsBar';
 import { toggleKeyboardShortcuts, initializeUI } from './store/uiSlice';
 import { markSaved } from './store/persistenceSlice';
 import { exportYAMLFile } from './utils/import-export';
+import { applyTheme, ThemeId } from './components/ThemePicker';
 
 function AppContent() {
   useEffect(() => {
     // Initialize UI state from localStorage
     store.dispatch(initializeUI());
     
-    // Apply theme class to html element based on stored preference
-    const currentTheme = store.getState().ui.theme;
-    document.documentElement.classList.toggle('dark', currentTheme === 'dark');
+    // Apply theme (including dark variants) from stored preference
+    const currentTheme = store.getState().ui.theme as ThemeId;
+    applyTheme(currentTheme);
 
     // Global keyboard shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {

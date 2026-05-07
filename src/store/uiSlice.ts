@@ -7,7 +7,7 @@ import type { UIState, ValidationStatus } from '@/types';
 
 // Read persisted preferences synchronously to avoid flash of initial state
 const storedHideWelcome = typeof window !== 'undefined' && localStorage.getItem('hideWelcome') === 'true';
-const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') as 'dark' | 'light' | null : null;
+const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') || 'dark' : 'dark';
 
 const initialState: UIState & { searchQuery: string; selectedNodeIds: string[]; simulatorRunning: boolean; simulatorStep: number; activeSimJobs: string[] } = {
   selectedNodeId: null,
@@ -17,7 +17,7 @@ const initialState: UIState & { searchQuery: string; selectedNodeIds: string[]; 
   keyboardShortcutsOpen: false,
   validationStatus: 'idle',
   validationErrors: {},
-  theme: storedTheme || 'dark',
+  theme: storedTheme as string,
   showWelcome: !storedHideWelcome,
   showTutorial: false,
   canvasLocked: false,
@@ -98,18 +98,21 @@ const uiSlice = createSlice({
     },
 
     // Theme
-    setTheme: (state, action: PayloadAction<'dark' | 'light'>) => {
+    setTheme: (state, action: PayloadAction<string>) => {
       state.theme = action.payload;
-      // Apply theme to document
-      document.documentElement.classList.toggle('dark', action.payload === 'dark');
-      // Save to localStorage
+      // Theme application is handled by the ThemePicker component
       localStorage.setItem('theme', action.payload);
     },
 
     toggleTheme: (state) => {
-      state.theme = state.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.classList.toggle('dark', state.theme === 'dark');
+      // Quick toggle: if any dark variant, go to light; if light, go to dark (midnight)
+      const isDark = state.theme !== 'light';
+      state.theme = isDark ? 'light' : 'dark';
       localStorage.setItem('theme', state.theme);
+      // Apply CSS classes
+      const html = document.documentElement;
+      html.classList.remove('dark', 'theme-dracula', 'theme-nord', 'theme-monokai', 'theme-synthwave', 'theme-github-dark');
+      if (state.theme === 'dark') html.classList.add('dark');
     },
 
     // Tutorial

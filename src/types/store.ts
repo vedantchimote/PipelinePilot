@@ -38,7 +38,7 @@ export interface UIState {
   keyboardShortcutsOpen: boolean;
   validationStatus: ValidationStatus;
   validationErrors: Record<string, string[]>; // jobId -> error messages
-  theme: 'dark' | 'light';
+  theme: string;
   showWelcome: boolean;
   showTutorial: boolean;
   canvasLocked: boolean;

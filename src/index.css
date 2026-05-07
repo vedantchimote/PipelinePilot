@@ -64,6 +64,91 @@
   background-color: var(--bg-primary);
 }
 
+/* ── Dark Theme: Dracula ── */
+.dark.theme-dracula {
+  --bg-primary: #282a36;
+  --bg-secondary: #21222c;
+  --bg-tertiary: #343746;
+  --border-primary: #44475a;
+  --border-secondary: #6272a4;
+  --text-primary: #f8f8f2;
+  --text-secondary: #bfc7d5;
+  --text-muted: #6272a4;
+  --accent: #bd93f9;
+  --accent-hover: #a87af0;
+  --accent-glow: rgba(189, 147, 249, 0.15);
+  --surface-glass: rgba(33, 34, 44, 0.88);
+  --minimap-mask: rgba(40, 42, 54, 0.9);
+}
+
+/* ── Dark Theme: Nord ── */
+.dark.theme-nord {
+  --bg-primary: #2e3440;
+  --bg-secondary: #3b4252;
+  --bg-tertiary: #434c5e;
+  --border-primary: #4c566a;
+  --border-secondary: #616e88;
+  --text-primary: #eceff4;
+  --text-secondary: #d8dee9;
+  --text-muted: #7b88a1;
+  --accent: #88c0d0;
+  --accent-hover: #81a1c1;
+  --accent-glow: rgba(136, 192, 208, 0.15);
+  --surface-glass: rgba(59, 66, 82, 0.88);
+  --minimap-mask: rgba(46, 52, 64, 0.9);
+}
+
+/* ── Dark Theme: Monokai ── */
+.dark.theme-monokai {
+  --bg-primary: #272822;
+  --bg-secondary: #1e1f1a;
+  --bg-tertiary: #3e3d32;
+  --border-primary: #49483e;
+  --border-secondary: #75715e;
+  --text-primary: #f8f8f2;
+  --text-secondary: #cfcfc2;
+  --text-muted: #75715e;
+  --accent: #a6e22e;
+  --accent-hover: #98d921;
+  --accent-glow: rgba(166, 226, 46, 0.12);
+  --surface-glass: rgba(30, 31, 26, 0.88);
+  --minimap-mask: rgba(39, 40, 34, 0.9);
+}
+
+/* ── Dark Theme: Synthwave ── */
+.dark.theme-synthwave {
+  --bg-primary: #1a1028;
+  --bg-secondary: #241534;
+  --bg-tertiary: #2e1d42;
+  --border-primary: #3d2960;
+  --border-secondary: #5b3e8a;
+  --text-primary: #e8d5ff;
+  --text-secondary: #b8a0d8;
+  --text-muted: #7a5ca0;
+  --accent: #ff7edb;
+  --accent-hover: #f563c7;
+  --accent-glow: rgba(255, 126, 219, 0.15);
+  --surface-glass: rgba(36, 21, 52, 0.88);
+  --minimap-mask: rgba(26, 16, 40, 0.9);
+}
+
+/* ── Dark Theme: GitHub Dark ── */
+.dark.theme-github-dark {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --border-primary: #30363d;
+  --border-secondary: #484f58;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --accent: #58a6ff;
+  --accent-hover: #388bfd;
+  --accent-glow: rgba(88, 166, 255, 0.12);
+  --surface-glass: rgba(22, 27, 34, 0.88);
+  --minimap-mask: rgba(13, 17, 23, 0.9);
+}
+
 /* ===== BASE STYLES ===== */
 body {
   margin: 0;
