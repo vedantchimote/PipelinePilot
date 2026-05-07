@@ -17,6 +17,7 @@ import { PathList } from './form/PathList';
 import { Checkbox } from './form/Checkbox';
 import { RuleBuilder } from './form/RuleBuilder';
 import ScriptSnippets from './ScriptSnippets';
+import AIScriptHelper from './AIScriptHelper';
 
 export const PropertyPanel = () => {
   const dispatch = useAppDispatch();
@@ -27,6 +28,7 @@ export const PropertyPanel = () => {
   const stages = useAppSelector((state) => state.pipeline.present.stages);
 
   const [formData, setFormData] = useState<Partial<Job_Node_Config>>({});
+  const [showAIHelper, setShowAIHelper] = useState(false);
   const allJobs = useAppSelector((state) => state.pipeline.present.jobs);
 
   useEffect(() => {
@@ -70,6 +72,7 @@ export const PropertyPanel = () => {
   if (!job || !selectedNodeId) return null;
 
   return (
+    <>
     <div
       className="fixed right-0 top-0 h-full w-[360px] flex flex-col z-50 slide-in-right overflow-hidden"
       style={{
@@ -137,12 +140,22 @@ export const PropertyPanel = () => {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-medium" style={{ color: 'var(--text-secondary)' }}>Script *</span>
-              <ScriptSnippets
-                onInsert={(snippet) => {
-                  const current = formData.script || [];
-                  updateField('script', [...current, snippet]);
-                }}
-              />
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setShowAIHelper(true)}
+                  className="text-[10px] font-medium px-2 py-0.5 rounded-md flex items-center gap-1 transition-colors"
+                  style={{ background: 'rgba(168,85,247,0.12)', color: '#a855f7' }}
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                  AI
+                </button>
+                <ScriptSnippets
+                  onInsert={(snippet) => {
+                    const current = formData.script || [];
+                    updateField('script', [...current, snippet]);
+                  }}
+                />
+              </div>
             </div>
             <TextArea
               value={formData.script?.join('\n') || ''}
@@ -238,6 +251,17 @@ export const PropertyPanel = () => {
           </div>
         </Section>
 
+        {/* Annotations Section */}
+        <Section title="Notes">
+          <TextArea
+            label="Job Annotation"
+            value={formData.annotation || ''}
+            onChange={(value) => updateField('annotation', value || undefined)}
+            placeholder="Add a note or comment about this job…"
+            rows={2}
+          />
+        </Section>
+
         {/* Trigger Section */}
         <Section title="Trigger">
           <div className="space-y-3">
@@ -287,6 +311,21 @@ export const PropertyPanel = () => {
         </button>
       </div>
     </div>
+
+    {/* AI Script Helper Modal */}
+    {showAIHelper && (
+      <AIScriptHelper
+        onGenerate={(script, image) => {
+          setFormData(prev => ({
+            ...prev,
+            script: [...(prev.script || []), ...script],
+            ...(image && !prev.image ? { image } : {}),
+          }));
+        }}
+        onClose={() => setShowAIHelper(false)}
+      />
+    )}
+    </>
   );
 };
 

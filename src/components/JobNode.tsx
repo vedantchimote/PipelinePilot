@@ -138,6 +138,17 @@ export const JobNode = memo(({ data }: NodeProps<JobNodeData>) => {
         )}
       </div>
 
+      {/* Annotation sticky note */}
+      {job.annotation && (
+        <div
+          className="mt-2 px-2 py-1 rounded-md text-[10px] italic leading-tight truncate"
+          style={{ background: 'rgba(250,204,21,0.12)', color: 'var(--text-muted)', borderLeft: '2px solid #facc15' }}
+          title={job.annotation}
+        >
+          {job.annotation}
+        </div>
+      )}
+
       {/* Hover Glow */}
       <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: 'var(--accent-glow)' }} />
 

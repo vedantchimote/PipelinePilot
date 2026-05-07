@@ -60,6 +60,7 @@ export interface Job_Node_Config {
   coverage?: string;
   parallel?: number | ParallelConfig;
   extends?: string; // Reference to a hidden job template (.base_*)
+  annotation?: string; // Sticky note / comment
 }
 
 export interface Variable {
