@@ -23,6 +23,7 @@
   --accent-hover: #4f46e5;
   --accent-glow: rgba(99, 102, 241, 0.15);
   --surface-glass: rgba(255, 255, 255, 0.8);
+  --minimap-mask: rgba(248, 250, 252, 0.85);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
@@ -52,6 +53,7 @@
   --accent-hover: #6366f1;
   --accent-glow: rgba(129, 140, 248, 0.12);
   --surface-glass: rgba(19, 27, 46, 0.85);
+  --minimap-mask: rgba(12, 18, 34, 0.88);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
@@ -102,17 +104,24 @@ body {
   stroke-width: 2;
 }
 
+/* ===== CONTROLS ===== */
 .react-flow__controls {
-  border-radius: 12px !important;
+  border-radius: 10px !important;
   overflow: hidden;
   border: 1px solid var(--border-primary) !important;
   box-shadow: var(--shadow-lg) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .react-flow__controls-button {
-  background: var(--bg-secondary) !important;
+  background: var(--surface-glass) !important;
   border-bottom: 1px solid var(--border-primary) !important;
-  fill: var(--text-secondary) !important;
+  fill: var(--text-muted) !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 6px !important;
+  transition: all 0.15s ease;
 }
 
 .react-flow__controls-button:hover {
@@ -120,11 +129,28 @@ body {
   fill: var(--accent) !important;
 }
 
+.react-flow__controls-button:last-child {
+  border-bottom: none !important;
+}
+
+/* ===== MINIMAP ===== */
 .react-flow__minimap {
-  border-radius: 12px !important;
+  border-radius: 10px !important;
   border: 1px solid var(--border-primary) !important;
   box-shadow: var(--shadow-lg) !important;
-  overflow: hidden;
+  overflow: hidden !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: var(--surface-glass) !important;
+}
+
+.react-flow__minimap svg {
+  background: transparent !important;
+}
+
+/* Hide React Flow attribution */
+.react-flow__attribution {
+  display: none !important;
 }
 
 /* Monaco Editor custom styles */

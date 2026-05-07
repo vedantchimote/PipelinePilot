@@ -233,14 +233,23 @@ export const CanvasInner = () => {
         aria-label="Pipeline diagram"
       >
         <Background color="var(--border-primary)" gap={20} size={1} />
-        <Controls className="bg-gray-800 border-gray-700" />
+        <Controls className="react-flow-controls-themed" showInteractive={false} />
         <MiniMap
-          className="bg-gray-800 border-gray-700"
+          className="react-flow-minimap-themed"
+          maskColor="var(--minimap-mask)"
           nodeColor={(node) => {
             if (node.data.hasErrors) return '#ef4444';
             if (node.data.job.trigger) return '#a855f7';
-            return '#3b82f6';
+            const stage = node.data.job.stage;
+            const stageColors: Record<string, string> = {
+              build: '#3b82f6', test: '#10b981', deploy: '#f59e0b',
+              scan: '#a855f7', verify: '#06b6d4', release: '#f43f5e',
+              lint: '#0ea5e9', package: '#8b5cf6',
+            };
+            return stageColors[stage] || '#6366f1';
           }}
+          nodeStrokeWidth={0}
+          nodeBorderRadius={4}
         />
       </ReactFlow>
 
