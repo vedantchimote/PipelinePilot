@@ -1,60 +1,18 @@
 /**
  * ValidationStatus Component
- * Displays current YAML validation status with theme-aware styling
+ * Displays current YAML validation status with high-contrast styling
  */
 
 import { memo } from 'react';
 import { useAppSelector } from '@/store';
 
-interface StatusConfig {
+interface StatusStyle {
   text: string;
   bg: string;
-  color: string;
+  border: string;
   dot: string;
   pulse?: boolean;
 }
-
-const STATUS_MAP: Record<string, StatusConfig> = {
-  validating: {
-    text: 'Validating...',
-    bg: 'rgba(59,130,246,0.12)',
-    color: '#60a5fa',
-    dot: '#3b82f6',
-    pulse: true,
-  },
-  valid: {
-    text: 'Valid',
-    bg: 'rgba(16,185,129,0.12)',
-    color: '#34d399',
-    dot: '#10b981',
-  },
-  invalid: {
-    text: 'Errors',
-    bg: 'rgba(239,68,68,0.12)',
-    color: '#f87171',
-    dot: '#ef4444',
-  },
-  offline: {
-    text: 'Offline',
-    bg: 'rgba(245,158,11,0.15)',
-    color: '#fbbf24',
-    dot: '#f59e0b',
-  },
-  idle: {
-    text: 'Idle',
-    bg: 'rgba(148,163,184,0.1)',
-    color: '#94a3b8',
-    dot: '#64748b',
-  },
-};
-
-const STATUS_MAP_LIGHT: Record<string, Partial<StatusConfig>> = {
-  validating: { bg: 'rgba(59,130,246,0.08)', color: '#2563eb', dot: '#3b82f6' },
-  valid:      { bg: 'rgba(16,185,129,0.08)', color: '#059669', dot: '#10b981' },
-  invalid:    { bg: 'rgba(239,68,68,0.08)',  color: '#dc2626', dot: '#ef4444' },
-  offline:    { bg: 'rgba(245,158,11,0.1)',  color: '#d97706', dot: '#f59e0b' },
-  idle:       { bg: 'rgba(100,116,139,0.08)', color: '#475569', dot: '#94a3b8' },
-};
 
 export const ValidationStatus = memo(() => {
   const status = useAppSelector((state) => state.ui.validationStatus);
@@ -62,27 +20,57 @@ export const ValidationStatus = memo(() => {
   const errorCount = Object.values(errors).flat().length;
 
   const isDark = document.documentElement.classList.contains('dark');
-  const key = status || 'idle';
-  const base = STATUS_MAP[key] || STATUS_MAP.idle;
-  const light = STATUS_MAP_LIGHT[key] || STATUS_MAP_LIGHT.idle;
-  const config = isDark ? base : { ...base, ...light };
+
+  const getStyle = (): StatusStyle => {
+    switch (status) {
+      case 'validating':
+        return isDark
+          ? { text: '#93c5fd', bg: 'rgba(59,130,246,0.18)', border: 'rgba(59,130,246,0.4)', dot: '#3b82f6', pulse: true }
+          : { text: '#1d4ed8', bg: '#dbeafe', border: '#93c5fd', dot: '#3b82f6', pulse: true };
+      case 'valid':
+        return isDark
+          ? { text: '#6ee7b7', bg: 'rgba(16,185,129,0.18)', border: 'rgba(16,185,129,0.4)', dot: '#10b981' }
+          : { text: '#047857', bg: '#d1fae5', border: '#6ee7b7', dot: '#10b981' };
+      case 'invalid':
+        return isDark
+          ? { text: '#fca5a5', bg: 'rgba(239,68,68,0.18)', border: 'rgba(239,68,68,0.4)', dot: '#ef4444' }
+          : { text: '#b91c1c', bg: '#fee2e2', border: '#fca5a5', dot: '#ef4444' };
+      case 'offline':
+        return isDark
+          ? { text: '#fcd34d', bg: 'rgba(245,158,11,0.18)', border: 'rgba(245,158,11,0.4)', dot: '#f59e0b' }
+          : { text: '#b45309', bg: '#fef3c7', border: '#fcd34d', dot: '#f59e0b' };
+      default: // idle
+        return isDark
+          ? { text: '#94a3b8', bg: 'rgba(100,116,139,0.15)', border: 'rgba(100,116,139,0.3)', dot: '#64748b' }
+          : { text: '#475569', bg: '#f1f5f9', border: '#cbd5e1', dot: '#94a3b8' };
+    }
+  };
+
+  const s = getStyle();
 
   const displayText = status === 'invalid'
     ? `${errorCount} Error${errorCount !== 1 ? 's' : ''}`
-    : config.text;
+    : status === 'validating' ? 'Validating...'
+    : status === 'valid' ? 'Valid'
+    : status === 'offline' ? 'Offline'
+    : 'Idle';
 
   return (
     <div
-      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide"
-      style={{ background: config.bg, color: config.color }}
+      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
+      style={{
+        background: s.bg,
+        color: s.text,
+        border: `1px solid ${s.border}`,
+      }}
       role="status"
       aria-live="polite"
       aria-label={`Validation status: ${displayText}`}
       title={status === 'offline' ? 'GitLab API is unreachable' : undefined}
     >
       <div
-        className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${config.pulse ? 'animate-pulse' : ''}`}
-        style={{ background: config.dot }}
+        className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${s.pulse ? 'animate-pulse' : ''}`}
+        style={{ background: s.dot }}
       />
       <span>{displayText}</span>
     </div>
