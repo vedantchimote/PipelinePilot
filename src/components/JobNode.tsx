@@ -13,24 +13,40 @@ interface JobNodeData {
   hasErrors: boolean;
 }
 
-const stageBadgeColors: Record<string, string> = {
-  build: 'from-blue-500/20 to-blue-600/10 text-blue-400 border-blue-500/30',
-  test: 'from-emerald-500/20 to-emerald-600/10 text-emerald-400 border-emerald-500/30',
-  deploy: 'from-amber-500/20 to-amber-600/10 text-amber-400 border-amber-500/30',
+const STAGE_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
+  build:   { bg: 'rgba(59,130,246,0.15)',  text: '#60a5fa', dot: '#3b82f6' },
+  test:    { bg: 'rgba(16,185,129,0.15)',   text: '#34d399', dot: '#10b981' },
+  deploy:  { bg: 'rgba(245,158,11,0.15)',   text: '#fbbf24', dot: '#f59e0b' },
+  scan:    { bg: 'rgba(168,85,247,0.15)',   text: '#c084fc', dot: '#a855f7' },
+  verify:  { bg: 'rgba(6,182,212,0.15)',    text: '#22d3ee', dot: '#06b6d4' },
+  release: { bg: 'rgba(244,63,94,0.15)',    text: '#fb7185', dot: '#f43f5e' },
+  lint:    { bg: 'rgba(14,165,233,0.15)',   text: '#38bdf8', dot: '#0ea5e9' },
+  package: { bg: 'rgba(139,92,246,0.15)',   text: '#a78bfa', dot: '#8b5cf6' },
 };
 
-const lightStageBadgeColors: Record<string, string> = {
-  build: 'from-blue-50 to-blue-100 text-blue-700 border-blue-200',
-  test: 'from-emerald-50 to-emerald-100 text-emerald-700 border-emerald-200',
-  deploy: 'from-amber-50 to-amber-100 text-amber-700 border-amber-200',
+const STAGE_COLORS_LIGHT: Record<string, { bg: string; text: string; dot: string }> = {
+  build:   { bg: 'rgba(59,130,246,0.1)',   text: '#2563eb', dot: '#3b82f6' },
+  test:    { bg: 'rgba(16,185,129,0.1)',    text: '#059669', dot: '#10b981' },
+  deploy:  { bg: 'rgba(245,158,11,0.1)',    text: '#d97706', dot: '#f59e0b' },
+  scan:    { bg: 'rgba(168,85,247,0.1)',    text: '#7c3aed', dot: '#a855f7' },
+  verify:  { bg: 'rgba(6,182,212,0.1)',     text: '#0891b2', dot: '#06b6d4' },
+  release: { bg: 'rgba(244,63,94,0.1)',     text: '#e11d48', dot: '#f43f5e' },
+  lint:    { bg: 'rgba(14,165,233,0.1)',    text: '#0284c7', dot: '#0ea5e9' },
+  package: { bg: 'rgba(139,92,246,0.1)',    text: '#6d28d9', dot: '#8b5cf6' },
 };
+
+const DEFAULT_DARK  = { bg: 'rgba(148,163,184,0.12)', text: '#94a3b8', dot: '#64748b' };
+const DEFAULT_LIGHT = { bg: 'rgba(100,116,139,0.08)', text: '#475569', dot: '#64748b' };
 
 export const JobNode = memo(({ data }: NodeProps<JobNodeData>) => {
   const { job, selected, hasErrors } = data;
   const isTrigger = !!job.trigger;
 
-  const darkBadge = stageBadgeColors[job.stage] || 'from-gray-500/20 to-gray-600/10 text-gray-400 border-gray-500/30';
-  const lightBadge = lightStageBadgeColors[job.stage] || 'from-gray-50 to-gray-100 text-gray-700 border-gray-200';
+  // Detect theme from the document class (set by App.tsx)
+  const isDark = document.documentElement.classList.contains('dark');
+  const palette = isDark
+    ? (STAGE_COLORS[job.stage] || DEFAULT_DARK)
+    : (STAGE_COLORS_LIGHT[job.stage] || DEFAULT_LIGHT);
 
   return (
     <div
@@ -83,8 +99,11 @@ export const JobNode = memo(({ data }: NodeProps<JobNodeData>) => {
       </div>
 
       {/* Stage Badge */}
-      <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium border bg-gradient-to-r dark:${darkBadge} ${lightBadge}`}>
-        <div className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
+      <div
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide"
+        style={{ background: palette.bg, color: palette.text }}
+      >
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: palette.dot }} />
         {job.stage}
       </div>
 
