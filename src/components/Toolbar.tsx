@@ -132,165 +132,138 @@ export const Toolbar = memo(() => {
 
   return (
     <>
-    <div className="h-14 glass border-b px-4 flex items-center justify-between z-30 relative" style={{ borderColor: 'var(--border-primary)' }}>
-      {/* Left Section - Main Actions */}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 mr-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+    <div className="h-12 glass border-b px-3 flex items-center z-30 relative" style={{ borderColor: 'var(--border-primary)' }}>
+      {/* ── Left: Brand + File ── */}
+      <div className="flex items-center gap-1 mr-auto">
+        {/* Brand */}
+        <div className="flex items-center gap-1.5 mr-1.5">
+          <div className="w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm">
+            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
           </div>
-          <h1 className="text-sm font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>PipelinePilot</h1>
+          <h1 className="text-[13px] font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>PipelinePilot</h1>
         </div>
-        <div className="w-px h-6" style={{ background: 'var(--border-primary)' }} />
-        
+
+        <div className="w-px h-5 mx-1" style={{ background: 'var(--border-primary)' }} />
+
+        {/* File operations */}
         <Tooltip content="New pipeline">
-          <button onClick={handleNewPipeline} aria-label="New Pipeline" className="toolbar-btn toolbar-btn-labeled">New</button>
+          <button onClick={handleNewPipeline} aria-label="New Pipeline" className="toolbar-btn text-[11px] px-2 py-1">New</button>
         </Tooltip>
-
-        <Tooltip content="Import YAML">
-          <button onClick={handleImport} aria-label="Import YAML" className="toolbar-btn toolbar-btn-labeled">Import</button>
+        <Tooltip content="Import YAML (Ctrl+V to paste)">
+          <button onClick={handleImport} aria-label="Import YAML" className="toolbar-btn text-[11px] px-2 py-1">Import</button>
         </Tooltip>
-
         <Tooltip content="Export YAML (Ctrl+E)">
-          <button onClick={handleExport} aria-label="Export YAML" className="btn-primary px-3 py-1.5 rounded-lg text-xs font-semibold">Export</button>
+          <button onClick={handleExport} aria-label="Export YAML" className="btn-primary px-2.5 py-1 rounded-md text-[11px] font-semibold">Export</button>
         </Tooltip>
 
-        <div className="w-px h-6" style={{ background: 'var(--border-primary)' }} />
+        <div className="w-px h-5 mx-1" style={{ background: 'var(--border-primary)' }} />
 
+        {/* Undo / Redo */}
         <Tooltip content="Undo (Ctrl+Z)">
-          <button onClick={handleUndo} disabled={!canUndo} aria-label="Undo" className="toolbar-btn disabled:opacity-30 disabled:cursor-not-allowed">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+          <button onClick={handleUndo} disabled={!canUndo} aria-label="Undo" className="toolbar-btn p-1 disabled:opacity-25">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
           </button>
         </Tooltip>
-
         <Tooltip content="Redo (Ctrl+Y)">
-          <button onClick={handleRedo} disabled={!canRedo} aria-label="Redo" className="toolbar-btn disabled:opacity-30 disabled:cursor-not-allowed">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" /></svg>
+          <button onClick={handleRedo} disabled={!canRedo} aria-label="Redo" className="toolbar-btn p-1 disabled:opacity-25">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" /></svg>
           </button>
         </Tooltip>
-
         <Tooltip content="Save (Ctrl+S)">
-          <button onClick={handleSave} aria-label="Save" className="toolbar-btn toolbar-btn-labeled">Save</button>
+          <button onClick={handleSave} aria-label="Save" className="toolbar-btn text-[11px] px-2 py-1">Save</button>
         </Tooltip>
+      </div>
 
-        <div className="w-px h-6" style={{ background: 'var(--border-primary)' }} />
-
+      {/* ── Center: Pipeline Tools ── */}
+      <div
+        className="flex items-center gap-0.5 px-1 py-0.5 rounded-lg"
+        style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}
+      >
         <AddJobButton />
 
+        <div className="w-px h-4 mx-0.5" style={{ background: 'var(--border-secondary)' }} />
+
         <Tooltip content="Manage stages">
-          <button
-            onClick={() => setShowStageManager(true)}
-            aria-label="Manage Stages"
-            className="toolbar-btn toolbar-btn-labeled text-xs flex items-center gap-1"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+          <button onClick={() => setShowStageManager(true)} aria-label="Manage Stages" className="toolbar-btn text-[11px] px-2 py-1 flex items-center gap-1">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
             Stages
           </button>
         </Tooltip>
 
         <Tooltip content="Manage includes">
-          <button
-            onClick={() => setShowIncludeManager(true)}
-            aria-label="Manage Includes"
-            className="toolbar-btn toolbar-btn-labeled text-xs flex items-center gap-1"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+          <button onClick={() => setShowIncludeManager(true)} aria-label="Manage Includes" className="toolbar-btn text-[11px] px-2 py-1 flex items-center gap-1">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
             Includes
           </button>
         </Tooltip>
 
-        <div className="w-px h-6" style={{ background: 'var(--border-primary)' }} />
+        <div className="w-px h-4 mx-0.5" style={{ background: 'var(--border-secondary)' }} />
 
         <Tooltip content="Auto-arrange nodes by stage">
-          <button
-            onClick={() => dispatch(autoLayout())}
-            aria-label="Auto Layout"
-            className="toolbar-btn toolbar-btn-labeled text-xs flex items-center gap-1"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
+          <button onClick={() => dispatch(autoLayout())} aria-label="Auto Layout" className="toolbar-btn text-[11px] px-2 py-1 flex items-center gap-1">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
             Layout
           </button>
         </Tooltip>
 
         <Tooltip content="Simulate pipeline execution">
-          <button
-            onClick={() => setShowSimulator(!showSimulator)}
-            aria-label="Pipeline Simulator"
-            className={`toolbar-btn toolbar-btn-labeled text-xs flex items-center gap-1 ${showSimulator ? 'text-green-400' : ''}`}
+          <button onClick={() => setShowSimulator(!showSimulator)} aria-label="Pipeline Simulator"
+            className={`toolbar-btn text-[11px] px-2 py-1 flex items-center gap-1 ${showSimulator ? 'text-green-400' : ''}`}
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             Simulate
           </button>
         </Tooltip>
       </div>
 
-      {/* Right Section - Search, Status and Settings */}
-      <div className="flex items-center gap-1.5">
-        {/* Search */}
+      {/* ── Right: Search, Status, Settings ── */}
+      <div className="flex items-center gap-1 ml-auto">
+        {/* Inline search */}
         {showSearch && (
-          <div className="flex items-center gap-1 mr-1">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => dispatch(setSearchQuery(e.target.value))}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') {
-                  dispatch(setSearchQuery(''));
-                  setShowSearch(false);
-                }
-              }}
-              placeholder="Search jobs..."
-              autoFocus
-              className="px-2.5 py-1 rounded-lg text-xs w-[140px]"
-              style={{
-                background: 'var(--bg-primary)',
-                border: '1px solid var(--border-primary)',
-                color: 'var(--text-primary)',
-                outline: 'none',
-              }}
-            />
-          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') { dispatch(setSearchQuery('')); setShowSearch(false); }
+            }}
+            placeholder="Search jobs…"
+            autoFocus
+            className="px-2 py-1 rounded-md text-[11px] w-[130px]"
+            style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-primary)', color: 'var(--text-primary)', outline: 'none' }}
+          />
         )}
 
         <Tooltip content="Search jobs (Ctrl+F)">
-          <button
-            onClick={() => {
-              setShowSearch(prev => !prev);
-              if (showSearch) dispatch(setSearchQuery(''));
-            }}
-            aria-label="Search Jobs"
-            className={`toolbar-btn ${showSearch ? 'text-indigo-400' : ''}`}
+          <button onClick={() => { setShowSearch(prev => !prev); if (showSearch) dispatch(setSearchQuery('')); }}
+            aria-label="Search Jobs" className={`toolbar-btn p-1 ${showSearch ? 'text-indigo-400' : ''}`}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </button>
         </Tooltip>
 
         <ValidationStatus />
 
-        <div className="w-px h-6 mx-1" style={{ background: 'var(--border-primary)' }} />
+        <div className="w-px h-5 mx-0.5" style={{ background: 'var(--border-primary)' }} />
 
         <Tooltip content="Open template library">
-          <button
-            onClick={() => dispatch(toggleTemplateLibrary())}
-            aria-label="Template Library"
-            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <button onClick={() => dispatch(toggleTemplateLibrary())} aria-label="Template Library" className="toolbar-btn p-1.5">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
         </Tooltip>
 
         <Tooltip content="Keyboard shortcuts (Ctrl+/)">
-          <button onClick={() => dispatch(toggleKeyboardShortcuts())} aria-label="Keyboard Shortcuts" className="toolbar-btn">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+          <button onClick={() => dispatch(toggleKeyboardShortcuts())} aria-label="Keyboard Shortcuts" className="toolbar-btn p-1.5">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
           </button>
         </Tooltip>
 
         <Tooltip content={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-          <button onClick={() => dispatch(toggleTheme())} aria-label="Toggle Theme" className="toolbar-btn">
+          <button onClick={() => dispatch(toggleTheme())} aria-label="Toggle Theme" className="toolbar-btn p-1.5">
             {theme === 'dark' ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
             ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
             )}
           </button>
         </Tooltip>
