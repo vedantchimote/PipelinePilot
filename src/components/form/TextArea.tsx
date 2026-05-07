@@ -1,7 +1,7 @@
 import { memo } from 'react';
 
 interface TextAreaProps {
-  label: string;
+  label?: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;

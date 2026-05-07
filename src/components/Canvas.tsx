@@ -26,12 +26,14 @@ import {
   addDependency,
   removeDependency,
   deleteJob,
+  duplicateJob,
 } from '@/store/pipelineSlice';
 import { selectNode } from '@/store/uiSlice';
 import { wouldCreateCycle, detectCycle } from '@/utils/dependency-graph';
 import JobNode from './JobNode';
 import DependencyEdge from './DependencyEdge';
 import CircularDependencyModal from './CircularDependencyModal';
+import NodeContextMenu from './NodeContextMenu';
 
 const nodeTypes: NodeTypes = {
   job: JobNode,
@@ -57,6 +59,8 @@ export const CanvasInner = () => {
   );
 
   const [circularDependencyCycle, setCircularDependencyCycle] = useState<string[] | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null);
+  const searchQuery = useAppSelector((state) => (state.ui as any).searchQuery || '');
   const { fitView } = useReactFlow();
   const prevJobCountRef = useRef(Object.keys(jobs).length);
 
@@ -88,6 +92,7 @@ export const CanvasInner = () => {
 
   // Convert jobs to React Flow nodes
   const nodes: Node[] = useMemo(() => {
+    const sq = searchQuery.toLowerCase();
     return Object.values(jobs).map((job) => ({
       id: job.id,
       type: 'job',
@@ -96,9 +101,10 @@ export const CanvasInner = () => {
         job,
         selected: selectedNodeId === job.id,
         hasErrors: validationErrorsArray.some((err) => err.jobId === job.id),
+        dimmed: sq ? !(job.name.toLowerCase().includes(sq) || job.stage.toLowerCase().includes(sq)) : false,
       },
     }));
-  }, [jobs, nodePositions, selectedNodeId, validationErrorsArray]);
+  }, [jobs, nodePositions, selectedNodeId, validationErrorsArray, searchQuery]);
 
   // Convert dependencies to React Flow edges
   const edges: Edge[] = useMemo(() => {
@@ -188,7 +194,17 @@ export const CanvasInner = () => {
   // Handle pane click (deselect)
   const onPaneClick = useCallback(() => {
     dispatch(selectNode(null));
+    setContextMenu(null);
   }, [dispatch]);
+
+  // Handle right-click on nodes
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      setContextMenu({ x: event.clientX, y: event.clientY, nodeId: node.id });
+    },
+    []
+  );
 
   // Handle node deletion
   const onNodesDelete = useCallback(
@@ -224,6 +240,7 @@ export const CanvasInner = () => {
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
         onNodesDelete={onNodesDelete}
+        onNodeContextMenu={onNodeContextMenu}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         defaultViewport={viewport}
@@ -271,6 +288,19 @@ export const CanvasInner = () => {
         <CircularDependencyModal
           cycle={circularDependencyCycle}
           onClose={() => setCircularDependencyCycle(null)}
+        />
+      )}
+
+      {/* Right-click Context Menu */}
+      {contextMenu && (
+        <NodeContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          nodeId={contextMenu.nodeId}
+          onEdit={() => dispatch(selectNode(contextMenu.nodeId))}
+          onDuplicate={() => dispatch(duplicateJob(contextMenu.nodeId))}
+          onDelete={() => dispatch(deleteJob(contextMenu.nodeId))}
+          onClose={() => setContextMenu(null)}
         />
       )}
     </div>

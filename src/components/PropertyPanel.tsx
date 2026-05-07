@@ -16,6 +16,7 @@ import { KeyValueList } from './form/KeyValueList';
 import { PathList } from './form/PathList';
 import { Checkbox } from './form/Checkbox';
 import { RuleBuilder } from './form/RuleBuilder';
+import ScriptSnippets from './ScriptSnippets';
 
 export const PropertyPanel = () => {
   const dispatch = useAppDispatch();
@@ -128,8 +129,16 @@ export const PropertyPanel = () => {
         {/* Scripts Section */}
         <Section title="Scripts">
           <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-medium" style={{ color: 'var(--text-secondary)' }}>Script *</span>
+              <ScriptSnippets
+                onInsert={(snippet) => {
+                  const current = formData.script || [];
+                  updateField('script', [...current, snippet]);
+                }}
+              />
+            </div>
             <TextArea
-              label="Script"
               value={formData.script?.join('\n') || ''}
               onChange={(value) => updateField('script', value.split('\n').filter(Boolean))}
               placeholder="npm install&#10;npm test"

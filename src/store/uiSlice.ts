@@ -9,18 +9,19 @@ import type { UIState, ValidationStatus } from '@/types';
 const storedHideWelcome = typeof window !== 'undefined' && localStorage.getItem('hideWelcome') === 'true';
 const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') as 'dark' | 'light' | null : null;
 
-const initialState: UIState = {
+const initialState: UIState & { searchQuery: string } = {
   selectedNodeId: null,
   propertyPanelOpen: false,
   templateLibraryOpen: false,
-  welcomeOverlayOpen: !storedHideWelcome, // Respect persisted preference from first render
+  welcomeOverlayOpen: !storedHideWelcome,
   keyboardShortcutsOpen: false,
   validationStatus: 'idle',
   validationErrors: {},
   theme: storedTheme || 'dark',
-  showWelcome: !storedHideWelcome, // Respect persisted preference from first render
+  showWelcome: !storedHideWelcome,
   showTutorial: false,
   canvasLocked: false,
+  searchQuery: '',
 };
 
 const uiSlice = createSlice({
@@ -141,6 +142,11 @@ const uiSlice = createSlice({
         document.documentElement.classList.toggle('dark', savedTheme === 'dark');
       }
     },
+
+    // Search
+    setSearchQuery: (state, action: PayloadAction<string>) => {
+      state.searchQuery = action.payload;
+    },
   },
 });
 
@@ -165,6 +171,7 @@ export const {
   toggleCanvasLock,
   setCanvasLocked,
   initializeUI,
+  setSearchQuery,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

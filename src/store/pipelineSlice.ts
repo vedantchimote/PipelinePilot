@@ -110,6 +110,36 @@ const pipelineSlice = createSlice({
       state.metadata.modified = new Date().toISOString();
     },
 
+    duplicateJob: (state, action: PayloadAction<string>) => {
+      const sourceId = action.payload;
+      const sourceJob = state.jobs[sourceId];
+      if (!sourceJob) return;
+
+      // Generate unique name
+      let copyIndex = 1;
+      let newName = `${sourceJob.name}_copy`;
+      while (state.jobs[newName]) {
+        copyIndex++;
+        newName = `${sourceJob.name}_copy_${copyIndex}`;
+      }
+
+      // Clone the job with new id/name
+      state.jobs[newName] = {
+        ...JSON.parse(JSON.stringify(sourceJob)),
+        id: newName,
+        name: newName,
+        needs: undefined, // Don't copy dependencies
+      };
+
+      // Place it offset from the original
+      const sourcePos = state.ui.nodes[sourceId] || { x: 250, y: 100 };
+      state.ui.nodes[newName] = {
+        x: sourcePos.x + 40,
+        y: sourcePos.y + 40,
+      };
+      state.metadata.modified = new Date().toISOString();
+    },
+
     moveJob: (state, action: PayloadAction<{ jobId: string; position: NodePosition }>) => {
       const { jobId, position } = action.payload;
       if (state.ui.nodes[jobId]) {
@@ -196,6 +226,7 @@ export const {
   addJob,
   updateJob,
   deleteJob,
+  duplicateJob,
   moveJob,
   addDependency,
   removeDependency,

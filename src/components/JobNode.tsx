@@ -11,6 +11,7 @@ interface JobNodeData {
   job: Job_Node_Config;
   selected: boolean;
   hasErrors: boolean;
+  dimmed?: boolean;
 }
 
 const STAGE_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
@@ -39,7 +40,7 @@ const DEFAULT_DARK  = { bg: 'rgba(148,163,184,0.12)', text: '#94a3b8', dot: '#64
 const DEFAULT_LIGHT = { bg: 'rgba(100,116,139,0.08)', text: '#475569', dot: '#64748b' };
 
 export const JobNode = memo(({ data }: NodeProps<JobNodeData>) => {
-  const { job, selected, hasErrors } = data;
+  const { job, selected, hasErrors, dimmed } = data;
   const isTrigger = !!job.trigger;
 
   // Detect theme from the document class (set by App.tsx)
@@ -66,6 +67,8 @@ export const JobNode = memo(({ data }: NodeProps<JobNodeData>) => {
         background: 'var(--bg-secondary)',
         border: '1px solid var(--border-primary)',
         boxShadow: selected ? undefined : 'var(--shadow-lg)',
+        opacity: dimmed ? 0.3 : 1,
+        transition: 'opacity 0.2s',
       }}
     >
       {/* Input Handle */}
