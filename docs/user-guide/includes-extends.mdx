@@ -1,0 +1,85 @@
+---
+title: Includes & Extends
+description: 'Visual management of YAML includes and job template inheritance'
+---
+
+## Overview
+
+Real-world GitLab CI pipelines heavily use `include` to reference external YAML and `extends` to inherit from base job templates. PipelinePilot provides visual interfaces for both.
+
+## Include Management
+
+### Accessing Includes
+
+Click the **Includes** button in the center toolbar pill to open the Include Manager modal.
+
+### Include Types
+
+<Tabs>
+  <Tab title="Local">
+    Reference a file in the same repository:
+    ```yaml
+    include:
+      - local: '/path/to/.gitlab-ci.yml'
+    ```
+  </Tab>
+  <Tab title="Template">
+    Use official GitLab CI templates:
+    ```yaml
+    include:
+      - template: 'Auto-DevOps.gitlab-ci.yml'
+    ```
+  </Tab>
+  <Tab title="Remote">
+    Reference an external URL:
+    ```yaml
+    include:
+      - remote: 'https://example.com/ci.yml'
+    ```
+  </Tab>
+  <Tab title="Project">
+    Include from another GitLab project:
+    ```yaml
+    include:
+      - project: 'group/other-project'
+        ref: 'main'
+        file: '/ci/shared.yml'
+    ```
+  </Tab>
+</Tabs>
+
+### How It Works
+
+1. Open the Include Manager
+2. Select the include type from the dropdown
+3. Enter the path, URL, or project details
+4. Click **Add** to add to the pipeline
+5. Includes appear at the **top** of the generated YAML output
+
+## Extends / Template Inheritance
+
+### Using Extends
+
+1. Create a hidden job template (name starting with `.`, e.g., `.base_docker`)
+2. Open any other job's PropertyPanel
+3. In the **Basic** section, find the **Extends** dropdown
+4. Select the template to inherit from
+
+### Example Output
+
+```yaml
+.base_docker:
+  image: docker:24
+  services:
+    - docker:24-dind
+
+build_image:
+  extends: .base_docker
+  stage: build
+  script:
+    - docker build -t $IMAGE .
+```
+
+<Tip>
+  Hidden job templates (starting with `.`) don't execute as pipeline jobs — they only serve as base configurations that other jobs can extend.
+</Tip>

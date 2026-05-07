@@ -1,15 +1,26 @@
 ---
 title: Features
-description: 'Comprehensive overview of all features in GitLab CI/CD Visual Editor'
+description: 'Complete feature reference for PipelinePilot — 15+ features across 3 tiers'
+---
+
+## Feature Overview
+
+PipelinePilot ships with 15+ features organized into three tiers, plus a full set of core editing capabilities.
+
+| Tier | Features | Focus |
+|------|----------|-------|
+| **Core** | Canvas, YAML Preview, Templates, Undo/Redo | Foundation |
+| **Tier 1** | Duplication, Stages, Paste Import, Snippets, Search | Quick Wins |
+| **Tier 2** | Multi-Select, Extends, Includes, Simulator, Auto-Layout | Power Tools |
+| **Tier 3** | GitLab Push, Diff View, Annotations, Env Flow, AI Helper | Premium |
+
 ---
 
 ## Core Features
 
 ### Visual Pipeline Canvas
 
-<img src="/images/canvas-overview.png" alt="Canvas Overview" />
-
-The heart of the application is the visual canvas powered by React Flow:
+The heart of the application — a React Flow-powered node-based canvas:
 
 <CardGroup cols={2}>
   <Card title="Drag & Drop" icon="hand">
@@ -19,399 +30,384 @@ The heart of the application is the visual canvas powered by React Flow:
     Navigate large pipelines with smooth zoom and pan controls
   </Card>
   <Card title="Stage Swim Lanes" icon="layer-group">
-    Visual grouping of jobs by stage for better organization
+    Visual grouping of jobs by stage (BUILD, TEST, DEPLOY labels)
   </Card>
   <Card title="Dependency Edges" icon="arrow-right-arrow-left">
-    Visual arrows showing job dependencies and execution order
+    Animated gradient edges showing job dependencies and execution order
   </Card>
 </CardGroup>
 
-**Key Capabilities:**
-- Add jobs with a single click
-- Create dependencies by dragging between jobs
-- Automatic cycle detection prevents invalid pipelines
-- Real-time position updates
-- Stage-based auto-layout
-- Visual indicators for job status (valid, error, trigger)
-
 ### Job Configuration Panel
 
-<img src="/images/property-panel.png" alt="Property Panel" />
-
-Comprehensive form-based configuration for every job property:
+Comprehensive sidebar for every job property:
 
 <Tabs>
   <Tab title="Basic">
-    - **Job Name**: Unique identifier for the job
-    - **Stage**: Pipeline stage (build, test, deploy, etc.)
-    - **Image**: Docker image to use
-    - **Tags**: Runner tags for job execution
-    - **When**: Execution condition (on_success, on_failure, always, manual)
+    - **Job Name**: Unique identifier
+    - **Stage**: Pipeline stage (build, test, deploy, custom)
+    - **Image**: Docker image (e.g., `node:20-alpine`)
+    - **Extends**: Visual template inheritance from hidden jobs
   </Tab>
-  
   <Tab title="Scripts">
-    - **Script**: Main commands to execute
-    - **Before Script**: Commands to run before main script
-    - **After Script**: Commands to run after main script (always executed)
+    - **Script**: Main commands with AI generation and snippet insertion
+    - **Before Script**: Pre-execution setup commands
+    - **After Script**: Post-execution cleanup (always runs)
   </Tab>
-  
-  <Tab title="Artifacts">
-    - **Paths**: Files/directories to preserve
-    - **Exclude**: Patterns to exclude
-    - **Expire In**: Artifact retention period
-    - **Expose As**: Name for UI download
-    - **Reports**: Test reports, coverage, etc.
-  </Tab>
-  
-  <Tab title="Cache">
-    - **Key**: Cache identifier (supports variables)
-    - **Paths**: Directories to cache
-    - **Policy**: pull, push, or pull-push
-    - **Untracked**: Include untracked files
-  </Tab>
-  
-  <Tab title="Variables">
-    - **Key-Value Pairs**: Job-specific variables
-    - **Protected**: Only available on protected branches
-    - **Masked**: Hidden in job logs
-    - **Inherited**: View global variables
-  </Tab>
-  
-  <Tab title="Rules">
-    - **If Conditions**: When to run the job
-    - **When**: Override execution condition
-    - **Allow Failure**: Continue pipeline on failure
-    - **Variables**: Rule-specific variables
-  </Tab>
-  
   <Tab title="Advanced">
-    - **Needs**: Explicit dependencies (DAG execution)
-    - **Dependencies**: Artifact dependencies
-    - **Timeout**: Maximum execution time
-    - **Retry**: Retry configuration
-    - **Allow Failure**: Continue on failure
+    - **Artifacts**: File paths to preserve between stages
+    - **Cache**: Key-based caching for dependencies
+    - **Variables**: Job-specific environment variables
+    - **Rules**: Conditional execution rules
     - **Trigger**: Multi-project pipeline triggers
+    - **Annotations**: Sticky notes for documentation
   </Tab>
 </Tabs>
 
 ### Real-Time YAML Preview
 
-<img src="/images/yaml-preview.png" alt="YAML Preview" />
-
-Monaco Editor integration provides VS Code-quality YAML preview:
+Monaco Editor integration (same engine as VS Code):
 
 ✅ **Syntax Highlighting**: Full YAML syntax highlighting  
-✅ **Line Numbers**: Easy reference to specific lines  
-✅ **Code Folding**: Collapse sections for better readability  
-✅ **Read-Only**: Prevents accidental edits  
-✅ **Dark Theme**: Matches application theme  
-✅ **Real-Time Updates**: Updates within 200ms of changes
+✅ **Live Updates**: Reflects changes within 200ms  
+✅ **Code Folding**: Collapse sections for readability  
+✅ **Line Numbers**: Easy reference  
+✅ **Includes Rendering**: Shows `include:` directives at the top  
+✅ **Extends Rendering**: Shows `extends:` on jobs using templates
 
-**YAML Optimizations:**
-- Automatic anchor generation for repeated config
-- Alias substitution to reduce duplication
-- Proper job ordering by stage
-- Clean formatting with consistent indentation
+### Toolbar Architecture
 
-### GitLab API Integration
+Professional 3-section toolbar layout:
 
-<img src="/images/validation.png" alt="Validation" />
+| Section | Contents |
+|---------|----------|
+| **Left** | Brand, New, Import, Export, Undo/Redo, Save |
+| **Center** | Add Job, Stages, Includes, Layout, Simulate (contained pill) |
+| **Right** | Search, Status, Push, Diff, Env Flow, Templates, Settings, Theme |
 
-Seamless integration with GitLab's CI Lint API:
+---
 
-<AccordionGroup>
-  <Accordion title="Real-Time Validation" icon="check">
-    - Validates YAML against GitLab's schema
-    - Debounced requests (500ms) to avoid API spam
-    - Displays validation status in toolbar
-    - Highlights invalid jobs on canvas
-    - Shows detailed error messages
-  </Accordion>
-  
-  <Accordion title="Template Fetching" icon="download">
-    - Fetches official GitLab CI templates
-    - Caches templates for offline use
-    - Searchable template library
-    - Preview template content before use
-  </Accordion>
-  
-  <Accordion title="Offline Mode" icon="wifi-slash">
-    - Graceful degradation when API unavailable
-    - Core editing works without internet
-    - Cached templates remain available
-    - Clear offline indicator in UI
-  </Accordion>
-</AccordionGroup>
+## Tier 1 — Quick Wins
 
-### Template Library
+### 1. Job Duplication
 
-<img src="/images/templates.png" alt="Template Library" />
+Right-click any node to access the context menu:
 
-Pre-built job templates for common CI/CD patterns:
+- **Edit**: Open the property panel
+- **Duplicate Job**: Clone with auto-incremented name (`job_1` → `job_1_copy`)
+- **Delete**: Remove the job and clean up dependencies
 
-**Official Templates:**
-- Docker Build & Push
-- Node.js (install, lint, test, build)
-- Python (setup, test, coverage)
-- Security Scanning (SAST, DAST, dependency scanning)
-- Deploy to Kubernetes
-- Deploy to AWS
-- And many more...
+### 2. Custom Stage Manager
 
-**Custom Templates:**
-- Save any job as a reusable template
-- Organize templates by category
-- Search by name or description
-- Drag onto canvas to apply
+<Note>
+  Accessible from the **Stages** button in the center toolbar pill.
+</Note>
 
-**Template Features:**
-- Searchable by name and description
-- Filterable by category and source
-- Preview before applying
-- Automatic name conflict resolution
-- Opens Property Panel for customization
+Premium modal for managing pipeline stages:
+
+- **Add/remove stages** beyond the default `build`, `test`, `deploy`
+- **Rename stages** inline with validation
+- **Reorder** with numbered rows
+- **Stage icons** per type (build, test, deploy, scan, lint, etc.)
+- **Auto-sort** capability
+- Supports custom stages: `lint`, `scan`, `package`, `release`, `cleanup`
+
+### 3. Paste YAML Import
+
+Press `Ctrl+V` anywhere on the canvas (not in an input field):
+
+- **Auto-detects** YAML content by checking for `stages:`, `script:`, or `stage:` keywords
+- **Parses** and imports the entire pipeline
+- **Shows toast** notification on success
+- **Error modal** with line/column info on parse failure
+
+### 4. Script Snippets
+
+Dropdown in the PropertyPanel's Scripts section with pre-built commands:
+
+**Categories:**
+- **Package Managers**: `npm ci`, `pip install`, `go mod download`
+- **Build Tools**: `docker build`, `mvn package`, `cargo build`
+- **Deployment**: `kubectl apply`, `terraform plan`, `helm upgrade`
+- **Testing**: `npm test`, `pytest`, `go test`
+
+### 5. Job Search / Filter
+
+Press `Ctrl+F` to toggle the search bar:
+
+- **Real-time filtering** by job name or stage
+- **Visual dimming**: Non-matching nodes drop to 30% opacity
+- **Press Escape** to clear search and restore all nodes
+- Efficient for pipelines with 20+ jobs
+
+---
+
+## Tier 2 — Power Features
+
+### 6. Multi-Select + Bulk Operations
+
+<Note>
+  Hold `Shift` and click nodes to add them to the selection.
+</Note>
+
+- **Cyan highlight ring** on multi-selected nodes
+- **Floating BulkActionsBar** appears at bottom-center:
+  - Shows count: `3 selected`
+  - **Move to Stage**: Dropdown to batch-reassign stages
+  - **Delete All**: Bulk delete with dependency cleanup
+  - **Clear Selection**: Deselect all
+- **Press Escape** to clear selection
+
+### 7. extends / YAML Anchors UI
+
+Visual template inheritance — how 90% of production GitLab CI works:
+
+- **Extends dropdown** in PropertyPanel's Basic section
+- Lists all **hidden job templates** (jobs starting with `.`)
+- When set, emits `extends: .base_docker` in YAML output
+- **Parsed on import**: Existing `extends` fields are preserved
+
+```yaml
+# Generated YAML with extends
+.base_docker:
+  image: docker:24
+  services:
+    - docker:24-dind
+
+build_image:
+  extends: .base_docker
+  stage: build
+  script:
+    - docker build -t $IMAGE .
+```
+
+### 8. include Support
+
+<Note>
+  Accessible from the **Includes** button in the center toolbar pill.
+</Note>
+
+Include Manager modal for referencing external YAML:
+
+| Type | Example | Use Case |
+|------|---------|----------|
+| **Local** | `/path/to/.gitlab-ci.yml` | Monorepo shared configs |
+| **Template** | `Auto-DevOps.gitlab-ci.yml` | Official GitLab templates |
+| **Remote** | `https://example.com/ci.yml` | External configurations |
+| **Project** | `group/project` + ref + file | Cross-project includes |
+
+- Rendered at the **top of YAML output** as `include:` block
+- Parsed correctly from imported YAML
+- Add/remove with visual list management
+
+### 9. Pipeline Execution Simulator
+
+<Note>
+  Toggle from the **Simulate** button in the center toolbar pill.
+</Note>
+
+Floating panel in the bottom-right corner:
+
+- **Computes execution waves** based on stage ordering and `needs` dependencies
+- Shows which jobs run **in parallel** (Wave 1: `build_app`, `build_docker`)
+- Shows which jobs run **sequentially** (Wave 2: `test_unit`, Wave 3: `deploy`)
+- **Run** button animates through waves:
+  - Green glow on active nodes
+  - Spinner on current wave
+  - Checkmarks on completed waves
+- Footer shows: `3 waves · 6 jobs`
+
+### 10. Auto-Layout
+
+One-click organization:
+
+- **Layout button** in the center toolbar pill
+- Groups jobs by their **assigned stage**
+- Arranges in neat rows: 280px width, 40px horizontal gap
+- 200px vertical gap between stage groups
+- Instantly cleans up messy pipelines after heavy editing
+
+---
+
+## Tier 3 — Premium Differentiators
+
+### 11. Live GitLab Push
+
+<Note>
+  Cloud-upload icon (↑) in the right toolbar section.
+</Note>
+
+Push `.gitlab-ci.yml` directly to a GitLab branch:
+
+- **GitLab URL**: Defaults to `https://gitlab.com`, supports self-hosted
+- **Personal Access Token**: `glpat-...` (not stored in localStorage for security)
+- **Project ID / Path**: Numeric ID or `group/project` path
+- **Branch**: Target branch (default: `main`)
+- **Commit Message**: Customizable
+- **API Flow**: Tries `PUT` (update) first, falls back to `POST` (create)
+- **Status indicators**: Success (green), Error (red with message), Pushing (spinner)
+- Persists URL/project/branch in localStorage for convenience
+
+### 12. Pipeline Diff View
+
+<Note>
+  Clipboard icon in the right toolbar section.
+</Note>
+
+Compare current pipeline with a previous version:
+
+**Two modes:**
+- **Saved Snapshot**: Save current state → compare later after edits
+- **Paste YAML**: Paste any `.gitlab-ci.yml` to compare against
+
+**Diff output:**
+| Indicator | Color | Meaning |
+|-----------|-------|---------|
+| `+` | 🟢 Green | Job added |
+| `−` | 🔴 Red | Job removed |
+| `~` | 🟡 Yellow | Job changed (with specific changes listed) |
+| `=` | Gray | Unchanged (count shown) |
+
+**Change details**: `stage: build → test`, `script modified`, `dependencies changed`
+
+### 13. Job Annotations
+
+Sticky notes for documentation:
+
+- **Notes section** in PropertyPanel with textarea
+- Annotations appear on job nodes as **yellow sticky notes** with left border
+- Useful for:
+  - Team documentation
+  - Code review comments
+  - Explaining complex job configurations
+  - TODO notes during pipeline development
+
+### 14. Environment Flow Diagram
+
+<Note>
+  Globe icon (🌐) in the right toolbar section.
+</Note>
+
+Visualize deployment targets:
+
+- **Extracts environments** from jobs using the `environment:` field
+- **Auto-sorts** by deployment stage: `dev → staging → uat → production`
+- **Shows approval gates**: Amber badge on jobs with `when: manual`
+- **Horizontal flow diagram** with arrows between environments
+- **Legend**: Manual approval (amber) vs Auto-deploy (green)
+- Shows jobs assigned to each environment
+
+### 15. AI Script Helper
+
+<Note>
+  Purple **AI** button in PropertyPanel's Scripts section.
+</Note>
+
+Describe what a job should do → get production-ready scripts:
+
+**Supports 18+ tech stacks:**
+
+| Category | Technologies |
+|----------|-------------|
+| **JavaScript** | Node.js, npm, Jest, ESLint |
+| **Python** | pip, pytest, Django, Flask |
+| **Containers** | Docker build & push, registry login |
+| **Orchestration** | Kubernetes (kubectl), Helm |
+| **Infrastructure** | Terraform, Ansible |
+| **Languages** | Go, Rust, Java (Maven) |
+| **Cloud** | AWS (S3, CloudFront, Lambda) |
+| **Security** | npm audit, Snyk, SAST |
+| **Notifications** | Slack webhooks |
+| **Database** | Migrations, seeding |
+
+**Features:**
+- **Quick suggestion chips**: Click to populate common tasks
+- **Script preview**: Review generated commands before applying
+- **Image recommendation**: Suggests the right Docker image
+- **Append mode**: Generated scripts are added to existing script, not replaced
+
+---
+
+## Core Capabilities
 
 ### Import & Export
 
-<img src="/images/import-export.png" alt="Import Export" />
-
-Bidirectional YAML synchronization:
-
 <Tabs>
   <Tab title="Import YAML">
-    **Import existing `.gitlab-ci.yml` files:**
-    - Parses YAML to Pipeline_State
-    - Renders jobs on canvas with auto-layout
-    - Preserves all job configuration
-    - Handles includes and extends
-    - Displays parsing errors with line numbers
-    - Suggests fixes for common syntax errors
+    - **File import**: Browse and select `.gitlab-ci.yml`
+    - **Clipboard paste**: `Ctrl+V` to paste YAML directly
+    - Parses all job properties including `extends` and `include`
+    - Auto-layout on import
+    - Error modal with line/column info
   </Tab>
-  
   <Tab title="Export YAML">
-    **Export to `.gitlab-ci.yml`:**
-    - Generates optimized YAML
-    - Uses anchors/aliases for DRY code
-    - Orders jobs by stage
-    - Preserves comments where possible
-    - Ready to commit to repository
+    - Generates optimized `.gitlab-ci.yml`
+    - Includes `include:` directives at the top
+    - Renders `extends:` on inheriting jobs
+    - YAML anchors/aliases for DRY code
+    - One-click download
   </Tab>
-  
-  <Tab title="Export JSON">
-    **Export Pipeline_State as JSON:**
-    - Full pipeline state backup
-    - Includes UI metadata (positions, viewport)
-    - Can be re-imported later
-    - Useful for version control
+  <Tab title="Push to GitLab">
+    - Direct API push to any GitLab branch
+    - Supports self-hosted instances
+    - Commit message customization
   </Tab>
 </Tabs>
 
 ### State Management & Persistence
 
-<img src="/images/persistence.png" alt="Persistence" />
-
-Never lose your work:
-
 <CardGroup cols={2}>
   <Card title="Auto-Save" icon="floppy-disk">
-    Saves to browser local storage every 30 seconds
-  </Card>
-  <Card title="Auto-Restore" icon="clock-rotate-left">
-    Restores your work when you return
+    Saves to browser localStorage every 30 seconds
   </Card>
   <Card title="Undo/Redo" icon="rotate-left">
     50-state history with Ctrl+Z / Ctrl+Y
   </Card>
-  <Card title="Manual Save" icon="download">
-    Export to YAML or JSON anytime
+  <Card title="Snapshots" icon="camera">
+    Save pipeline snapshots for diff comparison
+  </Card>
+  <Card title="Manual Export" icon="download">
+    Export to YAML file or push to GitLab anytime
   </Card>
 </CardGroup>
 
-**State Features:**
-- Immutable state updates with Redux
-- Time-travel debugging with Redux DevTools
-- Undo/redo for all canvas operations
-- Automatic recovery from crashes
-- Version migration for schema changes
-
 ### Keyboard Shortcuts
-
-<img src="/images/shortcuts.png" alt="Keyboard Shortcuts" />
-
-Power user features for efficient editing:
 
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+Z` | Undo last action |
 | `Ctrl+Y` | Redo last undone action |
 | `Ctrl+S` | Manual save to local storage |
-| `Delete` | Delete selected job |
-| `Ctrl+C` | Copy selected job |
-| `Ctrl+V` | Paste copied job |
 | `Ctrl+E` | Export YAML |
-| `Ctrl+I` | Import YAML |
-| `Ctrl+N` | Add new job |
-| `Ctrl+/` | Show keyboard shortcuts reference |
-| `Escape` | Close Property Panel |
+| `Ctrl+V` | Paste YAML import (when not in input) |
+| `Ctrl+F` | Toggle job search |
+| `Ctrl+/` | Show keyboard shortcuts panel |
+| `Shift+Click` | Multi-select nodes |
+| `Escape` | Close panel / Clear selection / Clear search |
+| `Delete` | Delete selected job |
 
-### Dark Mode UI
-
-<img src="/images/dark-mode.png" alt="Dark Mode" />
-
-Beautiful dark-first interface:
-
-✅ **WCAG AA Compliant**: All text meets contrast requirements  
-✅ **Tailwind CSS**: Utility-first styling  
-✅ **Custom Color Palette**: GitLab-inspired colors  
-✅ **Light Mode Toggle**: Switch themes anytime  
-✅ **Persistent Preference**: Remembers your choice
-
-**Color System:**
-- Primary: Blue (#3B82F6)
-- Accent: Purple (#8B5CF6)
-- Success: Green (#10B981)
-- Error: Red (#EF4444)
-- Warning: Yellow (#F59E0B)
-
-### Accessibility
-
-<img src="/images/accessibility.png" alt="Accessibility" />
-
-Inclusive design for all users:
-
-<AccordionGroup>
-  <Accordion title="Keyboard Navigation" icon="keyboard">
-    - All features accessible via keyboard
-    - Visible focus indicators
-    - Tab navigation through forms
-    - Arrow key navigation in lists
-  </Accordion>
-  
-  <Accordion title="Screen Reader Support" icon="audio-description">
-    - ARIA labels on all interactive elements
-    - ARIA roles for custom components
-    - ARIA live regions for status updates
-    - Semantic HTML structure
-  </Accordion>
-  
-  <Accordion title="Visual Accessibility" icon="eye">
-    - High contrast colors (WCAG AA)
-    - Resizable text
-    - No color-only indicators
-    - Clear focus states
-  </Accordion>
-</AccordionGroup>
-
-### First-Time User Experience
-
-<img src="/images/welcome.png" alt="Welcome Overlay" />
-
-Smooth onboarding for new users:
-
-<Steps>
-  <Step title="Welcome Overlay">
-    Quick-start options on first load:
-    - Start from Scratch
-    - Use "Hello World" Template
-    - Import Existing YAML
-  </Step>
-  
-  <Step title="Interactive Tutorial">
-    Step-by-step guide highlighting:
-    - Canvas interface
-    - Property Panel
-    - YAML Preview
-    - Export functionality
-  </Step>
-  
-  <Step title="Contextual Tooltips">
-    Hover tooltips on all UI elements explaining their purpose
-  </Step>
-  
-  <Step title="Example Pipelines">
-    Pre-built examples for common use cases:
-    - Node.js application
-    - Python application
-    - Docker build & deploy
-  </Step>
-</Steps>
-
-## Advanced Features
-
-### Dependency Graph Management
-
-<img src="/images/dependency-graph.png" alt="Dependency Graph" />
-
-Intelligent dependency handling:
-
-✅ **Cycle Detection**: Prevents circular dependencies automatically  
-✅ **Referential Integrity**: Validates all dependencies exist  
-✅ **Cascade Deletion**: Removes edges when jobs are deleted  
-✅ **Stage vs Needs**: Distinguishes implicit and explicit dependencies  
-✅ **Visual Feedback**: Highlights invalid dependencies in red
-
-### Multi-Project Pipelines
-
-<img src="/images/trigger-jobs.png" alt="Trigger Jobs" />
-
-Configure pipelines that trigger other projects:
-
-- Specify target project path
-- Set branch or tag
-- Pass variables to triggered pipeline
-- Configure strategy (depend or fire-and-forget)
-- Visual distinction with purple accent
-
-### Error Handling
-
-<img src="/images/error-handling.png" alt="Error Handling" />
-
-Comprehensive error handling:
-
-<CardGroup cols={2}>
-  <Card title="YAML Parsing Errors" icon="triangle-exclamation">
-    Detailed error messages with line/column numbers
-  </Card>
-  <Card title="Validation Errors" icon="circle-xmark">
-    Inline error display on canvas with tooltips
-  </Card>
-  <Card title="Network Errors" icon="wifi-slash">
-    Graceful offline mode with clear indicators
-  </Card>
-  <Card title="Storage Errors" icon="database">
-    Quota exceeded warnings with export options
-  </Card>
-</CardGroup>
-
-## Coming Soon
-
-<Note>
-  These features are planned for future releases:
-  
-  - **Collaboration**: Real-time multi-user editing
-  - **Version Control**: Built-in Git integration
-  - **Pipeline Execution**: Run pipelines directly from the editor
-  - **Advanced Analytics**: Pipeline performance insights
-  - **Custom Themes**: User-defined color schemes
-  - **Plugin System**: Extend functionality with plugins
-</Note>
+---
 
 ## Feature Comparison
 
-| Feature | Visual Editor | Manual YAML |
-|---------|--------------|-------------|
-| Syntax Errors | ❌ Prevented | ✅ Common |
-| Dependency Visualization | ✅ Built-in | ❌ Manual |
-| Real-Time Validation | ✅ Automatic | ❌ Manual |
-| Template Library | ✅ Included | ❌ Copy-paste |
-| Undo/Redo | ✅ 50 states | ❌ Git only |
-| Learning Curve | ✅ Low | ❌ High |
-| YAML Optimization | ✅ Automatic | ❌ Manual |
+| Feature | PipelinePilot | Manual YAML | Other Editors |
+|---------|:------------:|:-----------:|:-------------:|
+| Visual Canvas | ✅ | ❌ | ✅ |
+| AI Script Generation | ✅ | ❌ | ❌ |
+| Live GitLab Push | ✅ | ❌ | ❌ |
+| Pipeline Simulator | ✅ | ❌ | ❌ |
+| Pipeline Diff | ✅ | ❌ | ❌ |
+| Job Annotations | ✅ | ❌ | ❌ |
+| Environment Flow | ✅ | ❌ | ❌ |
+| extends/Includes UI | ✅ | Manual | ❌ |
+| Multi-Select Bulk Ops | ✅ | N/A | ❌ |
+| Auto-Layout | ✅ | N/A | Partial |
+| Template Library | ✅ | Copy-paste | Partial |
+| Undo/Redo (50 states) | ✅ | Git only | Limited |
 
 <Card
   title="Try It Now"
   icon="rocket"
   href="/quickstart"
 >
-  Get started with GitLab CI/CD Visual Editor in under 5 minutes
+  Get started with PipelinePilot in under 5 minutes
 </Card>

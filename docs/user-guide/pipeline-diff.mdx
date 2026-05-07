@@ -1,0 +1,57 @@
+---
+title: Pipeline Diff View
+description: 'Compare current pipeline with a saved snapshot or pasted YAML to see changes'
+---
+
+## Overview
+
+Pipeline Diff View compares your current pipeline configuration against a previous version, highlighting added, removed, and changed jobs with color-coded indicators.
+
+## Accessing the Diff Viewer
+
+Click the **clipboard/compare icon** in the right section of the toolbar.
+
+## Comparison Modes
+
+<Tabs>
+  <Tab title="Saved Snapshot">
+    1. Click **Save Snapshot** to store the current pipeline state
+    2. Make changes to your pipeline
+    3. Open the Diff Viewer — it automatically compares against the snapshot
+  </Tab>
+  <Tab title="Paste YAML">
+    1. Switch to the **Paste YAML** tab
+    2. Paste any `.gitlab-ci.yml` content
+    3. Click **Compare** to see differences
+  </Tab>
+</Tabs>
+
+## Understanding the Diff
+
+| Indicator | Color | Meaning |
+|-----------|-------|---------|
+| `+` Added | 🟢 Green | Job exists in current but not in base |
+| `−` Removed | 🔴 Red | Job exists in base but not in current |
+| `~` Changed | 🟡 Yellow | Job exists in both but has modifications |
+| `=` Unchanged | Gray | No differences (count shown at bottom) |
+
+### Change Details
+
+For changed jobs, specific modifications are listed:
+- `stage: build → test` — Stage reassignment
+- `script modified` — Script commands changed
+- `dependencies changed` — `needs` array updated
+- `rules changed` — Conditional rules modified
+- `image changed` — Docker image updated
+- `allow_failure toggled` — Failure policy changed
+
+## Use Cases
+
+- **Code review**: See what changed before pushing to GitLab
+- **Debugging**: Compare a working pipeline with a broken one
+- **Documentation**: Track pipeline evolution over time
+- **Rollback reference**: Know what to revert when things break
+
+<Tip>
+  Snapshots are stored in `localStorage` and persist across browser sessions. Only one snapshot is stored at a time — saving a new one overwrites the previous.
+</Tip>

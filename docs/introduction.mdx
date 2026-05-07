@@ -1,6 +1,6 @@
 ---
 title: Introduction
-description: 'Welcome to GitLab CI/CD Pipeline Visual Editor - A modern, visual approach to building GitLab CI/CD pipelines'
+description: 'Welcome to PipelinePilot — the professional visual editor for GitLab CI/CD pipelines'
 ---
 
 <img
@@ -14,9 +14,9 @@ description: 'Welcome to GitLab CI/CD Pipeline Visual Editor - A modern, visual 
   alt="Hero Dark"
 />
 
-## What is GitLab CI/CD Visual Editor?
+## What is PipelinePilot?
 
-GitLab CI/CD Pipeline Visual Editor is a web-based GUI application that revolutionizes how you create and manage GitLab CI/CD pipelines. Instead of manually writing YAML files, you can visually compose pipelines using an intuitive drag-and-drop interface.
+PipelinePilot is a professional-grade, web-based visual editor for GitLab CI/CD pipelines. Instead of manually writing YAML files, you can visually compose, simulate, and deploy pipelines using an intuitive drag-and-drop interface — complete with AI-powered script generation, live GitLab integration, and a full suite of DevOps power tools.
 
 <CardGroup cols={2}>
   <Card
@@ -34,45 +34,86 @@ GitLab CI/CD Pipeline Visual Editor is a web-based GUI application that revoluti
     See your YAML generated in real-time with optimizations like anchors and aliases
   </Card>
   <Card
-    title="GitLab Integration"
-    icon="gitlab"
-    href="/user-guide/validation"
+    title="AI Script Helper"
+    icon="microchip"
+    href="/user-guide/ai-script-helper"
   >
-    Validate your pipelines against GitLab's API before committing
+    Describe what a job should do in plain English — get production-ready scripts instantly
   </Card>
   <Card
-    title="Template Library"
-    icon="layer-group"
-    href="/user-guide/templates"
+    title="Live GitLab Push"
+    icon="cloud-arrow-up"
+    href="/user-guide/gitlab-push"
   >
-    Use pre-built templates for common CI/CD patterns
+    Push your pipeline directly to any GitLab branch without leaving the editor
   </Card>
 </CardGroup>
 
-## Key Features
+## Feature Tiers
+
+PipelinePilot ships with 15+ features across three tiers:
+
+### Tier 1 — Quick Wins
 
 <AccordionGroup>
-  <Accordion icon="palette" title="Visual Pipeline Composition">
-    Create CI/CD pipelines using a node-based canvas where jobs are visual nodes and dependencies are edges. No more YAML syntax errors!
+  <Accordion icon="clone" title="Job Duplication">
+    Right-click any job node → "Duplicate Job" to instantly clone similar jobs (e.g., `test_unit`, `test_integration`)
   </Accordion>
-  <Accordion icon="bolt" title="Real-Time Validation">
-    Integrate with GitLab's CI Lint API to validate your pipeline configuration in real-time as you build.
+  <Accordion icon="layer-group" title="Custom Stage Manager">
+    Add, remove, rename, and reorder stages beyond the default `build/test/deploy`. Supports custom stages like `lint`, `scan`, `package`, `release`, `cleanup`.
   </Accordion>
-  <Accordion icon="arrows-rotate" title="Bidirectional YAML Sync">
-    Import existing `.gitlab-ci.yml` files to visualize them, or export your visual pipeline to optimized YAML.
+  <Accordion icon="paste" title="Paste YAML Import">
+    Press `Ctrl+V` anywhere on the canvas to paste an existing `.gitlab-ci.yml` directly — no file dialog needed.
   </Accordion>
-  <Accordion icon="puzzle-piece" title="Template System">
-    Access official GitLab templates and create your own reusable job templates for common patterns.
+  <Accordion icon="terminal" title="Script Snippets">
+    Dropdown with common DevOps commands: `npm ci`, `docker build`, `kubectl apply`, `terraform plan` — saves typing.
   </Accordion>
-  <Accordion icon="moon" title="Dark Mode First">
-    Beautiful dark mode interface designed for developers who work in low-light environments.
-  </Accordion>
-  <Accordion icon="keyboard" title="Keyboard Shortcuts">
-    Power user features with comprehensive keyboard shortcuts for efficient pipeline editing.
+  <Accordion icon="magnifying-glass" title="Job Search / Filter">
+    `Ctrl+F` to search jobs by name or stage. Non-matching nodes dim automatically for large pipeline navigation.
   </Accordion>
 </AccordionGroup>
 
-## Why Visual Editor?
+### Tier 2 — Power Features
+
+<AccordionGroup>
+  <Accordion icon="object-group" title="Multi-Select + Bulk Operations">
+    `Shift+Click` to select multiple jobs → floating bulk actions bar for mass delete, stage change, or move operations.
+  </Accordion>
+  <Accordion icon="diagram-project" title="extends / YAML Anchors UI">
+    Create hidden base job templates (`.base_docker`) and let other jobs extend them visually — how 90% of real GitLab CI works.
+  </Accordion>
+  <Accordion icon="link" title="include Support">
+    Reference external YAML files (`include: - template: Auto-DevOps.gitlab-ci.yml`) with a visual manager for local, template, remote, and project includes.
+  </Accordion>
+  <Accordion icon="play" title="Pipeline Execution Simulator">
+    Animate which jobs run in parallel vs sequential based on `needs` dependencies. Shows the actual execution graph with wave-by-wave visualization.
+  </Accordion>
+  <Accordion icon="table-cells" title="Auto-Layout">
+    One-click "Organize" button that auto-arranges all nodes by stage and dependency flow into neat, readable rows.
+  </Accordion>
+</AccordionGroup>
+
+### Tier 3 — Premium Differentiators
+
+<AccordionGroup>
+  <Accordion icon="cloud-arrow-up" title="Live GitLab Push">
+    Connect to the GitLab API and push `.gitlab-ci.yml` directly to any branch — complete with project selection, commit messages, and token management.
+  </Accordion>
+  <Accordion icon="code-compare" title="Pipeline Diff View">
+    Compare current pipeline with a saved snapshot or pasted YAML — shows added, removed, and changed jobs with color-coded indicators.
+  </Accordion>
+  <Accordion icon="note-sticky" title="Job Annotations">
+    Add sticky notes and comments to any job — displayed as yellow notes on nodes. Great for team documentation and code reviews.
+  </Accordion>
+  <Accordion icon="globe" title="Environment Flow Diagram">
+    Visualize deploy targets: `staging → production` with approval gates. Auto-detects environments and manual approval requirements.
+  </Accordion>
+  <Accordion icon="microchip" title="AI Script Helper">
+    Describe what a job should do in plain English → auto-generates production-ready script blocks with recommended Docker images. Supports 18+ tech stacks.
+  </Accordion>
+</AccordionGroup>
+
+## Why PipelinePilot?
 
 Traditional YAML editing for CI/CD pipelines has several challenges:
 
@@ -80,26 +121,28 @@ Traditional YAML editing for CI/CD pipelines has several challenges:
 - **Complex Dependencies**: Hard to visualize job dependencies and execution order
 - **Repetition**: Lots of duplicated configuration across jobs
 - **Learning Curve**: Requires memorizing GitLab CI/CD YAML syntax
+- **No Simulation**: Can't see what will run in parallel without deploying
 
-GitLab CI/CD Visual Editor solves these problems by providing:
+PipelinePilot solves these with:
 
 ✅ **Visual Clarity**: See your entire pipeline structure at a glance  
 ✅ **Error Prevention**: Form-based configuration prevents syntax errors  
 ✅ **Smart Optimization**: Automatic YAML anchors/aliases reduce duplication  
 ✅ **Instant Feedback**: Real-time validation catches issues before commit  
-✅ **Faster Onboarding**: Intuitive interface requires minimal training
+✅ **AI-Powered**: Generate scripts from descriptions, not memory  
+✅ **Direct Push**: Deploy to GitLab without leaving the editor
 
 ## Who Is This For?
 
 <CardGroup cols={3}>
   <Card title="DevOps Engineers" icon="user-gear">
-    Build complex multi-stage pipelines with ease
+    Build complex multi-stage pipelines with AI assistance and simulation
   </Card>
   <Card title="Developers" icon="code">
-    Create CI/CD pipelines without YAML expertise
+    Create CI/CD pipelines without YAML expertise using visual tools
   </Card>
   <Card title="Teams" icon="users">
-    Standardize pipeline patterns with templates
+    Standardize pipeline patterns with templates, annotations, and includes
   </Card>
 </CardGroup>
 
@@ -107,16 +150,16 @@ GitLab CI/CD Visual Editor solves these problems by providing:
 
 <Steps>
   <Step title="Install Dependencies">
-    Clone the repository and install dependencies with npm or yarn
+    Clone the repository and install dependencies with npm
   </Step>
   <Step title="Start Development Server">
-    Run the development server and open the application in your browser
+    Run `npm run dev` and open the application at `http://localhost:5173`
   </Step>
   <Step title="Create Your First Pipeline">
     Use the visual canvas to add jobs, configure properties, and create dependencies
   </Step>
-  <Step title="Export YAML">
-    Export your pipeline as a `.gitlab-ci.yml` file ready to commit
+  <Step title="Export or Push">
+    Export your pipeline as `.gitlab-ci.yml` or push directly to GitLab
   </Step>
 </Steps>
 
@@ -130,24 +173,24 @@ GitLab CI/CD Visual Editor solves these problems by providing:
 
 ## Technology Stack
 
-The GitLab CI/CD Visual Editor is built with modern web technologies:
+PipelinePilot is built with modern web technologies:
 
 - **React 18+** with TypeScript for type-safe component development
-- **React Flow** for the node-based canvas interface
-- **Redux Toolkit** for centralized state management
+- **React Flow v12** for the node-based canvas interface
+- **Redux Toolkit** with redux-undo for state management and time-travel
 - **Monaco Editor** for YAML preview (same engine as VS Code)
-- **Tailwind CSS** for beautiful dark mode UI
+- **Vite 5** for blazing-fast development builds
+- **Tailwind CSS** for responsive dark/light mode UI
 - **js-yaml** for YAML parsing and generation
-- **Axios** for GitLab API integration
 
 ## Open Source
 
-GitLab CI/CD Visual Editor is open source and welcomes contributions from the community. Check out our [Contributing Guide](/contributing/guidelines) to get started.
+PipelinePilot is open source and welcomes contributions from the community. Check out our [Contributing Guide](/contributing/guidelines) to get started.
 
 <Card
   title="View on GitHub"
   icon="github"
-  href="https://github.com/yourusername/gitlab-cicd-visual-editor"
+  href="https://github.com/vedantchimote/PipelinePilot"
 >
   Star the repository and contribute to the project
 </Card>

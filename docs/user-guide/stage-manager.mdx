@@ -1,0 +1,44 @@
+---
+title: Stage Manager
+description: 'Add, remove, rename, and reorder pipeline stages beyond the defaults'
+---
+
+## Overview
+
+The Stage Manager lets you customize your pipeline's stage structure beyond the default `build`, `test`, `deploy`. Real-world pipelines often need stages like `lint`, `scan`, `package`, `release`, and `cleanup`.
+
+## Accessing the Stage Manager
+
+Click the **Stages** button in the center toolbar pill to open the Stage Manager modal.
+
+## Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Add Stages" icon="plus">
+    Create new custom stages with any name
+  </Card>
+  <Card title="Remove Stages" icon="trash">
+    Delete stages that are no longer needed
+  </Card>
+  <Card title="Rename Stages" icon="pen">
+    Edit stage names inline with real-time validation
+  </Card>
+  <Card title="Reorder Stages" icon="sort">
+    Change the order of stages to match your pipeline flow
+  </Card>
+</CardGroup>
+
+## Common Custom Stages
+
+| Stage | Purpose |
+|-------|---------|
+| `lint` | Code quality checks (ESLint, Prettier) |
+| `scan` | Security scanning (SAST, dependency audit) |
+| `package` | Build artifacts, Docker images |
+| `release` | Publish to registries, create releases |
+| `cleanup` | Remove temporary resources |
+| `notify` | Send Slack/email notifications |
+
+<Tip>
+  Stages defined in the Stage Manager automatically appear in the Stage dropdown when configuring jobs in the PropertyPanel.
+</Tip>

@@ -1,0 +1,71 @@
+---
+title: Environment Flow Diagram
+description: 'Visualize deployment targets with approval gates across environments'
+---
+
+## Overview
+
+The Environment Flow Diagram extracts `environment:` configurations from your jobs and renders a horizontal flow showing how deployments progress through your infrastructure — from development through staging to production.
+
+## Accessing the Environment Flow
+
+Click the **globe icon** (🌐) in the right section of the toolbar.
+
+## How It Works
+
+1. **Scans all jobs** for `environment:` field (string or object)
+2. **Groups jobs by environment** name
+3. **Auto-sorts** environments by deployment order:
+   - `dev` / `development` → `staging` / `stage` → `uat` → `preprod` → `production` / `prod`
+4. **Detects approval gates** from `when: manual` settings
+
+## Visual Elements
+
+<CardGroup cols={2}>
+  <Card title="Environment Cards" icon="server">
+    Color-coded cards showing environment name and assigned jobs
+  </Card>
+  <Card title="Flow Arrows" icon="arrow-right">
+    Arrows connecting environments in deployment order
+  </Card>
+  <Card title="Approval Gates" icon="lock">
+    Amber badge on environments requiring manual approval (`when: manual`)
+  </Card>
+  <Card title="Legend" icon="circle-info">
+    Footer showing manual vs auto-deploy indicators and total count
+  </Card>
+</CardGroup>
+
+## Setting Up Environments
+
+To see environments in the flow diagram, configure the `environment:` field on your deploy jobs:
+
+```yaml
+deploy_staging:
+  stage: deploy
+  environment: staging
+  script:
+    - kubectl apply -f k8s/staging/
+
+deploy_production:
+  stage: deploy
+  environment: production
+  when: manual  # Creates an approval gate
+  script:
+    - kubectl apply -f k8s/production/
+```
+
+## Flow Example
+
+```
+┌──────────┐    →    ┌──────────┐    →    ┌──────────────┐
+│  staging  │         │   uat    │         │  production  │
+│           │         │          │         │   🔒 MANUAL  │
+│ deploy_   │         │ deploy_  │         │   deploy_    │
+│ staging   │         │ uat      │         │   prod       │
+└──────────┘         └──────────┘         └──────────────┘
+```
+
+<Tip>
+  The environment flow is read-only — it's a visualization tool. To modify environments, edit the `environment:` field in each job's PropertyPanel configuration.
+</Tip>

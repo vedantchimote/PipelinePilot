@@ -1,0 +1,58 @@
+---
+title: Pipeline Execution Simulator
+description: 'Visualize which jobs run in parallel vs sequential based on dependencies'
+---
+
+## Overview
+
+The Pipeline Execution Simulator computes the actual execution order of your pipeline and animates it wave-by-wave, showing which jobs run in parallel and which must wait.
+
+## Accessing the Simulator
+
+Click the **Simulate** button in the center toolbar pill. A floating panel appears in the bottom-right corner.
+
+## How It Works
+
+### Execution Waves
+
+The simulator computes waves based on two factors:
+
+1. **Stage ordering**: Jobs in earlier stages run before later stages
+2. **`needs` dependencies**: Jobs with explicit `needs` wait for their dependencies
+
+```
+Wave 1: build_app, build_docker     (parallel — both in build stage)
+Wave 2: test_unit, test_integration  (parallel — both in test stage)
+Wave 3: deploy_staging              (sequential — depends on tests)
+Wave 4: deploy_production            (sequential — depends on staging)
+```
+
+### Running the Simulation
+
+<Steps>
+  <Step title="Open Simulator">
+    Click Simulate → panel appears showing wave breakdown
+  </Step>
+  <Step title="Review Waves">
+    Each wave shows which jobs run together in parallel
+  </Step>
+  <Step title="Click Run">
+    Jobs light up with a **green glow** as each wave executes
+  </Step>
+  <Step title="Watch Progress">
+    Completed waves show ✓ checkmarks, current wave shows a spinner
+  </Step>
+</Steps>
+
+## Visual Indicators
+
+| Indicator | Meaning |
+|-----------|---------|
+| 🟢 Green glow on node | Job is currently executing |
+| ✓ Checkmark | Wave completed |
+| Spinner | Wave currently running |
+| Footer count | `3 waves · 6 jobs` summary |
+
+<Tip>
+  The simulator helps you understand the actual parallelism of your pipeline before pushing it to GitLab — saving you from unexpected sequential bottlenecks.
+</Tip>

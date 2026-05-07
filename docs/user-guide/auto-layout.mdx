@@ -1,0 +1,43 @@
+---
+title: Auto-Layout
+description: 'One-click organization of pipeline nodes by stage and dependency flow'
+---
+
+## Overview
+
+Auto-Layout instantly arranges all nodes on the canvas into neat, readable rows grouped by stage. Perfect for cleaning up after heavy editing or after importing a large YAML file.
+
+## How to Use
+
+Click the **Layout** button in the center toolbar pill. All nodes will immediately snap to organized positions.
+
+## Layout Algorithm
+
+The auto-layout engine:
+
+1. **Groups jobs by stage** in the order defined in the pipeline
+2. **Arranges within each stage** from left to right
+3. **Consistent spacing**: 280px node width, 40px horizontal gap
+4. **Stage separation**: 200px vertical gap between stage groups
+5. **Starting position**: First job at (100, 100)
+
+### Example Layout
+
+```
+BUILD    ──  [build_app]  [build_docker]
+
+TEST     ──  [test_unit]  [test_integration]  [test_e2e]
+
+DEPLOY   ──  [deploy_staging]  [deploy_production]
+```
+
+## When to Use
+
+- After **importing** a large YAML file
+- After **bulk operations** that scatter nodes
+- When starting a **new pipeline from a template**
+- Whenever the canvas feels **cluttered**
+
+<Tip>
+  Auto-Layout preserves all dependencies and job configurations — it only changes node positions.
+</Tip>

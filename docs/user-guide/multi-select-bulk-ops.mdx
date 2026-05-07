@@ -1,0 +1,55 @@
+---
+title: Multi-Select & Bulk Operations
+description: 'Select multiple jobs and perform bulk actions like stage reassignment and mass deletion'
+---
+
+## Overview
+
+Multi-Select allows you to select multiple job nodes simultaneously and perform batch operations through a floating action bar.
+
+## How to Use
+
+### Selecting Multiple Nodes
+
+<Steps>
+  <Step title="Hold Shift">
+    Hold down the `Shift` key on your keyboard
+  </Step>
+  <Step title="Click Nodes">
+    Click on each job node you want to select. A **cyan highlight ring** appears around selected nodes.
+  </Step>
+  <Step title="View Selection Bar">
+    A floating **BulkActionsBar** appears at the bottom-center of the screen showing the count and available actions.
+  </Step>
+</Steps>
+
+### Available Bulk Actions
+
+<CardGroup cols={3}>
+  <Card title="Move to Stage" icon="right-left">
+    Select a target stage from the dropdown to reassign all selected jobs at once
+  </Card>
+  <Card title="Delete All" icon="trash">
+    Remove all selected jobs and clean up their dependency edges
+  </Card>
+  <Card title="Clear Selection" icon="xmark">
+    Deselect all nodes (also triggered by pressing `Escape`)
+  </Card>
+</CardGroup>
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Shift + Click` | Toggle node in selection |
+| `Escape` | Clear all selections |
+
+## Use Cases
+
+- **Batch stage reassignment**: Moving a group of test jobs from `test` to `integration`
+- **Mass cleanup**: Deleting all jobs in a deprecated stage
+- **Pipeline restructuring**: Quickly reorganizing large pipelines
+
+<Warning>
+  Bulk delete removes all selected jobs permanently. Use `Ctrl+Z` to undo if needed.
+</Warning>

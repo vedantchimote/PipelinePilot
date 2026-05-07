@@ -1,0 +1,87 @@
+---
+title: AI Script Helper
+description: 'Describe what a job should do in plain English and get production-ready scripts'
+---
+
+## Overview
+
+The AI Script Helper uses intelligent template matching to generate production-ready CI/CD script blocks from natural language descriptions. No external API required — everything runs locally with 18+ built-in templates.
+
+## Accessing the AI Helper
+
+1. Open a job's PropertyPanel by clicking on a job node
+2. In the **Scripts** section, click the purple **AI** button (next to Snippets)
+
+## How It Works
+
+<Steps>
+  <Step title="Describe the Task">
+    Type what the job should do in the text area, e.g., "Build and push a Docker image to the registry"
+  </Step>
+  <Step title="Use Suggestions">
+    Or click one of the quick suggestion chips for common tasks
+  </Step>
+  <Step title="Generate">
+    Click **Generate Script** to see the preview with recommended commands and Docker image
+  </Step>
+  <Step title="Apply">
+    Click **Apply to Job** to add the generated script to the job's configuration
+  </Step>
+</Steps>
+
+## Supported Tech Stacks
+
+<Tabs>
+  <Tab title="JavaScript/Node.js">
+    - `npm ci` + `npm run build`
+    - `npm run test -- --coverage`
+    - `npm run lint`
+    - Image: `node:20-alpine`
+  </Tab>
+  <Tab title="Python">
+    - `pip install -r requirements.txt`
+    - `python -m pytest`
+    - Image: `python:3.12-slim`
+  </Tab>
+  <Tab title="Docker">
+    - `docker login`, `docker build`, `docker push`
+    - Uses `$CI_REGISTRY_*` variables
+    - Image: `docker:24`
+  </Tab>
+  <Tab title="Kubernetes">
+    - `kubectl config use-context`
+    - `kubectl apply -f`
+    - `kubectl rollout status`
+    - Image: `bitnami/kubectl:latest`
+  </Tab>
+  <Tab title="Terraform">
+    - `terraform init`, `plan`, `apply`
+    - Image: `hashicorp/terraform:1.7`
+  </Tab>
+  <Tab title="More">
+    - **Go**: `go mod download`, `go build`, `go test`
+    - **Rust**: `cargo build --release`, `cargo test`
+    - **Java**: `mvn clean package`, `mvn test`
+    - **Helm**: `helm repo update`, `helm upgrade --install`
+    - **AWS**: `aws s3 sync`, CloudFront invalidation
+    - **Ansible**: `ansible-playbook`
+    - **Security**: `npm audit`, Snyk scan
+    - **Notifications**: Slack webhook
+    - **Database**: Migrations and seeding
+  </Tab>
+</Tabs>
+
+## Quick Suggestion Chips
+
+Pre-built prompts for one-click generation:
+
+- Build a Node.js application
+- Run Python unit tests
+- Build and push Docker image
+- Deploy to Kubernetes
+- Run Terraform infrastructure
+- Security vulnerability scan
+
+<Tip>
+  The AI Helper **appends** generated scripts to existing ones rather than replacing them. It also sets the Docker image only if one isn't already configured.
+</Tip>

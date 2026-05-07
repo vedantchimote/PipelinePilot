@@ -1,0 +1,65 @@
+---
+title: Job Annotations
+description: 'Add sticky notes and documentation comments to any job node'
+---
+
+## Overview
+
+Job Annotations let you attach sticky notes to any job in your pipeline. These notes appear directly on the canvas as yellow note indicators, making it easy to document complex configurations, leave TODO items, or communicate with team members.
+
+## Adding an Annotation
+
+<Steps>
+  <Step title="Select a Job">
+    Click on any job node to open the PropertyPanel
+  </Step>
+  <Step title="Find the Notes Section">
+    Scroll to the **Notes** section in the PropertyPanel
+  </Step>
+  <Step title="Enter Your Note">
+    Type your annotation in the **Job Annotation** textarea
+  </Step>
+  <Step title="Save">
+    Click **Save Changes** to apply
+  </Step>
+</Steps>
+
+## Visual Display
+
+Annotations appear on the job node as a **yellow sticky note** with:
+- Left yellow border (`#facc15`)
+- Subtle yellow background
+- Italic text (10px)
+- Truncated with hover tooltip for full text
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Team Documentation" icon="users">
+    Explain why a job is configured a certain way for team members
+  </Card>
+  <Card title="Code Review Notes" icon="comments">
+    Leave review comments directly on pipeline jobs
+  </Card>
+  <Card title="TODO Items" icon="list-check">
+    Mark jobs that need optimization or refactoring
+  </Card>
+  <Card title="Configuration Notes" icon="gear">
+    Document non-obvious settings or workarounds
+  </Card>
+</CardGroup>
+
+## Examples
+
+```
+"This job uses manual approval because production 
+deployments require sign-off from the team lead"
+
+"TODO: Add caching for node_modules to speed up builds"
+
+"Uses docker:24 because v25 has a known issue with our registry"
+```
+
+<Note>
+  Annotations are stored as part of the job configuration but are **not** emitted in the YAML output — they exist only within PipelinePilot for documentation purposes.
+</Note>

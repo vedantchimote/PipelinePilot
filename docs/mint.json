@@ -1,28 +1,28 @@
 {
-  "name": "GitLab CI/CD Visual Editor",
+  "name": "PipelinePilot",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#3B82F6",
-    "light": "#60A5FA",
-    "dark": "#1E40AF",
+    "primary": "#6366F1",
+    "light": "#818CF8",
+    "dark": "#4338CA",
     "anchors": {
-      "from": "#3B82F6",
+      "from": "#6366F1",
       "to": "#8B5CF6"
     }
   },
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:support@example.com"
+      "url": "https://github.com/vedantchimote/PipelinePilot/issues"
     }
   ],
   "topbarCtaButton": {
     "name": "Get Started",
-    "url": "https://github.com/yourusername/gitlab-cicd-visual-editor"
+    "url": "https://github.com/vedantchimote/PipelinePilot"
   },
   "tabs": [
     {
@@ -42,17 +42,12 @@
     {
       "name": "Documentation",
       "icon": "book-open-cover",
-      "url": "https://docs.example.com"
-    },
-    {
-      "name": "Community",
-      "icon": "discord",
-      "url": "https://discord.gg/example"
+      "url": "https://github.com/vedantchimote/PipelinePilot#readme"
     },
     {
       "name": "GitHub",
       "icon": "github",
-      "url": "https://github.com/yourusername/gitlab-cicd-visual-editor"
+      "url": "https://github.com/vedantchimote/PipelinePilot"
     }
   ],
   "navigation": [
@@ -75,6 +70,26 @@
         "user-guide/import-export",
         "user-guide/keyboard-shortcuts",
         "user-guide/validation"
+      ]
+    },
+    {
+      "group": "Power Features",
+      "pages": [
+        "user-guide/multi-select-bulk-ops",
+        "user-guide/stage-manager",
+        "user-guide/includes-extends",
+        "user-guide/pipeline-simulator",
+        "user-guide/auto-layout"
+      ]
+    },
+    {
+      "group": "Premium Features",
+      "pages": [
+        "user-guide/ai-script-helper",
+        "user-guide/gitlab-push",
+        "user-guide/pipeline-diff",
+        "user-guide/job-annotations",
+        "user-guide/environment-flow"
       ]
     },
     {
@@ -134,8 +149,6 @@
     }
   ],
   "footerSocials": {
-    "github": "https://github.com/yourusername/gitlab-cicd-visual-editor",
-    "twitter": "https://twitter.com/yourhandle",
-    "discord": "https://discord.gg/example"
+    "github": "https://github.com/vedantchimote/PipelinePilot"
   }
 }

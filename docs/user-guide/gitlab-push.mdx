@@ -1,0 +1,55 @@
+---
+title: Live GitLab Push
+description: 'Push your pipeline directly to a GitLab branch without leaving the editor'
+---
+
+## Overview
+
+Live GitLab Push allows you to commit your `.gitlab-ci.yml` directly to any GitLab repository branch using the GitLab API — no terminal, no copy-paste, no context switching.
+
+## Accessing GitLab Push
+
+Click the **cloud-upload icon** (↑) in the right section of the toolbar.
+
+## Configuration
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **GitLab URL** | Your GitLab instance URL | `https://gitlab.com` |
+| **Personal Access Token** | PAT with `api` scope | `glpat-xxxxxxxxxxxx` |
+| **Project ID / Path** | Numeric ID or namespace path | `vedantchimote/my-app` |
+| **Branch** | Target branch | `main` |
+| **Commit Message** | Message for the commit | `Update CI pipeline` |
+
+## How It Works
+
+<Steps>
+  <Step title="Enter Credentials">
+    Fill in your GitLab URL and Personal Access Token
+  </Step>
+  <Step title="Select Project">
+    Enter the project ID or full path (e.g., `group/project`)
+  </Step>
+  <Step title="Choose Branch">
+    Specify the target branch (defaults to `main`)
+  </Step>
+  <Step title="Push">
+    Click **Push to GitLab** — the current pipeline YAML is committed to the repository
+  </Step>
+</Steps>
+
+## API Flow
+
+1. Generates YAML from current pipeline state using `toYAML()`
+2. Attempts `PUT /api/v4/projects/:id/repository/files/.gitlab-ci.yml` (update existing file)
+3. If file doesn't exist (404), falls back to `POST` (create new file)
+4. Returns success or error with GitLab's error message
+
+## Persistence
+
+- **GitLab URL**, **Project ID**, and **Branch** are saved in `localStorage` for convenience
+- **Access Token** is never persisted for security reasons
+
+<Warning>
+  Make sure your Personal Access Token has the `api` scope and access to the target project. For self-hosted GitLab instances, update the GitLab URL accordingly.
+</Warning>
