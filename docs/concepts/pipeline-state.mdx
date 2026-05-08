@@ -9,6 +9,56 @@ The `PipelineState` is the central data model that represents your entire CI/CD 
 
 ## Data Structure
 
+```mermaid
+classDiagram
+    class PipelineState {
+        +Record~string, Job~ jobs
+        +string[] stages
+        +IncludeDirective[] includes
+        +Record~string, string~ globalVariables
+    }
+
+    class Job {
+        +string id
+        +string name
+        +string stage
+        +string image
+        +string[] script
+        +string[] before_script
+        +string[] after_script
+        +string[] needs
+        +string extends
+        +ArtifactConfig artifacts
+        +CacheConfig cache
+        +Record~string, string~ variables
+        +RuleConfig[] rules
+        +EnvironmentConfig environment
+        +TriggerConfig trigger
+        +string annotation
+        +Position position
+    }
+
+    class IncludeDirective {
+        +string type
+        +string path
+        +string template
+        +string remote
+        +string project
+        +string ref
+        +string file
+    }
+
+    class Position {
+        +number x
+        +number y
+    }
+
+    PipelineState "1" --> "*" Job : contains
+    PipelineState "1" --> "*" IncludeDirective : references
+    Job "1" --> "1" Position : has
+    Job --> Job : needs / extends
+```
+
 ```typescript
 interface PipelineState {
   jobs: Record<string, Job>;           // All jobs, keyed by ID
@@ -38,15 +88,21 @@ interface Job {
 }
 ```
 
-## State Flow
+## State Lifecycle
 
-```
-User Interaction → Redux Action → Reducer → New PipelineState → React Re-render
-                                                    │
-                                                    ├── Canvas nodes update
-                                                    ├── YAML preview regenerates
-                                                    ├── Validation runs
-                                                    └── Auto-save triggers
+```mermaid
+stateDiagram-v2
+    [*] --> Empty : App loads (no saved state)
+    [*] --> Restored : App loads (saved state in localStorage)
+    Empty --> Editing : User adds first job
+    Restored --> Editing : User modifies pipeline
+    Editing --> Saved : Auto-save / Ctrl+S
+    Saved --> Editing : User makes changes
+    Editing --> Exported : Export YAML / Push to GitLab
+    Exported --> Editing : Continue editing
+    Editing --> Imported : Import YAML / Paste
+    Imported --> Editing : Continue editing
+    Editing --> Empty : Clear pipeline
 ```
 
 ## Persistence

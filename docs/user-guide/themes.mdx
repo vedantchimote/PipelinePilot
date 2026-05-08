@@ -78,23 +78,50 @@ Each app theme has a **dedicated Monaco editor theme** registered via `defineThe
 
 ## Architecture
 
-The theme engine uses **CSS custom properties** cascading from the `<html>` root:
+### Theme Application Flow
 
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant TP as ThemePicker
+    participant HTML as HTML Root
+    participant CSS as CSS Engine
+    participant RX as Redux
+    participant LS as localStorage
+    participant CV as Canvas
+    participant MO as Monaco
+
+    U->>TP: Select theme
+    TP->>HTML: Set class (e.g. "dark theme-dracula")
+    HTML->>CSS: CSS variables cascade
+    TP->>LS: Persist theme ID
+    TP->>RX: dispatch(setTheme(id))
+    CSS->>CV: Components read var(--bg-primary) etc.
+    CV->>CV: requestAnimationFrame → update SVG
+    CSS->>MO: editor.setTheme("pp-dracula")
 ```
-applyTheme(themeId)
-  ├── Sets CSS class on <html>     →  .dark, .dark.theme-dracula, etc.
-  ├── localStorage.setItem()       →  Persists choice
-  └── dispatch(setTheme())         →  Updates Redux state
-                                        │
-CSS Variables cascade:                   │
-  :root (light)                         ├── --bg-primary
-  .dark (midnight)                      ├── --bg-secondary
-  .dark.theme-dracula                   ├── --bg-tertiary
-  .dark.theme-nord                      ├── --accent
-  .dark.theme-monokai                   ├── --text-primary
-  .dark.theme-synthwave                 ├── --text-secondary
-  .dark.theme-github-dark               ├── --border-primary
-                                        └── ... (14 properties)
+
+### CSS Variable Cascade
+
+```mermaid
+graph TD
+    Root[":root (Light defaults)"]
+    Root --> Dark[".dark (Midnight overrides)"]
+    Dark --> Dracula[".dark.theme-dracula"]
+    Dark --> Nord[".dark.theme-nord"]
+    Dark --> Monokai[".dark.theme-monokai"]
+    Dark --> Synthwave[".dark.theme-synthwave"]
+    Dark --> GitHub[".dark.theme-github-dark"]
+
+    Root -->|"14 CSS variables"| Vars["--bg-primary\n--bg-secondary\n--bg-tertiary\n--accent\n--text-primary\n--text-secondary\n--text-muted\n--border-primary\n..."]
+
+    style Root fill:#f8fafc,color:#000
+    style Dark fill:#0f172a,color:#fff
+    style Dracula fill:#282a36,color:#f8f8f2
+    style Nord fill:#2e3440,color:#d8dee9
+    style Monokai fill:#272822,color:#f8f8f2
+    style Synthwave fill:#1a1028,color:#e0def4
+    style GitHub fill:#0d1117,color:#c9d1d9
 ```
 
 ### Key Files

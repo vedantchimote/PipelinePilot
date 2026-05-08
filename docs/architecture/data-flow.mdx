@@ -5,43 +5,127 @@ description: 'How data flows through PipelinePilot'
 
 ## Unidirectional Data Flow
 
-PipelinePilot follows a strict unidirectional data flow pattern:
+PipelinePilot follows a strict unidirectional data flow pattern. Every user interaction follows the same predictable cycle:
 
-```
-User Action → Redux Dispatch → Reducer → New State → React Re-render
-     │                                        │
-     │                                        ├── Canvas (React Flow)
-     │                                        ├── YAML Preview (Monaco)
-     │                                        ├── Property Panel
-     │                                        └── Toolbar Status
-     │
-     └── Side Effects:
-         ├── localStorage auto-save (every 30s)
-         ├── YAML regeneration (via useMemo)
-         └── Validation (via useEffect)
+```mermaid
+flowchart LR
+    A["User Action"] --> B["Redux Dispatch"]
+    B --> C["Reducer"]
+    C --> D["New State"]
+    D --> E["React Re-render"]
+    E --> A
+
+    D --> F["Canvas"]
+    D --> G["YAML Preview"]
+    D --> H["Property Panel"]
+    D --> I["Toolbar Status"]
+
+    style A fill:#6366f1,color:#fff
+    style D fill:#22c55e,color:#fff
 ```
 
 ## Key Data Paths
 
 ### Creating a Job
-1. User clicks **+ Add Job**
-2. `addJob` action dispatched with default properties
-3. Reducer adds job to `state.pipeline.present.jobs`
-4. Canvas renders new node at default position
-5. YAML preview updates with new job block
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant TB as Toolbar
+    participant RX as Redux Store
+    participant CV as Canvas
+    participant YE as YAML Engine
+    participant MO as Monaco Editor
+
+    U->>TB: Click "+ Add Job"
+    TB->>RX: dispatch(addJob({stage}))
+    RX->>RX: Reducer adds job to state
+    RX->>CV: New node rendered
+    RX->>YE: toYAML(newState)
+    YE->>MO: Updated YAML string
+    Note over RX: Auto-save triggers after 30s
+```
 
 ### Importing YAML
-1. User pastes YAML or imports file
-2. `fromYAML()` parses text into `PipelineState`
-3. `importYAML` action dispatched with parsed state
-4. Reducer replaces entire pipeline state
-5. All components re-render with imported data
-6. Auto-layout arranges nodes by stage
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant App as App
+    participant YE as YAML Engine
+    participant RX as Redux Store
+    participant CV as Canvas
+    participant MO as Monaco Editor
+
+    U->>App: Paste YAML / Import File
+    App->>YE: fromYAML(text)
+    YE->>YE: Parse + validate
+    YE->>RX: dispatch(importYAML(state))
+    RX->>CV: Render all nodes
+    RX->>CV: autoLayout()
+    RX->>MO: Re-generate YAML preview
+```
 
 ### Theme Change
-1. User selects theme in ThemePicker
-2. `applyTheme()` sets CSS classes on `<html>`
-3. `setTheme` action updates Redux state
-4. CSS variables cascade to all components
-5. Canvas `useEffect` reads computed styles via `requestAnimationFrame`
-6. Monaco editor calls `setTheme()` with matching custom theme
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant TP as ThemePicker
+    participant DOM as HTML Root
+    participant CSS as CSS Variables
+    participant CV as Canvas
+    participant MO as Monaco Editor
+
+    U->>TP: Select "Dracula"
+    TP->>DOM: classList = "dark theme-dracula"
+    TP->>CSS: Variables cascade to all components
+    TP->>TP: localStorage.setItem()
+    TP->>TP: dispatch(setTheme("dracula"))
+    CSS->>CV: requestAnimationFrame → read computed styles
+    CV->>CV: Update SVG background colors
+    CSS->>MO: setTheme("pp-dracula")
+    MO->>MO: Apply custom Dracula syntax colors
+```
+
+### Export / GitLab Push
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant TB as Toolbar
+    participant YE as YAML Engine
+    participant FS as File System
+    participant GL as GitLab API
+
+    U->>TB: Click "Export" or "Push"
+    TB->>YE: toYAML(currentState)
+
+    alt Export to File
+        YE->>FS: Download .gitlab-ci.yml
+    else Push to GitLab
+        YE->>GL: PUT /api/v4/.../files/.gitlab-ci.yml
+        GL-->>TB: 200 OK / 404
+        alt File doesn't exist
+            YE->>GL: POST (create new file)
+        end
+        GL-->>TB: Success / Error status
+    end
+```
+
+## Side Effects
+
+```mermaid
+flowchart TD
+    A["State Change"] --> B["Auto-save to localStorage"]
+    A --> C["YAML Regeneration via useMemo"]
+    A --> D["Validation via useEffect"]
+    A --> E["Canvas Node Re-render"]
+    A --> F["Persistence isDirty flag"]
+
+    B --> B1["Every 30 seconds"]
+    D --> D1["Circular dependency check"]
+    D --> D2["Stage existence check"]
+
+    style A fill:#6366f1,color:#fff
+```

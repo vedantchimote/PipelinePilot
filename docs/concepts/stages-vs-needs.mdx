@@ -11,6 +11,34 @@ GitLab CI/CD supports two complementary dependency systems. PipelinePilot visual
 
 By default, jobs are grouped into **stages** that run sequentially:
 
+```mermaid
+graph LR
+    subgraph "Stage: build"
+        A["build_app"]
+        B["build_docker"]
+    end
+    subgraph "Stage: test"
+        C["test_unit"]
+        D["test_integration"]
+    end
+    subgraph "Stage: deploy"
+        E["deploy_prod"]
+    end
+
+    A -.->|"implicit: all build must finish"| C
+    A -.->|"implicit"| D
+    B -.->|"implicit"| C
+    B -.->|"implicit"| D
+    C -.->|"implicit: all test must finish"| E
+    D -.->|"implicit"| E
+
+    style A fill:#3b82f6,color:#fff
+    style B fill:#3b82f6,color:#fff
+    style C fill:#22c55e,color:#fff
+    style D fill:#22c55e,color:#fff
+    style E fill:#f59e0b,color:#fff
+```
+
 ```yaml
 stages:
   - build
@@ -33,6 +61,20 @@ deploy_prod:
 
 The `needs` keyword creates **explicit dependencies** between specific jobs, enabling parallelism:
 
+```mermaid
+graph LR
+    A["build_app"] -->|needs| C["test_unit"]
+    B["build_docker"]
+    C -->|needs| E["deploy_staging"]
+
+    style A fill:#3b82f6,color:#fff
+    style B fill:#3b82f6,color:#fff
+    style C fill:#22c55e,color:#fff
+    style E fill:#f59e0b,color:#fff
+```
+
+In this example, `test_unit` starts as soon as `build_app` finishes — it does **not** wait for `build_docker`. This enables significantly faster pipelines.
+
 ```yaml
 build_app:
   stage: build
@@ -50,6 +92,30 @@ deploy_staging:
 ```
 
 **In PipelinePilot**: `needs` dependencies are shown as animated gradient arrows between job nodes.
+
+## Side-by-Side Comparison
+
+```mermaid
+graph TD
+    subgraph "Stage-Based (Sequential)"
+        direction LR
+        S1["build_app"] -.-> S2["build_docker"]
+        S2 -.-> S3["test_unit"]
+        S3 -.-> S4["deploy"]
+        S4 -.-> S5["Total: 20 min"]
+    end
+
+    subgraph "DAG with needs (Parallel)"
+        direction LR
+        D1["build_app"] -->|needs| D3["test_unit"]
+        D2["build_docker"]
+        D3 -->|needs| D4["deploy"]
+        D4 --> D5["Total: 12 min"]
+    end
+
+    style S5 fill:#ef4444,color:#fff
+    style D5 fill:#22c55e,color:#fff
+```
 
 ## When to Use Which
 

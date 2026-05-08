@@ -3,17 +3,71 @@ title: State Management
 description: 'Redux Toolkit architecture with undo/redo support'
 ---
 
+## Store Architecture
+
+```mermaid
+graph TD
+    subgraph "Redux Store"
+        PS["pipelineSlice"]
+        UI["uiSlice"]
+        PE["persistenceSlice"]
+    end
+
+    subgraph "redux-undo wrapper"
+        PS --> Past["past: PipelineState[]"]
+        PS --> Present["present: PipelineState"]
+        PS --> Future["future: PipelineState[]"]
+    end
+
+    subgraph "PipelineState"
+        Present --> Jobs["jobs: Record<id, Job>"]
+        Present --> Stages["stages: string[]"]
+        Present --> Includes["includes: IncludeDirective[]"]
+        Present --> GVars["globalVariables: Record"]
+    end
+
+    UI --> Theme["theme: ThemeId"]
+    UI --> Selected["selectedJobId: string | null"]
+    UI --> Search["searchQuery: string"]
+
+    PE --> Dirty["isDirty: boolean"]
+    PE --> Saved["lastSaved: timestamp"]
+
+    style PS fill:#6366f1,color:#fff
+    style UI fill:#3b82f6,color:#fff
+    style PE fill:#22c55e,color:#fff
+```
+
 ## Redux Slices
 
 PipelinePilot uses three Redux slices:
 
 | Slice | Purpose | Key State |
-|-------|---------|-----------|
+|-------|---------|-----------| 
 | `pipelineSlice` | Pipeline data (wrapped in `redux-undo`) | `jobs`, `stages`, `includes`, `globalVariables` |
 | `uiSlice` | UI state | `theme`, `selectedJobId`, `searchQuery`, `templateLibraryOpen` |
 | `persistenceSlice` | Save tracking | `isDirty`, `lastSaved` |
 
 ## Undo/Redo
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant App as App
+    participant RU as redux-undo
+
+    U->>App: Makes 3 edits (A → B → C → D)
+    Note over RU: past: [A, B, C], present: D, future: []
+
+    U->>App: Ctrl+Z (Undo)
+    Note over RU: past: [A, B], present: C, future: [D]
+
+    U->>App: Ctrl+Z (Undo again)
+    Note over RU: past: [A], present: B, future: [C, D]
+
+    U->>App: Ctrl+Y (Redo)
+    Note over RU: past: [A, B], present: C, future: [D]
+```
 
 The `pipelineSlice` is wrapped in `redux-undo`, providing:
 
@@ -30,10 +84,12 @@ The `pipelineSlice` is wrapped in `redux-undo`, providing:
 | `addJob` | Add a new job with defaults |
 | `updateJob` | Modify job properties |
 | `removeJob` | Delete a job and clean up deps |
+| `duplicateJob` | Clone with `_copy` suffix |
 | `importYAML` | Replace entire state from parsed YAML |
 | `clearPipeline` | Reset to empty pipeline |
 | `autoLayout` | Rearrange all jobs by stage |
 | `updateStages` | Modify the stage list |
+| `addInclude` / `removeInclude` | Manage include directives |
 
 ### UI Actions
 | Action | Purpose |
@@ -42,3 +98,20 @@ The `pipelineSlice` is wrapped in `redux-undo`, providing:
 | `selectJob` | Set active job for property panel |
 | `setSearchQuery` | Filter jobs by name |
 | `toggleTemplateLibrary` | Open/close template sidebar |
+
+## Action Flow
+
+```mermaid
+flowchart LR
+    A["User Click"] --> B["dispatch(action)"]
+    B --> C{"Which Slice?"}
+    C -->|Pipeline| D["pipelineSlice reducer"]
+    C -->|UI| E["uiSlice reducer"]
+    C -->|Save| F["persistenceSlice reducer"]
+    D --> G["redux-undo records history"]
+    G --> H["New state emitted"]
+    H --> I["Components re-render"]
+
+    style A fill:#6366f1,color:#fff
+    style H fill:#22c55e,color:#fff
+```

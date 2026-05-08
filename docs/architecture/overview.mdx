@@ -5,7 +5,7 @@ description: 'High-level architecture of GitLab CI/CD Visual Editor'
 
 ## System Architecture
 
-GitLab CI/CD Visual Editor is a single-page application (SPA) built with React that runs entirely in the browser. It integrates with GitLab's API for validation and template fetching but works fully offline for core editing functionality.
+PipelinePilot is a single-page application (SPA) built with React that runs entirely in the browser. It integrates with GitLab's API for validation and file push but works fully offline for core editing functionality.
 
 ```mermaid
 graph TB
@@ -184,18 +184,18 @@ Core functionality works without internet:
 
 ### Styling
 
-**Tailwind CSS**
+**Tailwind CSS + CSS Variable Theme Engine**
 
 - Utility-first CSS framework
-- Built-in dark mode support
-- Consistent design system
-- Minimal bundle size
+- 7 built-in themes (Light, Midnight, Dracula, Nord, Monokai, Synthwave, GitHub Dark)
+- CSS custom properties (`--bg-primary`, `--accent`, etc.) for runtime theme switching
+- Custom Monaco editor themes per app theme
 
-**Why Tailwind?**
-- Rapid development
-- No CSS naming conflicts
-- Easy theming
-- Excellent documentation
+**Why CSS Variables over Tailwind theming?**
+- Runtime switching without rebuild
+- React Flow SVG backgrounds can read computed styles
+- Monaco editor themes need programmatic color values
+- Single source of truth for all component colors
 
 ### HTTP Client
 
@@ -267,31 +267,38 @@ Monaco Editor
 
 ### Component Hierarchy
 
-```
-App
-├── Toolbar
-│   ├── ActionButtons
-│   ├── ValidationStatus
-│   └── ThemeToggle
-├── MainLayout
-│   ├── Canvas (60%)
-│   │   ├── JobNode (multiple)
-│   │   ├── DependencyEdge (multiple)
-│   │   └── CanvasControls
-│   └── MonacoPreview (40%)
-├── PropertyPanel (overlay)
-│   ├── BasicConfig
-│   ├── ScriptConfig
-│   ├── ArtifactsConfig
-│   ├── CacheConfig
-│   ├── VariablesConfig
-│   └── RulesConfig
-├── TemplateLibrary (overlay)
-│   ├── SearchBar
-│   ├── CategoryFilter
-│   └── TemplateCard (multiple)
-├── WelcomeOverlay
-└── KeyboardShortcutsPanel
+```mermaid
+graph TD
+    App --> Toolbar
+    App --> Layout["Main Layout"]
+    App --> Modals["Modals / Overlays"]
+
+    Toolbar --> TL["Left: Brand, File, Undo, Save"]
+    Toolbar --> TC["Center: Add Job, Stages, Includes, Layout, Simulate"]
+    Toolbar --> TR["Right: Search, Status, Push, Diff, Env, Templates, Theme"]
+
+    Layout --> Canvas["Canvas 60%"]
+    Layout --> Monaco["MonacoPreview 40%"]
+
+    Canvas --> JobNode["JobNode x N"]
+    Canvas --> Edges["DependencyEdge x N"]
+    Canvas --> BG["Background + Minimap"]
+
+    Modals --> PropertyPanel
+    Modals --> StageManager
+    Modals --> IncludeManager
+    Modals --> SimulatorPanel
+    Modals --> GitLabPushModal
+    Modals --> DiffViewer
+    Modals --> EnvironmentFlow
+    Modals --> TemplateLibrary
+    Modals --> WelcomeOverlay
+    Modals --> BulkActionsBar
+    Modals --> CircularDependencyModal
+
+    style App fill:#6366f1,color:#fff
+    style Canvas fill:#3b82f6,color:#fff
+    style Monaco fill:#22c55e,color:#fff
 ```
 
 ### Component Responsibilities
@@ -356,7 +363,8 @@ App
     templateLibraryOpen: boolean,
     validationStatus: 'idle' | 'validating' | 'valid' | 'invalid' | 'offline',
     validationErrors: Record<string, string[]>,
-    theme: 'dark' | 'light'
+    theme: 'light' | 'midnight' | 'dracula' | 'nord' | 'monokai' | 'synthwave' | 'github-dark',
+    searchQuery: string
   },
   templates: {
     official: Template[],
@@ -366,6 +374,7 @@ App
   },
   persistence: {
     lastSaved: string | null,
+    isDirty: boolean,
     autoSaveEnabled: boolean
   }
 }

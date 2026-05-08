@@ -7,6 +7,38 @@ description: 'How PipelinePilot converts visual pipelines to YAML and back'
 
 The YAML Engine is the bidirectional translation layer between the visual canvas and `.gitlab-ci.yml` text. It handles both **serialization** (state → YAML) and **deserialization** (YAML → state).
 
+## Bidirectional Flow
+
+```mermaid
+flowchart LR
+    subgraph "Visual Canvas"
+        Nodes["Job Nodes"]
+        Edges["Dependency Edges"]
+        Stages["Stage Swim Lanes"]
+    end
+
+    subgraph "YAML Engine"
+        TO["toYAML()"]
+        FROM["fromYAML()"]
+    end
+
+    subgraph "YAML Output"
+        YAML[".gitlab-ci.yml"]
+    end
+
+    Nodes --> TO
+    Edges --> TO
+    Stages --> TO
+    TO --> YAML
+    YAML --> FROM
+    FROM --> Nodes
+    FROM --> Edges
+    FROM --> Stages
+
+    style TO fill:#22c55e,color:#fff
+    style FROM fill:#3b82f6,color:#fff
+```
+
 ## Key Functions
 
 | Function | Direction | Purpose |
@@ -15,6 +47,22 @@ The YAML Engine is the bidirectional translation layer between the visual canvas
 | `fromYAML(text)` | YAML → State | Parses YAML into PipelineState |
 
 ## Serialization (`toYAML`)
+
+```mermaid
+flowchart TD
+    A["PipelineState"] --> B["Extract includes"]
+    B --> C["Extract stages"]
+    C --> D["Separate hidden templates from regular jobs"]
+    D --> E["For each job: build properties"]
+    E --> F["Emit only non-default values"]
+    F --> G["Add extends references"]
+    G --> H["Order by stage"]
+    H --> I["Serialize to YAML string"]
+    I --> J["Final .gitlab-ci.yml"]
+
+    style A fill:#6366f1,color:#fff
+    style J fill:#22c55e,color:#fff
+```
 
 The engine produces clean, production-ready YAML:
 
@@ -48,6 +96,25 @@ build_app:
 
 ## Deserialization (`fromYAML`)
 
+```mermaid
+flowchart TD
+    A["YAML string"] --> B["js-yaml.load()"]
+    B --> C{"Valid YAML?"}
+    C -->|No| D["Error modal with line/column"]
+    C -->|Yes| E["Extract stages array"]
+    E --> F["Extract include directives"]
+    F --> G["For each key: is it a job?"]
+    G --> H["Parse job properties"]
+    H --> I["Resolve needs references"]
+    I --> J["Resolve extends references"]
+    J --> K["Assign positions"]
+    K --> L["Return PipelineState"]
+
+    style A fill:#3b82f6,color:#fff
+    style L fill:#22c55e,color:#fff
+    style D fill:#ef4444,color:#fff
+```
+
 The parser handles:
 
 - Standard job properties (stage, script, image, artifacts, etc.)
@@ -60,6 +127,30 @@ The parser handles:
 <Warning>
   The parser validates structure during import. If YAML contains syntax errors, a detailed error modal shows the line and column of the issue.
 </Warning>
+
+## Round-Trip Fidelity
+
+```mermaid
+flowchart LR
+    A["Original YAML"] -->|fromYAML| B["PipelineState"]
+    B -->|toYAML| C["Generated YAML"]
+    C -->|fromYAML| D["PipelineState 2"]
+
+    B -.->|"Semantically Equal"| D
+
+    style A fill:#3b82f6,color:#fff
+    style C fill:#22c55e,color:#fff
+```
+
+**Preserved:**
+- All job configuration and properties
+- Dependencies (`needs`, `extends`)
+- Include directives and stage ordering
+
+**Not Preserved:**
+- YAML comments (limitation of js-yaml)
+- Original formatting preferences
+- Whitespace style
 
 ## Source
 
