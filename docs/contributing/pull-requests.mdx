@@ -1,0 +1,43 @@
+---
+title: Pull Requests
+description: 'How to submit pull requests to PipelinePilot'
+---
+
+## PR Process
+
+<Steps>
+  <Step title="Fork and Branch">
+    Fork the repo and create a feature branch:
+    ```bash
+    git checkout -b feat/my-feature
+    ```
+  </Step>
+  <Step title="Make Changes">
+    Implement your feature or fix. Follow the [Code Style](/contributing/code-style) guide.
+  </Step>
+  <Step title="Test">
+    Run type checking and tests:
+    ```bash
+    npx tsc --noEmit
+    npm test
+    ```
+  </Step>
+  <Step title="Commit">
+    Use conventional commit messages:
+    ```bash
+    git commit -m "feat: add new template category"
+    ```
+  </Step>
+  <Step title="Push and Open PR">
+    Push to your fork and open a PR against `main`.
+  </Step>
+</Steps>
+
+## PR Checklist
+
+- [ ] TypeScript compiles with zero errors (`npx tsc --noEmit`)
+- [ ] All existing tests pass
+- [ ] New features include appropriate tests
+- [ ] Theme compatibility — no hardcoded gray colors, uses CSS variables
+- [ ] Responsive — works at different browser widths
+- [ ] Documentation updated if adding new features

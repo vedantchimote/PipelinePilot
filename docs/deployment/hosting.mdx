@@ -1,0 +1,53 @@
+---
+title: Hosting
+description: 'Deploy PipelinePilot to popular hosting platforms'
+---
+
+## Static Site Deployment
+
+PipelinePilot builds to a static site — no server required. Deploy the `dist/` folder to any static host.
+
+## Hosting Options
+
+<CardGroup cols={2}>
+  <Card title="Vercel" icon="triangle">
+    ```bash
+    npm i -g vercel
+    vercel --prod
+    ```
+    Zero-config deployment with automatic HTTPS.
+  </Card>
+  <Card title="Netlify" icon="globe">
+    ```bash
+    npm i -g netlify-cli
+    netlify deploy --prod --dir=dist
+    ```
+    Drag-and-drop deployment also available.
+  </Card>
+  <Card title="GitHub Pages" icon="github">
+    Set `base: '/PipelinePilot/'` in `vite.config.ts`, then deploy the `dist/` folder.
+  </Card>
+  <Card title="Docker" icon="docker">
+    ```dockerfile
+    FROM nginx:alpine
+    COPY dist/ /usr/share/nginx/html/
+    ```
+    Serve with any containerized web server.
+  </Card>
+</CardGroup>
+
+## SPA Routing
+
+PipelinePilot is a single-page application. Configure your host to redirect all routes to `index.html`:
+
+**Netlify** (`_redirects`):
+```
+/*    /index.html   200
+```
+
+**Nginx**:
+```nginx
+location / {
+    try_files $uri $uri/ /index.html;
+}
+```

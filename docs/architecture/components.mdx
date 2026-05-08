@@ -1,0 +1,49 @@
+---
+title: Components
+description: 'Key React components in PipelinePilot'
+---
+
+## Component Architecture
+
+PipelinePilot is composed of ~30 React components organized by function:
+
+### Core Layout
+
+| Component | Description |
+|-----------|-------------|
+| `App.tsx` | Root component, theme initialization, layout |
+| `Toolbar.tsx` | 3-section toolbar with all actions |
+| `Canvas.tsx` | React Flow canvas with nodes, edges, backgrounds |
+| `MonacoPreview.tsx` | YAML preview with custom themed Monaco editor |
+
+### Job Editing
+
+| Component | Description |
+|-----------|-------------|
+| `PropertyPanel.tsx` | Sidebar for editing selected job properties |
+| `JobNode.tsx` | Individual job card rendered on the canvas |
+| `AddJobButton.tsx` | Dropdown button for adding jobs to specific stages |
+| `ScriptSnippets.tsx` | Pre-built command snippet dropdown |
+
+### Feature Modals
+
+| Component | Description |
+|-----------|-------------|
+| `StageManager.tsx` | Add/remove/reorder stages |
+| `IncludeManager.tsx` | Manage external YAML includes |
+| `SimulatorPanel.tsx` | Pipeline execution wave simulator |
+| `GitLabPushModal.tsx` | Push to GitLab API |
+| `DiffViewer.tsx` | Pipeline diff comparison |
+| `EnvironmentFlow.tsx` | Deployment environment visualization |
+| `CircularDependencyModal.tsx` | Cycle detection warning |
+
+### UI Components
+
+| Component | Description |
+|-----------|-------------|
+| `ThemePicker.tsx` | Theme selection dropdown with 7 themes |
+| `WelcomeOverlay.tsx` | First-launch onboarding overlay |
+| `TemplateLibrary.tsx` | Sidebar with pipeline templates |
+| `ValidationStatus.tsx` | Toolbar status indicator |
+| `BulkActionsBar.tsx` | Floating bar for multi-select operations |
+| `Tooltip.tsx` | Reusable tooltip wrapper |

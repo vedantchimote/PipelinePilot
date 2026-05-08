@@ -145,7 +145,15 @@ export const Toolbar = memo(() => {
         {/* Brand */}
         <div className="flex items-center gap-1.5 mr-1.5">
           <div className="w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm">
-            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+              {/* Linear pipeline: 3 nodes connected by line */}
+              <path d="M5 12 H 19" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
+              <circle cx="5" cy="12" r="3.2" fill="white"/>
+              <circle cx="12" cy="12" r="3.2" fill="white"/>
+              <circle cx="19" cy="12" r="3.2" fill="white"/>
+              <path d="M11 10.5 L13.5 12 L11 13.5 Z" fill="#6366f1"/>
+              <path d="M18 10.5 L20.5 12 L18 13.5 Z" fill="#6366f1"/>
+            </svg>
           </div>
           <h1 className="text-[13px] font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>PipelinePilot</h1>
         </div>

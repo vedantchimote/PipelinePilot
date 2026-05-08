@@ -1,0 +1,40 @@
+---
+title: Environment Variables
+description: 'Configuration options for PipelinePilot'
+---
+
+## Available Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_GITLAB_URL` | `https://gitlab.com` | Default GitLab instance URL for the Push modal |
+
+## Usage
+
+Create a `.env` file in the project root:
+
+```bash
+VITE_GITLAB_URL=https://gitlab.mycompany.com
+```
+
+Or set inline when running:
+
+```bash
+VITE_GITLAB_URL=https://gitlab.mycompany.com npm run dev
+```
+
+<Note>
+  PipelinePilot is designed to work **fully offline** without any environment variables. All pipeline editing, YAML generation, and template features work without any API connection. Environment variables only configure optional integrations.
+</Note>
+
+## Runtime Configuration
+
+The following settings are stored in `localStorage` and configurable through the UI:
+
+| Setting | Storage Key | Description |
+|---------|------------|-------------|
+| Theme | `pipeline-pilot-theme` | Selected theme ID |
+| Pipeline state | `pipeline-pilot-state` | Auto-saved pipeline data |
+| GitLab URL | `gitlab-push-url` | Last used GitLab URL |
+| Project ID | `gitlab-push-project` | Last used project |
+| Branch | `gitlab-push-branch` | Last used branch |

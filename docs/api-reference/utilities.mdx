@@ -1,0 +1,37 @@
+---
+title: Utilities
+description: 'Helper functions and utilities reference'
+---
+
+## Import / Export Utilities
+
+Located in `src/utils/import-export.ts`:
+
+| Function | Description |
+|----------|-------------|
+| `importYAMLFile()` | Opens file dialog, reads `.yml`/`.yaml`, returns parsed state |
+| `exportYAMLFile(state)` | Generates YAML and triggers browser download |
+
+## Theme Utilities
+
+Located in `src/components/ThemePicker.tsx`:
+
+| Function | Description |
+|----------|-------------|
+| `applyTheme(themeId)` | Sets CSS classes, saves to localStorage, dispatches Redux |
+
+## YAML Engine
+
+Located in `src/engine/yaml-engine.ts`:
+
+| Function | Description |
+|----------|-------------|
+| `toYAML(state)` | Serializes PipelineState to YAML string |
+| `fromYAML(text)` | Parses YAML string to PipelineState |
+
+## Hooks
+
+| Hook | Location | Purpose |
+|------|----------|---------|
+| `useAppSelector` | `src/store/index.ts` | Typed Redux selector |
+| `useAppDispatch` | `src/store/index.ts` | Typed Redux dispatch |

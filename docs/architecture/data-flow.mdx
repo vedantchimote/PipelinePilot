@@ -1,0 +1,47 @@
+---
+title: Data Flow
+description: 'How data flows through PipelinePilot'
+---
+
+## Unidirectional Data Flow
+
+PipelinePilot follows a strict unidirectional data flow pattern:
+
+```
+User Action → Redux Dispatch → Reducer → New State → React Re-render
+     │                                        │
+     │                                        ├── Canvas (React Flow)
+     │                                        ├── YAML Preview (Monaco)
+     │                                        ├── Property Panel
+     │                                        └── Toolbar Status
+     │
+     └── Side Effects:
+         ├── localStorage auto-save (every 30s)
+         ├── YAML regeneration (via useMemo)
+         └── Validation (via useEffect)
+```
+
+## Key Data Paths
+
+### Creating a Job
+1. User clicks **+ Add Job**
+2. `addJob` action dispatched with default properties
+3. Reducer adds job to `state.pipeline.present.jobs`
+4. Canvas renders new node at default position
+5. YAML preview updates with new job block
+
+### Importing YAML
+1. User pastes YAML or imports file
+2. `fromYAML()` parses text into `PipelineState`
+3. `importYAML` action dispatched with parsed state
+4. Reducer replaces entire pipeline state
+5. All components re-render with imported data
+6. Auto-layout arranges nodes by stage
+
+### Theme Change
+1. User selects theme in ThemePicker
+2. `applyTheme()` sets CSS classes on `<html>`
+3. `setTheme` action updates Redux state
+4. CSS variables cascade to all components
+5. Canvas `useEffect` reads computed styles via `requestAnimationFrame`
+6. Monaco editor calls `setTheme()` with matching custom theme

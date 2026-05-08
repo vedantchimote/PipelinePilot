@@ -1,0 +1,43 @@
+---
+title: Redux Actions
+description: 'Complete reference of Redux actions available in PipelinePilot'
+---
+
+## Pipeline Actions
+
+Actions from `pipelineSlice` — all support undo/redo:
+
+| Action | Payload | Description |
+|--------|---------|-------------|
+| `addJob` | `{ stage?: string }` | Add new job with default props |
+| `updateJob` | `{ id, changes }` | Update any job property |
+| `removeJob` | `string` (job ID) | Delete job, clean up dependencies |
+| `duplicateJob` | `string` (job ID) | Clone job with `_copy` suffix |
+| `importYAML` | `PipelineState` | Replace entire state |
+| `clearPipeline` | — | Reset to empty pipeline |
+| `autoLayout` | — | Rearrange jobs by stage |
+| `updateStages` | `string[]` | Set new stage list |
+| `addInclude` | `IncludeDirective` | Add include directive |
+| `removeInclude` | `number` (index) | Remove include by index |
+| `updateJobPosition` | `{ id, position }` | Update node coordinates |
+
+## UI Actions
+
+Actions from `uiSlice`:
+
+| Action | Payload | Description |
+|--------|---------|-------------|
+| `setTheme` | `ThemeId` | Switch active theme |
+| `selectJob` | `string \| null` | Set active job for property panel |
+| `setSearchQuery` | `string` | Filter jobs by search term |
+| `toggleTemplateLibrary` | — | Open/close template sidebar |
+| `toggleKeyboardShortcuts` | — | Toggle shortcuts panel |
+
+## Persistence Actions
+
+Actions from `persistenceSlice`:
+
+| Action | Payload | Description |
+|--------|---------|-------------|
+| `markSaved` | — | Set `isDirty = false` |
+| `markDirty` | — | Set `isDirty = true` |

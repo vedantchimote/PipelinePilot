@@ -85,6 +85,7 @@
     {
       "group": "Premium Features",
       "pages": [
+        "user-guide/themes",
         "user-guide/ai-script-helper",
         "user-guide/gitlab-push",
         "user-guide/pipeline-diff",

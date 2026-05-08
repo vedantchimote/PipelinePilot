@@ -1,0 +1,38 @@
+---
+title: Code Style
+description: 'Coding standards and conventions for PipelinePilot'
+---
+
+## TypeScript
+
+- **Strict mode** enabled — no `any` types without justification
+- Use **functional components** with hooks (no class components)
+- Prefer `const` over `let`, never use `var`
+- Use **typed hooks**: `useAppSelector` and `useAppDispatch` from `@/store`
+
+## Component Conventions
+
+| Convention | Example |
+|-----------|---------|
+| File names | PascalCase (`StageManager.tsx`) |
+| Component exports | Named exports preferred (`export const Toolbar = ...`) |
+| Props interface | Inline or co-located (`interface ToolbarProps { ... }`) |
+| Memoization | Use `memo()` for expensive components, `useMemo`/`useCallback` for derived data |
+
+## CSS
+
+- **CSS Variables** for theme colors (`var(--bg-primary)`, `var(--text-primary)`)
+- **Tailwind** for layout utilities (`flex`, `gap-2`, `px-4`)
+- **Inline styles** for dynamic theme values (`style={{ background: 'var(--bg-secondary)' }}`)
+- **Never** hardcode gray palette (`bg-gray-800`) — always use CSS variables
+
+## Commits
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add pipeline diff comparison view
+fix: resolve canvas white flash on theme switch
+refactor: migrate modals to CSS variable styling
+docs: update Mintlify theme documentation
+```

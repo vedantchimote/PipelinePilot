@@ -1,0 +1,44 @@
+---
+title: Testing Requirements
+description: 'Testing standards for PipelinePilot contributions'
+---
+
+## Testing Stack
+
+| Tool | Purpose |
+|------|---------|
+| **Vitest** | Unit testing framework |
+| **fast-check** | Property-based testing |
+
+## What to Test
+
+### YAML Engine (Required)
+
+The YAML engine (`src/engine/yaml-engine.ts`) is the most critical module:
+
+- **Round-trip**: `fromYAML(toYAML(state))` should produce equivalent state
+- **Edge cases**: Empty pipelines, single jobs, complex dependencies
+- **Include directives**: All four types (local, template, remote, project)
+- **Extends**: Template inheritance parsing and generation
+
+### Property-Based Tests
+
+Use `fast-check` for generating arbitrary pipeline states:
+
+```typescript
+import * as fc from 'fast-check';
+
+fc.assert(
+  fc.property(arbitraryPipelineState(), (state) => {
+    const yaml = toYAML(state);
+    const parsed = fromYAML(yaml);
+    expect(parsed.stages).toEqual(state.stages);
+  })
+);
+```
+
+### What Doesn't Need Tests
+
+- Pure UI layout (visual testing preferred)
+- Third-party library wrappers (Monaco, React Flow)
+- Simple Redux action dispatches

@@ -1,0 +1,49 @@
+---
+title: Debugging
+description: 'Tips for debugging PipelinePilot'
+---
+
+## Browser DevTools
+
+### Redux DevTools
+
+Install the [Redux DevTools Extension](https://chromewebstore.google.com/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd) to inspect:
+
+- **State tree** — View the complete pipeline, UI, and persistence state
+- **Action log** — See every dispatched action in order
+- **Time-travel** — Step back through state changes
+- **Diff view** — See exactly what changed per action
+
+### React DevTools
+
+Install [React Developer Tools](https://chromewebstore.google.com/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi) to:
+
+- Inspect component tree and props
+- Profile render performance
+- Identify unnecessary re-renders
+
+## Common Issues
+
+### Canvas Remains White After Theme Switch
+
+**Cause**: React Flow's `<Background>` component renders SVG patterns that don't read CSS variables natively.
+
+**Solution**: The `Canvas.tsx` component uses `requestAnimationFrame` + `getComputedStyle` to push live CSS values to SVG. If you modify theme variables, ensure the `useEffect` dependency array includes the `theme` value from Redux.
+
+### Monaco Editor Not Updating Theme
+
+**Cause**: Custom themes must be registered via `defineTheme()` before `setTheme()` is called.
+
+**Solution**: Themes are registered in the `onMount` handler of `MonacoPreview.tsx`. The `themesRegistered` state flag gates the `useEffect` that switches themes.
+
+### YAML Generation Slow
+
+Enable performance logging by running in dev mode (`npm run dev`). The console will warn when YAML generation exceeds 50ms:
+
+```
+⚠️ YAML generation took 127.34ms for 45 jobs
+```
+
+<Tip>
+  If YAML generation becomes slow with many jobs, check for unnecessary re-renders in the `useMemo` dependency array.
+</Tip>

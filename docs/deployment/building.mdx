@@ -1,0 +1,44 @@
+---
+title: Building for Production
+description: 'Build and optimize PipelinePilot for deployment'
+---
+
+## Production Build
+
+```bash
+npm run build
+```
+
+This creates an optimized production bundle in the `dist/` directory:
+
+```
+dist/
+├── index.html
+├── assets/
+│   ├── index-[hash].js      # Main application bundle
+│   ├── index-[hash].css     # Compiled styles
+│   └── vendor-[hash].js     # Third-party libraries
+└── icon.svg                  # Favicon
+```
+
+## Build Optimizations
+
+Vite automatically applies:
+
+- **Tree shaking** — Dead code elimination
+- **Code splitting** — Vendor chunk separation
+- **CSS minification** — Compressed stylesheets
+- **Asset hashing** — Cache-busting filenames
+- **Gzip ready** — Small bundle sizes
+
+## Preview Locally
+
+```bash
+npm run preview
+```
+
+Opens a local server serving the production build at `http://localhost:4173`.
+
+<Tip>
+  Always test with `npm run preview` before deploying to catch production-only issues.
+</Tip>

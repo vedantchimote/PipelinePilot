@@ -1,11 +1,11 @@
 ---
 title: Features
-description: 'Complete feature reference for PipelinePilot — 15+ features across 3 tiers'
+description: 'Complete feature reference for PipelinePilot — 16+ features across 3 tiers plus a theme engine'
 ---
 
 ## Feature Overview
 
-PipelinePilot ships with 15+ features organized into three tiers, plus a full set of core editing capabilities.
+PipelinePilot ships with 16+ features organized into three tiers, a full theme engine, and a complete set of core editing capabilities.
 
 | Tier | Features | Focus |
 |------|----------|-------|
@@ -72,7 +72,28 @@ Monaco Editor integration (same engine as VS Code):
 ✅ **Code Folding**: Collapse sections for readability  
 ✅ **Line Numbers**: Easy reference  
 ✅ **Includes Rendering**: Shows `include:` directives at the top  
-✅ **Extends Rendering**: Shows `extends:` on jobs using templates
+✅ **Extends Rendering**: Shows `extends:` on jobs using templates  
+✅ **Theme-Adaptive**: 7 custom Monaco themes matching each app theme
+
+### Theme Engine
+
+7 built-in themes with full UI reactivity:
+
+<CardGroup cols={3}>
+  <Card title="Light" icon="sun">Clean white canvas with indigo accents</Card>
+  <Card title="Midnight" icon="moon">Deep navy blue — the default dark mode</Card>
+  <Card title="Dracula" icon="ghost">Classic purple-gray developer theme</Card>
+  <Card title="Nord" icon="snowflake">Arctic blue-gray frost palette</Card>
+  <Card title="Monokai" icon="palette">Warm olive-dark Sublime inspired</Card>
+  <Card title="Synthwave" icon="bolt">Neon cyberpunk aesthetic</Card>
+  <Card title="GitHub Dark" icon="github">Matches GitHub's dark mode</Card>
+</CardGroup>
+
+Every component adapts: canvas, toolbar, modals, YAML editor, stage labels, and minimap. Themes persist across sessions via `localStorage`.
+
+<Note>
+  See [Theme Engine documentation](/user-guide/themes) for architecture details and custom Monaco theme specifications.
+</Note>
 
 ### Toolbar Architecture
 
@@ -398,6 +419,8 @@ Describe what a job should do → get production-ready scripts:
 | Pipeline Diff | ✅ | ❌ | ❌ |
 | Job Annotations | ✅ | ❌ | ❌ |
 | Environment Flow | ✅ | ❌ | ❌ |
+| 7 Theme Variants | ✅ | N/A | ❌ |
+| Themed YAML Editor | ✅ | N/A | ❌ |
 | extends/Includes UI | ✅ | Manual | ❌ |
 | Multi-Select Bulk Ops | ✅ | N/A | ❌ |
 | Auto-Layout | ✅ | N/A | Partial |

@@ -1,0 +1,44 @@
+---
+title: GitLab API Client
+description: 'API client for interacting with GitLab repositories'
+---
+
+## Overview
+
+PipelinePilot includes a built-in GitLab API client for pushing `.gitlab-ci.yml` files directly to GitLab repositories.
+
+## Authentication
+
+| Field | Description |
+|-------|-------------|
+| **GitLab URL** | Instance URL (default: `https://gitlab.com`) |
+| **Personal Access Token** | `glpat-...` token with `api` scope |
+| **Project ID** | Numeric ID or `group/project` path |
+
+<Warning>
+  Personal Access Tokens are **not stored** in localStorage for security. They must be re-entered each session.
+</Warning>
+
+## API Endpoints Used
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| `PUT` | `/api/v4/projects/:id/repository/files/.gitlab-ci.yml` | Update existing file |
+| `POST` | `/api/v4/projects/:id/repository/files/.gitlab-ci.yml` | Create new file |
+
+## Flow
+
+1. User fills in GitLab URL, token, project ID, branch, and commit message
+2. The current YAML is generated via `toYAML()`
+3. Client tries `PUT` first (update existing file)
+4. If file doesn't exist (404), falls back to `POST` (create new file)
+5. Success/error status shown in the modal
+
+## Configuration Persistence
+
+The following fields are saved to `localStorage` for convenience:
+- GitLab URL
+- Project ID/Path
+- Branch name
+
+Token is **never persisted** for security.
