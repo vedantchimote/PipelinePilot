@@ -7,34 +7,57 @@ description: 'Complete keyboard shortcut reference for PipelinePilot'
 
 PipelinePilot supports keyboard shortcuts for all common operations. Press `Ctrl+/` to toggle the shortcuts panel inside the app.
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+Z` | Undo last action |
-| `Ctrl+Y` | Redo last undone action |
-| `Ctrl+S` | Manual save to localStorage |
-| `Ctrl+E` | Export YAML file |
-| `Ctrl+V` | Paste YAML import (when canvas is focused) |
-| `Ctrl+F` | Toggle job search / filter |
-| `Ctrl+/` | Show keyboard shortcuts panel |
-| `Shift+Click` | Multi-select nodes |
-| `Escape` | Close panel / Clear selection / Clear search |
-| `Delete` | Delete selected job |
+## File Operations
 
----
+| Shortcut | Action | Notes |
+|----------|--------|-------|
+| `Ctrl+S` | Save to localStorage | Manual save (auto-save runs every 30s) |
+| `Ctrl+E` | Export YAML file | Downloads `.gitlab-ci.yml` |
+| `Ctrl+V` | Paste YAML import | Only works when canvas is focused (not in an input field) |
 
-## Context Menu
+## Editing
 
-Right-click any job node to access:
+| Shortcut | Action | Notes |
+|----------|--------|-------|
+| `Ctrl+Z` | Undo last action | Up to 50 states of history |
+| `Ctrl+Y` | Redo last undone action | |
+| `Delete` | Delete selected job | Removes job and cleans up dependency edges |
 
-- **Edit** — Open the property panel for the job
-- **Duplicate Job** — Clone with auto-incremented name
-- **Delete** — Remove the job and clean up dependencies
+## Navigation & Search
+
+| Shortcut | Action | Notes |
+|----------|--------|-------|
+| `Ctrl+F` | Toggle job search | Type to filter; non-matching nodes dim to 30% |
+| `Escape` | Close / Clear | Closes property panel, clears search, clears multi-selection |
+| `Ctrl+/` | Toggle shortcuts panel | Shows this reference inside the app |
+
+## Multi-Select
+
+| Shortcut | Action | Notes |
+|----------|--------|-------|
+| `Shift+Click` | Toggle node in selection | Cyan ring appears around selected nodes |
+| `Escape` | Clear all selections | Also closes the BulkActionsBar |
 
 ## Canvas Navigation
 
 | Action | Control |
 |--------|---------|
-| Pan | Click and drag on empty canvas |
-| Zoom | Mouse scroll wheel |
-| Fit to view | Click the fit-to-view button (bottom-left) |
-| Zoom in/out | Click `+`/`-` buttons (bottom-left) |
+| Pan | Click and drag on empty canvas area |
+| Zoom in/out | Mouse scroll wheel |
+| Fit to view | Click the `⊡` button (bottom-left corner) |
+| Zoom in | Click `+` button (bottom-left corner) |
+| Zoom out | Click `−` button (bottom-left corner) |
+
+## Context Menu (Right-Click)
+
+Right-click any job node to access:
+
+| Option | Action |
+|--------|--------|
+| **Edit** | Open the PropertyPanel for the job |
+| **Duplicate Job** | Clone with auto-incremented name (`job_1` → `job_1_copy`) |
+| **Delete** | Remove the job and clean up dependencies |
+
+<Tip>
+  Memorize `Ctrl+Z` (undo), `Ctrl+F` (search), and `Shift+Click` (multi-select) — these three shortcuts cover 90% of advanced editing workflows.
+</Tip>

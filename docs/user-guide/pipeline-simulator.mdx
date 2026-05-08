@@ -11,48 +11,85 @@ The Pipeline Execution Simulator computes the actual execution order of your pip
 
 Click the **Simulate** button in the center toolbar pill. A floating panel appears in the bottom-right corner.
 
-## How It Works
-
-### Execution Waves
-
-The simulator computes waves based on two factors:
-
-1. **Stage ordering**: Jobs in earlier stages run before later stages
-2. **`needs` dependencies**: Jobs with explicit `needs` wait for their dependencies
-
-```
-Wave 1: build_app, build_docker     (parallel — both in build stage)
-Wave 2: test_unit, test_integration  (parallel — both in test stage)
-Wave 3: deploy_staging              (sequential — depends on tests)
-Wave 4: deploy_production            (sequential — depends on staging)
-```
-
-### Running the Simulation
+## Step-by-Step Usage
 
 <Steps>
-  <Step title="Open Simulator">
-    Click Simulate → panel appears showing wave breakdown
+  <Step title="Build your pipeline">
+    Add jobs, set stages, and create `needs` dependencies
   </Step>
-  <Step title="Review Waves">
-    Each wave shows which jobs run together in parallel
+  <Step title="Click 'Simulate'">
+    The Simulator panel opens in the bottom-right corner, showing the computed wave breakdown
   </Step>
-  <Step title="Click Run">
-    Jobs light up with a **green glow** as each wave executes
+  <Step title="Review waves">
+    Each wave lists which jobs run together in parallel. Jobs appear in the same wave only if their dependencies are all in earlier waves.
   </Step>
-  <Step title="Watch Progress">
-    Completed waves show ✓ checkmarks, current wave shows a spinner
+  <Step title="Click 'Run'">
+    The animation begins — jobs on the canvas glow green as each wave executes
+  </Step>
+  <Step title="Watch the progression">
+    - Current wave: spinner icon
+    - Completed wave: ✓ checkmark
+    - Active nodes: green glow effect
+  </Step>
+  <Step title="Review the summary">
+    Footer shows totals: `3 waves · 6 jobs`
   </Step>
 </Steps>
+
+## How Waves Are Computed
+
+```mermaid
+flowchart TD
+    A["All pipeline jobs"] --> B["Find jobs with no dependencies"]
+    B --> C["Wave 1: these run first"]
+    C --> D["Find jobs whose dependencies are all in completed waves"]
+    D --> E["Wave 2: these run next"]
+    E --> F["Repeat until all jobs are placed"]
+    F --> G["Wave N: final jobs"]
+
+    style C fill:#22c55e,color:#fff
+    style E fill:#3b82f6,color:#fff
+    style G fill:#f59e0b,color:#fff
+```
+
+### Example
+
+```mermaid
+gantt
+    title Execution Timeline
+    dateFormat X
+    axisFormat %s
+
+    section Wave 1
+    build_app      :a, 0, 3
+    build_docker   :b, 0, 4
+
+    section Wave 2
+    test_unit      :c, 4, 7
+    test_e2e       :d, 4, 8
+
+    section Wave 3
+    deploy_staging :e, 8, 10
+
+    section Wave 4
+    deploy_production :f, 10, 12
+```
 
 ## Visual Indicators
 
 | Indicator | Meaning |
 |-----------|---------|
-| 🟢 Green glow on node | Job is currently executing |
-| ✓ Checkmark | Wave completed |
-| Spinner | Wave currently running |
-| Footer count | `3 waves · 6 jobs` summary |
+| 🟢 Green glow on node | Job is currently executing in the active wave |
+| ✓ Checkmark on wave | Wave completed successfully |
+| Spinner on wave | Wave currently running |
+| Footer count | Summary: `3 waves · 6 jobs` |
+
+## What It Tells You
+
+- **Too many sequential waves?** Your pipeline might be slower than necessary — add `needs` to enable more parallelism
+- **All jobs in one wave?** You might be missing proper stage assignments
+- **Unexpected ordering?** Check your `needs` dependencies for unintended chains
 
 <Tip>
-  The simulator helps you understand the actual parallelism of your pipeline before pushing it to GitLab — saving you from unexpected sequential bottlenecks.
+  The simulator helps you understand the actual parallelism of your pipeline before pushing it to GitLab — saving you from unexpected sequential bottlenecks and wasted CI/CD minutes.
 </Tip>

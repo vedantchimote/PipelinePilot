@@ -9,35 +9,65 @@ Auto-Layout instantly arranges all nodes on the canvas into neat, readable rows 
 
 ## How to Use
 
-Click the **Layout** button in the center toolbar pill. All nodes will immediately snap to organized positions.
+<Steps>
+  <Step title="Click 'Layout' in the center toolbar">
+    All nodes immediately snap to organized positions — no configuration needed.
+  </Step>
+</Steps>
+
+That's it — one click.
 
 ## Layout Algorithm
 
-The auto-layout engine:
+```mermaid
+flowchart TD
+    A["All Jobs"] --> B["Group by stage"]
+    B --> C["Order stages as defined"]
+    C --> D["Arrange jobs left-to-right within each stage"]
+    D --> E["Apply consistent spacing"]
+    E --> F["Neat, organized canvas"]
 
-1. **Groups jobs by stage** in the order defined in the pipeline
-2. **Arranges within each stage** from left to right
-3. **Consistent spacing**: 280px node width, 40px horizontal gap
-4. **Stage separation**: 200px vertical gap between stage groups
-5. **Starting position**: First job at (100, 100)
+    style A fill:#6366f1,color:#fff
+    style F fill:#22c55e,color:#fff
+```
 
-### Example Layout
+### Spacing Constants
 
+| Parameter | Value |
+|-----------|-------|
+| Node width | 280px |
+| Horizontal gap between nodes | 40px |
+| Vertical gap between stage groups | 200px |
+| Starting position | (100, 100) |
+
+### Before & After
+
+**Before** (messy after heavy editing):
+```
+          [test_e2e]
+  [build_app]                    [deploy_prod]
+                [test_unit]
+       [build_docker]
+                              [deploy_staging]
+```
+
+**After** (auto-layout applied):
 ```
 BUILD    ──  [build_app]  [build_docker]
 
-TEST     ──  [test_unit]  [test_integration]  [test_e2e]
+TEST     ──  [test_unit]  [test_e2e]
 
-DEPLOY   ──  [deploy_staging]  [deploy_production]
+DEPLOY   ──  [deploy_staging]  [deploy_prod]
 ```
 
 ## When to Use
 
-- After **importing** a large YAML file
+- After **importing** a large YAML file (auto-layout runs automatically on import)
 - After **bulk operations** that scatter nodes
 - When starting a **new pipeline from a template**
-- Whenever the canvas feels **cluttered**
+- Whenever the canvas feels **cluttered or hard to read**
+- After **adding many new jobs** in sequence
 
-<Tip>
-  Auto-Layout preserves all dependencies and job configurations — it only changes node positions.
-</Tip>
+<Note>
+  Auto-Layout preserves all dependencies, configurations, and scripts — it only changes node positions on the canvas. Your YAML output is unaffected.
+</Note>

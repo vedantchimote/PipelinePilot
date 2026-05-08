@@ -5,30 +5,71 @@ description: 'Real-time pipeline validation and error detection'
 
 ## Overview
 
-PipelinePilot validates your pipeline in real-time as you edit. The validation status indicator in the toolbar shows the current state.
+PipelinePilot validates your pipeline in real time as you edit. The validation status indicator in the toolbar shows the current state with a colored dot.
+
+## How Validation Works
+
+```mermaid
+flowchart LR
+    A["User edits pipeline"] --> B["Validation engine runs"]
+    B --> C{"All checks pass?"}
+    C -->|Yes| D["✅ Valid - Green dot"]
+    C -->|No| E["⚠️ Issues detected"]
+    E --> F["Error indicators on nodes"]
+    E --> G["Circular dependency modal"]
+
+    style D fill:#22c55e,color:#fff
+    style E fill:#ef4444,color:#fff
+```
 
 ## Validation Checks
 
-| Check | Description |
-|-------|-------------|
-| **Stage existence** | Every job must reference a valid stage |
-| **Circular dependencies** | Detects cycles in `needs` dependencies |
-| **Missing dependencies** | Warns when `needs` references non-existent jobs |
-| **Empty scripts** | Jobs must have at least one script command |
-| **Duplicate names** | Job names must be unique |
+| Check | Description | Severity |
+|-------|-------------|----------|
+| **Stage existence** | Every job must reference a stage that exists in the stages list | Error |
+| **Circular dependencies** | Detects cycles in `needs` dependency chains | Error (blocks export) |
+| **Missing dependencies** | `needs` references a job that doesn't exist | Warning |
+| **Empty scripts** | Jobs should have at least one script command | Warning |
+| **Duplicate names** | Job names must be unique across the pipeline | Error |
 
 ## Status Indicators
 
-| Status | Icon | Meaning |
-|--------|------|---------|
-| **Idle** | Gray dot | No validation errors, pipeline is clean |
-| **Offline** | Red dot | GitLab API is unreachable (editing still works) |
-| **Valid** | Green dot | All validation checks passed |
+| Status | Toolbar Display | Meaning |
+|--------|----------------|---------|
+| **Idle** | Gray dot + "Idle" | No validation running, pipeline is clean |
+| **Offline** | Red dot + "Offline" | GitLab API is unreachable (editing still works fully) |
+| **Valid** | Green dot + "Valid" | All validation checks passed |
 
 ## Circular Dependency Detection
 
-When a circular dependency is detected (e.g., `A needs B`, `B needs C`, `C needs A`), PipelinePilot shows a dedicated modal listing the dependency chain and highlighting affected nodes on the canvas.
+When a circular dependency is detected (e.g., `A needs B`, `B needs C`, `C needs A`):
+
+```mermaid
+graph LR
+    A["Job A"] -->|needs| B["Job B"]
+    B -->|needs| C["Job C"]
+    C -->|needs| A
+
+    style A fill:#ef4444,color:#fff
+    style B fill:#ef4444,color:#fff
+    style C fill:#ef4444,color:#fff
+```
+
+<Steps>
+  <Step title="Detection">
+    The engine detects the cycle during dependency analysis
+  </Step>
+  <Step title="Modal appears">
+    A **CircularDependencyModal** shows the full chain: `A → B → C → A`
+  </Step>
+  <Step title="Resolution">
+    Remove one of the `needs` edges to break the cycle
+  </Step>
+  <Step title="Export unblocked">
+    Once resolved, export and push are re-enabled
+  </Step>
+</Steps>
 
 <Warning>
-  Circular dependencies make pipelines unrunnable. PipelinePilot blocks export when cycles are detected.
+  Circular dependencies make pipelines unrunnable on GitLab. PipelinePilot blocks export when cycles are detected to prevent pushing broken pipelines.
 </Warning>

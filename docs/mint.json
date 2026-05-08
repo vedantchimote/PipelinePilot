@@ -63,6 +63,7 @@
     {
       "group": "User Guide",
       "pages": [
+        "user-guide/complete-guide",
         "user-guide/creating-pipelines",
         "user-guide/canvas-interface",
         "user-guide/job-configuration",

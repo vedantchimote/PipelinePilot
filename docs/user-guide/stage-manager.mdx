@@ -11,34 +11,74 @@ The Stage Manager lets you customize your pipeline's stage structure beyond the 
 
 Click the **Stages** button in the center toolbar pill to open the Stage Manager modal.
 
-## Capabilities
+## Step-by-Step Usage
 
-<CardGroup cols={2}>
-  <Card title="Add Stages" icon="plus">
-    Create new custom stages with any name
-  </Card>
-  <Card title="Remove Stages" icon="trash">
-    Delete stages that are no longer needed
-  </Card>
-  <Card title="Rename Stages" icon="pen">
-    Edit stage names inline with real-time validation
-  </Card>
-  <Card title="Reorder Stages" icon="sort">
-    Change the order of stages to match your pipeline flow
-  </Card>
-</CardGroup>
+<Steps>
+  <Step title="Open the Stage Manager">
+    Click **Stages** in the center toolbar. The modal appears with your current stages listed.
+  </Step>
+  <Step title="Add a new stage">
+    Type a name in the input field at the bottom (e.g., `lint`) and click the **+** button or press Enter.
+  </Step>
+  <Step title="Reorder stages">
+    Stages execute in the listed order — top to bottom. Each stage shows a number indicating its position in the pipeline.
+  </Step>
+  <Step title="Rename a stage">
+    Click directly on any stage name to edit it inline. The name validates in real time — duplicates and empty names are rejected.
+  </Step>
+  <Step title="Delete a stage">
+    Click the trash icon next to any stage to remove it. Jobs assigned to the deleted stage will need to be reassigned.
+  </Step>
+  <Step title="Apply changes">
+    Click **Apply** — the canvas swim lane labels and the Stage dropdown in the PropertyPanel update immediately.
+  </Step>
+</Steps>
+
+## Stage Execution Model
+
+```mermaid
+graph LR
+    A["lint"] --> B["build"]
+    B --> C["test"]
+    C --> D["scan"]
+    D --> E["deploy"]
+    E --> F["notify"]
+
+    style A fill:#8b5cf6,color:#fff
+    style B fill:#3b82f6,color:#fff
+    style C fill:#22c55e,color:#fff
+    style D fill:#f59e0b,color:#fff
+    style E fill:#ef4444,color:#fff
+    style F fill:#06b6d4,color:#fff
+```
+
+All jobs in `lint` complete → then all `build` jobs → then all `test` jobs → and so on.
 
 ## Common Custom Stages
 
-| Stage | Purpose |
-|-------|---------|
-| `lint` | Code quality checks (ESLint, Prettier) |
-| `scan` | Security scanning (SAST, dependency audit) |
-| `package` | Build artifacts, Docker images |
-| `release` | Publish to registries, create releases |
-| `cleanup` | Remove temporary resources |
-| `notify` | Send Slack/email notifications |
+| Stage | Purpose | Example Jobs |
+|-------|---------|-------------|
+| `lint` | Code quality checks | ESLint, Prettier, Flake8 |
+| `scan` | Security scanning | SAST, dependency audit, Snyk |
+| `package` | Build artifacts | Docker image build, npm pack |
+| `release` | Publish releases | npm publish, GitHub Release |
+| `cleanup` | Remove temp resources | Cleanup test databases |
+| `notify` | Send notifications | Slack webhook, email |
+
+## Stage Icons
+
+The Stage Manager automatically assigns icons based on stage name keywords:
+
+| Keyword | Icon |
+|---------|------|
+| `build`, `compile` | 🔨 Hammer |
+| `test`, `spec` | 🧪 Flask |
+| `deploy`, `release` | 🚀 Rocket |
+| `lint`, `format` | 📐 Ruler |
+| `scan`, `security` | 🔒 Lock |
+| `package`, `bundle` | 📦 Package |
+| Other | ⚙️ Gear |
 
 <Tip>
-  Stages defined in the Stage Manager automatically appear in the Stage dropdown when configuring jobs in the PropertyPanel.
+  Stages defined in the Stage Manager automatically appear in the Stage dropdown when configuring jobs in the PropertyPanel. You don't need to manually sync them.
 </Tip>
