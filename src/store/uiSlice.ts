@@ -109,7 +109,7 @@ const uiSlice = createSlice({
       const isDark = state.theme !== 'light';
       state.theme = isDark ? 'light' : 'dark';
       localStorage.setItem('theme', state.theme);
-      // Apply CSS classes
+      // Apply CSS classes directly (applyTheme can't be imported here to avoid circular deps)
       const html = document.documentElement;
       html.classList.remove('dark', 'theme-dracula', 'theme-nord', 'theme-monokai', 'theme-synthwave', 'theme-github-dark');
       if (state.theme === 'dark') html.classList.add('dark');
@@ -138,7 +138,7 @@ const uiSlice = createSlice({
     initializeUI: (state) => {
       const hideWelcome = localStorage.getItem('hideWelcome') === 'true';
       const tutorialCompleted = localStorage.getItem('tutorialCompleted') === 'true';
-      const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
+      const savedTheme = localStorage.getItem('theme');
 
       state.showWelcome = !hideWelcome;
       state.welcomeOverlayOpen = !hideWelcome;
@@ -146,7 +146,7 @@ const uiSlice = createSlice({
       
       if (savedTheme) {
         state.theme = savedTheme;
-        document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+        // CSS class application is handled by applyTheme() in App.tsx
       }
     },
 

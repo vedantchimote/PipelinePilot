@@ -54,11 +54,15 @@ export const CanvasInner = () => {
   // Compute live CSS variable values for SVG Background (SVG attrs can't use CSS vars)
   const [bgColors, setBgColors] = useState({ bg: '#0c1222', dots: '#1e2d4a' });
   useEffect(() => {
-    const styles = getComputedStyle(document.documentElement);
-    setBgColors({
-      bg: styles.getPropertyValue('--bg-primary').trim() || '#0c1222',
-      dots: styles.getPropertyValue('--border-primary').trim() || '#1e2d4a',
+    // Defer until after CSS classes are painted to the DOM
+    const raf = requestAnimationFrame(() => {
+      const styles = getComputedStyle(document.documentElement);
+      setBgColors({
+        bg: styles.getPropertyValue('--bg-primary').trim() || '#0c1222',
+        dots: styles.getPropertyValue('--border-primary').trim() || '#1e2d4a',
+      });
     });
+    return () => cancelAnimationFrame(raf);
   }, [theme]);
   
   // Memoize validation errors array to avoid recalculation

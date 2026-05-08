@@ -78,14 +78,15 @@ export const WelcomeOverlay = memo(() => {
         role="dialog"
         aria-modal="true"
         aria-labelledby="welcome-title"
-        className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-3xl p-8"
+        className="rounded-2xl shadow-2xl w-full max-w-3xl p-8"
+        style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }}
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 id="welcome-title" className="text-4xl font-bold text-white mb-3">
+          <h1 id="welcome-title" className="text-4xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
             Welcome to GitLab CI/CD Pipeline Editor
           </h1>
-          <p className="text-gray-400 text-lg">
+          <p className="text-lg" style={{ color: 'var(--text-muted)' }}>
             Create, edit, and visualize your GitLab CI/CD pipelines with ease
           </p>
         </div>
@@ -94,7 +95,8 @@ export const WelcomeOverlay = memo(() => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <button
             onClick={handleStartFromScratch}
-            className="p-6 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition-colors group"
+            className="p-6 rounded-lg text-left transition-colors group hover:opacity-90"
+            style={{ background: 'var(--bg-tertiary)' }}
           >
             <div className="flex items-start gap-4">
               <div className="p-3 bg-blue-600 rounded-lg group-hover:bg-blue-500 transition-colors">
@@ -103,8 +105,8 @@ export const WelcomeOverlay = memo(() => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-white font-semibold mb-1">Start from Scratch</h3>
-                <p className="text-gray-400 text-sm">
+                <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>Start from Scratch</h3>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                   Begin with an empty canvas and build your pipeline step by step
                 </p>
               </div>
@@ -113,7 +115,8 @@ export const WelcomeOverlay = memo(() => {
 
           <button
             onClick={handleUseTemplate}
-            className="p-6 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition-colors group"
+            className="p-6 rounded-lg text-left transition-colors group hover:opacity-90"
+            style={{ background: 'var(--bg-tertiary)' }}
           >
             <div className="flex items-start gap-4">
               <div className="p-3 bg-purple-600 rounded-lg group-hover:bg-purple-500 transition-colors">
@@ -122,8 +125,8 @@ export const WelcomeOverlay = memo(() => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-white font-semibold mb-1">Use Template</h3>
-                <p className="text-gray-400 text-sm">
+                <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>Use Template</h3>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                   Choose from official GitLab templates or your custom templates
                 </p>
               </div>
@@ -132,7 +135,8 @@ export const WelcomeOverlay = memo(() => {
 
           <button
             onClick={handleImportYAML}
-            className="p-6 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition-colors group"
+            className="p-6 rounded-lg text-left transition-colors group hover:opacity-90"
+            style={{ background: 'var(--bg-tertiary)' }}
           >
             <div className="flex items-start gap-4">
               <div className="p-3 bg-green-600 rounded-lg group-hover:bg-green-500 transition-colors">
@@ -141,8 +145,8 @@ export const WelcomeOverlay = memo(() => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-white font-semibold mb-1">Import YAML</h3>
-                <p className="text-gray-400 text-sm">
+                <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>Import YAML</h3>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                   Import an existing .gitlab-ci.yml file to visualize and edit
                 </p>
               </div>
@@ -151,7 +155,8 @@ export const WelcomeOverlay = memo(() => {
 
           <button
             onClick={handleHelloWorld}
-            className="p-6 bg-gray-700 hover:bg-gray-600 rounded-lg text-left transition-colors group"
+            className="p-6 rounded-lg text-left transition-colors group hover:opacity-90"
+            style={{ background: 'var(--bg-tertiary)' }}
           >
             <div className="flex items-start gap-4">
               <div className="p-3 bg-yellow-600 rounded-lg group-hover:bg-yellow-500 transition-colors">
@@ -160,8 +165,8 @@ export const WelcomeOverlay = memo(() => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-white font-semibold mb-1">Hello World</h3>
-                <p className="text-gray-400 text-sm">
+                <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>Hello World</h3>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                   Start with a simple "Hello World" job to explore the editor
                 </p>
               </div>
@@ -170,7 +175,7 @@ export const WelcomeOverlay = memo(() => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-700">
+        <div className="flex items-center justify-between pt-6 border-t" style={{ borderColor: 'var(--border-primary)' }}>
           <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
             <input
               type="checkbox"

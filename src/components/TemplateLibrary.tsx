@@ -70,11 +70,11 @@ export const TemplateLibrary = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed left-0 top-0 h-full w-96 bg-gray-800 border-r border-gray-700 shadow-2xl overflow-hidden z-50 flex flex-col slide-in-left">
+    <div className="fixed left-0 top-0 h-full w-96 shadow-2xl overflow-hidden z-50 flex flex-col slide-in-left" style={{ background: 'var(--bg-secondary)', borderRight: '1px solid var(--border-primary)' }}>
       {/* Header */}
-      <div className="p-4 border-b border-gray-700">
+      <div className="p-4 border-b" style={{ borderColor: 'var(--border-primary)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white">Template Library</h2>
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Template Library</h2>
           <button
             onClick={() => dispatch(closeTemplateLibrary())}
             className="text-gray-400 hover:text-white transition-colors"
@@ -91,12 +91,13 @@ export const TemplateLibrary = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search templates..."
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', color: 'var(--text-primary)' }}
         />
       </div>
 
       {/* Filters */}
-      <div className="p-4 border-b border-gray-700 space-y-3">
+      <div className="p-4 border-b space-y-3" style={{ borderColor: 'var(--border-primary)' }}>
         {/* Category Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
@@ -108,8 +109,9 @@ export const TemplateLibrary = () => {
                 className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'text-gray-300 hover:opacity-80'
                 }`}
+                style={selectedCategory !== category ? { background: 'var(--bg-tertiary)' } : {}}
               >
                 {category}
               </button>
@@ -128,8 +130,9 @@ export const TemplateLibrary = () => {
                 className={`flex-1 px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                   selectedSource === source
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'text-gray-300 hover:opacity-80'
                 }`}
+                style={selectedSource !== source ? { background: 'var(--bg-tertiary)' } : {}}
               >
                 {source}
               </button>

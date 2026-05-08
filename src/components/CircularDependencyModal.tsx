@@ -17,10 +17,11 @@ export const CircularDependencyModal = memo(({ cycle, onClose }: CircularDepende
         role="dialog"
         aria-modal="true"
         aria-labelledby="cycle-title"
-        className="bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full mx-4 scale-in"
+        className="rounded-2xl shadow-2xl max-w-2xl w-full mx-4 scale-in"
+        style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }}
       >
         {/* Header */}
-        <div className="p-6 border-b border-gray-700">
+        <div className="p-6 border-b" style={{ borderColor: 'var(--border-primary)' }}>
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-red-900/30 rounded-full flex items-center justify-center flex-shrink-0">
               <svg
@@ -38,10 +39,10 @@ export const CircularDependencyModal = memo(({ cycle, onClose }: CircularDepende
               </svg>
             </div>
             <div className="flex-1">
-              <h2 id="cycle-title" className="text-xl font-bold text-white mb-2">
+              <h2 id="cycle-title" className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
                 Circular Dependency Detected
               </h2>
-              <p className="text-gray-400">
+              <p style={{ color: 'var(--text-muted)' }}>
                 Cannot create this dependency because it would create a circular reference in the
                 pipeline.
               </p>
@@ -52,8 +53,8 @@ export const CircularDependencyModal = memo(({ cycle, onClose }: CircularDepende
         {/* Content */}
         <div className="p-6">
           <div className="mb-4">
-            <h3 className="text-sm font-semibold text-gray-300 mb-2">Cycle Path:</h3>
-            <div className="p-4 bg-gray-900 rounded-lg border border-red-900/30">
+            <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>Cycle Path:</h3>
+            <div className="p-4 rounded-lg border border-red-900/30" style={{ background: 'var(--bg-tertiary)' }}>
               <div className="flex items-center gap-2 flex-wrap">
                 {[...cycle, cycle[0]].map((jobName, index) => (
                   <div key={`${jobName}-${index}`} className="flex items-center gap-2">
@@ -61,8 +62,9 @@ export const CircularDependencyModal = memo(({ cycle, onClose }: CircularDepende
                       className={`px-3 py-1.5 rounded-lg font-mono text-sm ${
                         index === 0 || index === cycle.length
                           ? 'bg-red-900/30 text-red-400 border border-red-700'
-                          : 'bg-gray-700 text-white'
+                          : 'text-white'
                       }`}
+                      style={index === 0 || index === cycle.length ? {} : { background: 'var(--bg-tertiary)' }}
                     >
                       {jobName}
                     </span>
@@ -115,7 +117,7 @@ export const CircularDependencyModal = memo(({ cycle, onClose }: CircularDepende
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-700 flex justify-end">
+        <div className="p-6 border-t flex justify-end" style={{ borderColor: 'var(--border-primary)' }}>
           <button
             onClick={onClose}
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
